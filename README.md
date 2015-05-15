@@ -61,3 +61,7 @@ Two things:
 
  * You need to set `MinimumLevel` on **both** the Serilog `LoggerConfiguration` and the `ILoggerFactory`
  * Serilog and ASP.NET assign different priorities to the `Debug` and `Trace` levels; Serilog's `Debug` is ASP.NET's `Trace`, and vice-versa
+
+### Credits
+
+This package evolved from an earlier package _Microsoft.Framework.Logging.Serilog_ [provided by the ASP.NET team](https://github.com/aspnet/Logging/pull/182).
