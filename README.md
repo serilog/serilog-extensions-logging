@@ -38,7 +38,20 @@ The conditional compilation (`#if`) is necessary if you're targeting the CoreCLR
       loggerfactory.AddSerilog();
 ```
 
-That's it!
+That's it! With the level bumped up a little you should see log output like:
+
+```
+2015-05-15 22:14:44.646 +10:00 [Debug] RouteCollection.RouteAsync
+	Routes: 
+		Microsoft.AspNet.Mvc.Routing.AttributeRoute
+		{controller=Home}/{action=Index}/{id?}
+	Handled? True
+2015-05-15 22:14:44.647 +10:00 [Debug] RouterMiddleware.Invoke
+	Handled? True
+2015-05-15 22:14:45.706 +10:00 [Debug] /lib/jquery/jquery.js not modified
+2015-05-15 22:14:45.706 +10:00 [Debug] /css/site.css not modified
+2015-05-15 22:14:45.741 +10:00 [Debug] Handled. Status code: 304 File: /css/site.css
+```
 
 ### Levels
 
