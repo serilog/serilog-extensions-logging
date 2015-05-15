@@ -17,15 +17,13 @@ namespace Serilog.Framework.Logging
 {
     public class SerilogLoggerProvider : ILoggerProvider, ILogEventEnricher
     {
-        private readonly ILogger _logger;
+        // May be null; if it is, Log.Logger will be lazily used
+        readonly ILogger _logger;
 
-        public SerilogLoggerProvider(LoggerConfiguration loggerConfiguration)
+        public SerilogLoggerProvider(ILogger logger = null)
         {
-            if (loggerConfiguration == null) throw new ArgumentNullException("loggerConfiguration");
-
-            _logger = loggerConfiguration
-                .Enrich.With(this)
-                .CreateLogger();
+            if (logger != null)
+                _logger = logger.ForContext(new[] { this });
         }
 
         public FrameworkLogger CreateLogger(string name)

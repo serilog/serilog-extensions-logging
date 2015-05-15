@@ -12,20 +12,30 @@ namespace Serilog.Framework.Logging
 {
     public class SerilogLogger : FrameworkLogger
     {
-        private readonly SerilogLoggerProvider _provider;
-        private readonly string _name;
-        private readonly ILogger _logger;
+        readonly SerilogLoggerProvider _provider;
+        readonly string _name;
+        readonly ILogger _logger;
 
         public SerilogLogger(
             SerilogLoggerProvider provider,
-            ILogger logger,
-            string name)
+            ILogger logger = null,
+            string name = null)
         {
             if (provider == null) throw new ArgumentNullException("provider");
-            if (logger == null) throw new ArgumentNullException("logger");
             _provider = provider;
             _name = name;
-            _logger = logger.ForContext(Constants.SourceContextPropertyName, name);
+            _logger = logger;
+
+            if (_logger == null)
+            {
+                // If a logger was passed, the provider has already added itself as an enricher
+                _logger = Serilog.Log.Logger.ForContext(new[] { provider });
+            }
+
+            if (_name != null)
+            {
+                _logger = _logger.ForContext(Constants.SourceContextPropertyName, name);
+            }
         }
 
         // On CTP

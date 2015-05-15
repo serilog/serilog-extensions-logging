@@ -11,20 +11,21 @@ namespace Sample
 
         public Program()
         {
-            var factory = new LoggerFactory();
-            _logger = factory.CreateLogger(typeof(Program).FullName);
-#if DNXCORE50
-            factory.AddSerilog(new LoggerConfiguration()
+            Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.Debug()
-                .WriteTo.TextWriter(Console.Out));
+#if DNXCORE50
+                .WriteTo.TextWriter(Console.Out)
 #else
-            factory.AddSerilog(new LoggerConfiguration()
                 .Enrich.WithMachineName()
                 .Enrich.WithProcessId()
                 .Enrich.WithThreadId()
-                .MinimumLevel.Debug()
-                .WriteTo.LiterateConsole());
+                .WriteTo.LiterateConsole()
 #endif
+                .CreateLogger();
+
+            _logger = new LoggerFactory()
+                .AddSerilog()
+                .CreateLogger(typeof(Program).FullName);
         }
 
         public void Main(string[] args)

@@ -28,16 +28,16 @@ namespace MvcSample
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerfactory)
         {
-            var configuration = new LoggerConfiguration()
+            Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.Verbose()
 #if DNXCORE50
                 .WriteTo.TextWriter(System.Console.Out)
 #else
                 .WriteTo.Trace()
 #endif
-                ;
+                .CreateLogger();
 
-            loggerfactory.AddSerilog(configuration);
+            loggerfactory.AddSerilog(Log.Logger);
             loggerfactory.MinimumLevel = LogLevel.Debug;
 
             if (env.IsEnvironment("Development"))

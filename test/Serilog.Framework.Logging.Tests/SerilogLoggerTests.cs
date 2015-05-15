@@ -18,15 +18,17 @@ namespace Serilog.Framework.Logging.Test
 
         private Tuple<SerilogLogger, SerilogSink> SetUp(LogLevel logLevel)
         {
-            // Arrange
-            var serilog = new LoggerConfiguration()
+            var sink = new SerilogSink();
+
+            var config = new LoggerConfiguration()
                 .Enrich.WithMachineName()
                 .Enrich.WithProcessId()
-                .Enrich.WithThreadId();
-            serilog = SetMinLevel(serilog, logLevel);
-            var sink = new SerilogSink();
-            serilog.WriteTo.Sink(sink);
-            var provider = new SerilogLoggerProvider(serilog);
+                .Enrich.WithThreadId()
+                .WriteTo.Sink(sink);
+
+            SetMinLevel(config, logLevel);
+
+            var provider = new SerilogLoggerProvider(config.CreateLogger());
             var logger = (SerilogLogger)provider.CreateLogger(_name);
 
             return new Tuple<SerilogLogger, SerilogSink>(logger, sink);

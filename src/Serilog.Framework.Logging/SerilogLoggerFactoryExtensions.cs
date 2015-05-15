@@ -3,20 +3,27 @@
 
 using System;
 using Serilog.Framework.Logging;
-using Serilog;
 
 namespace Microsoft.Framework.Logging
 {
+    /// <summary>
+    /// Extends <see cref="ILoggerFactory"/> with Serilog configuration methods.
+    /// </summary>
     public static class SerilogLoggerFactoryExtensions
     {
+        /// <summary>
+        /// Add Serilog to the logging pipeline.
+        /// </summary>
+        /// <param name="factory">The logger factory to configure.</param>
+        /// <param name="logger">The Serilog logger; if not supplied, the static <see cref="Serilog.Log"/> will be used.</param>
+        /// <returns>The logger factory.</returns>
         public static ILoggerFactory AddSerilog(
             this ILoggerFactory factory,
-            LoggerConfiguration loggerConfiguration)
+            Serilog.ILogger logger = null)
         {
             if (factory == null) throw new ArgumentNullException("factory");
-            if (loggerConfiguration == null) throw new ArgumentNullException("loggerConfiguration");
 
-            factory.AddProvider(new SerilogLoggerProvider(loggerConfiguration));
+            factory.AddProvider(new SerilogLoggerProvider(logger));
 
             return factory;
         }

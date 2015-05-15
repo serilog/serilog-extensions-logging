@@ -1,6 +1,7 @@
 ﻿/// <binding Clean='clean' />
 
 var gulp = require("gulp"),
+  merge = require("event-stream").merge,
   rimraf = require("rimraf"),
   fs = require("fs");
 
@@ -25,8 +26,10 @@ gulp.task("copy", ["clean"], function () {
     "jquery-validation-unobtrusive": "jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"
   }
 
-  for (var destinationDir in bower) {
-    gulp.src(paths.bower + bower[destinationDir])
+  var tasks = bower.map(function (destinationDir) {
+    return gulp.src(paths.bower + bower[destinationDir])
       .pipe(gulp.dest(paths.lib + destinationDir));
-  }
+  });
+
+  return merge(tasks);
 });
