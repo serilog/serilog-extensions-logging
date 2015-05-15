@@ -7,7 +7,7 @@ using System.Runtime.Remoting;
 using System.Runtime.Remoting.Messaging;
 #endif
 
-namespace Microsoft.Framework.Logging.Serilog
+namespace Serilog.Framework.Logging
 {
     public class SerilogLoggerScope : IDisposable
     {

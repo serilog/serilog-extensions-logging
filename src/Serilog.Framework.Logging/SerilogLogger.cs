@@ -1,23 +1,24 @@
 // Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
+using Microsoft.Framework.Logging;
 using System;
-using Microsoft.Framework.Internal;
 using Serilog.Core;
 using Serilog.Events;
-using SLogger = Serilog.ILogger;
+using FrameworkLogger = Microsoft.Framework.Logging.ILogger;
+using System.Reflection;
 
-namespace Microsoft.Framework.Logging.Serilog
+namespace Serilog.Framework.Logging
 {
-    public class SerilogLogger : ILogger
+    public class SerilogLogger : FrameworkLogger
     {
         private readonly SerilogLoggerProvider _provider;
         private readonly string _name;
-        private readonly SLogger _logger;
+        private readonly ILogger _logger;
 
         public SerilogLogger(
             SerilogLoggerProvider provider,
-            SLogger logger,
+            ILogger logger,
             string name)
         {
             if (provider == null) throw new ArgumentNullException("provider");
@@ -66,6 +67,15 @@ namespace Microsoft.Framework.Logging.Serilog
                     }
 
                     logger = logger.ForContext(property.Key, property.Value);
+                }
+
+                var stateType = state.GetType();
+                var stateTypeInfo = stateType.GetTypeInfo();
+                // Imperfect, but at least eliminates `1 and + names
+                if (messageTemplate == null && !stateTypeInfo.IsGenericType && !stateTypeInfo.IsNested)
+                {
+                    messageTemplate = "{" + stateType.Name + ":l}";
+                    logger = logger.ForContext(stateType.Name, LogFormatter.Formatter(state, null));
                 }
             }
 

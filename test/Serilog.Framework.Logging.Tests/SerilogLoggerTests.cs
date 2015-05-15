@@ -3,7 +3,6 @@
 
 using System;
 using System.Globalization;
-using Microsoft.Framework.Logging.Serilog;
 using Serilog.Events;
 using Microsoft.Framework.Logging;
 using NUnit.Framework;

@@ -5,20 +5,21 @@ using System;
 #if DNX451
 using System.Runtime.Remoting;
 using System.Runtime.Remoting.Messaging;
-using Microsoft.Framework.Internal;
 #else
 using System.Threading;
 #endif
+using Microsoft.Framework.Logging;
 using Serilog.Core;
 using Serilog.Events;
+using FrameworkLogger = Microsoft.Framework.Logging.ILogger;
 
-namespace Microsoft.Framework.Logging.Serilog
+namespace Serilog.Framework.Logging
 {
     public class SerilogLoggerProvider : ILoggerProvider, ILogEventEnricher
     {
-        private readonly global::Serilog.ILogger _logger;
+        private readonly ILogger _logger;
 
-        public SerilogLoggerProvider(global::Serilog.LoggerConfiguration loggerConfiguration)
+        public SerilogLoggerProvider(LoggerConfiguration loggerConfiguration)
         {
             if (loggerConfiguration == null) throw new ArgumentNullException("loggerConfiguration");
 
@@ -27,7 +28,7 @@ namespace Microsoft.Framework.Logging.Serilog
                 .CreateLogger();
         }
 
-        public ILogger CreateLogger(string name)
+        public FrameworkLogger CreateLogger(string name)
         {
             return new SerilogLogger(this, _logger, name);
         }
