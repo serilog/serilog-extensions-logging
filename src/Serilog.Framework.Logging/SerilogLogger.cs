@@ -75,8 +75,10 @@ namespace Serilog.Framework.Logging
                     {
                         messageTemplate = (string)property.Value;
                     }
-
-                    logger = logger.ForContext(property.Key, property.Value);
+                    else
+                    {
+                        logger = logger.ForContext(property.Key, property.Value);
+                    }
                 }
 
                 var stateType = state.GetType();
