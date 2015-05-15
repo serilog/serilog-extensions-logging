@@ -7,10 +7,16 @@
   "licenseUrl": "",
 
   "dependencies": {
+        "Microsoft.Framework.Logging.Interfaces": "1.0.0-beta4",
+        "Serilog": "1.5.5"
   },
 
   "frameworks" : {
-    "dnx451": { },
+    "dnx451": {
+            "frameworkAssemblies": {
+                "System.Runtime": ""
+            }
+ },
     "dnxcore50" : {
       "dependencies": {
         "System.Collections": "4.0.10-beta-22816",

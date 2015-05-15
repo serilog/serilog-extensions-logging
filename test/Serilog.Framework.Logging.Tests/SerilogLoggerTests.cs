@@ -1,0 +1,275 @@
+﻿// Copyright (c) .NET Foundation. All rights reserved.
+// Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
+
+using System;
+using System.Globalization;
+using Microsoft.Framework.Logging.Serilog;
+using Serilog.Events;
+using Microsoft.Framework.Logging;
+using NUnit.Framework;
+
+namespace Serilog.Framework.Logging.Test
+{
+    [TestFixture]
+    public class SerilogLoggerTest
+    {
+        private const string _name = "test";
+        private const string _state = "This is a test";
+        private static readonly Func<object, Exception, string> TheMessageAndError = (message, error) => string.Format(CultureInfo.CurrentCulture, "{0}:{1}", message, error);
+
+        private Tuple<SerilogLogger, SerilogSink> SetUp(LogLevel logLevel)
+        {
+            // Arrange
+            var serilog = new LoggerConfiguration()
+                .Enrich.WithMachineName()
+                .Enrich.WithProcessId()
+                .Enrich.WithThreadId();
+            serilog = SetMinLevel(serilog, logLevel);
+            var sink = new SerilogSink();
+            serilog.WriteTo.Sink(sink);
+            var provider = new SerilogLoggerProvider(serilog);
+            var logger = (SerilogLogger)provider.CreateLogger(_name);
+
+            return new Tuple<SerilogLogger, SerilogSink>(logger, sink);
+        }
+
+        private LoggerConfiguration SetMinLevel(LoggerConfiguration serilog, LogLevel logLevel)
+        {
+            switch (logLevel)
+            {
+                case LogLevel.Debug:
+                    return serilog.MinimumLevel.Verbose();
+                case LogLevel.Verbose:
+                    return serilog.MinimumLevel.Debug();
+                case LogLevel.Information:
+                    return serilog.MinimumLevel.Information();
+                case LogLevel.Warning:
+                    return serilog.MinimumLevel.Warning();
+                case LogLevel.Error:
+                    return serilog.MinimumLevel.Error();
+                case LogLevel.Critical:
+                    return serilog.MinimumLevel.Fatal();
+                default:
+                    return serilog.MinimumLevel.Verbose();
+            }
+        }
+
+        [Test]
+        public void LogsWhenNullFilterGiven()
+        {
+            // Arrange
+            var t = SetUp(LogLevel.Verbose);
+            var logger = t.Item1;
+            var sink = t.Item2;
+
+            // Act
+            logger.Log(LogLevel.Information, 0, _state, null, null);
+
+            // Assert
+            Assert.AreEqual(1, sink.Writes.Count);
+        }
+
+        [Test]
+        public void LogsCorrectLevel()
+        {
+            // Arrange
+            var t = SetUp(LogLevel.Debug);
+            var logger = t.Item1;
+            var sink = t.Item2;
+
+            // Act
+            logger.Log(LogLevel.Debug, 0, _state, null, null);
+            logger.Log(LogLevel.Verbose, 0, _state, null, null);
+            logger.Log(LogLevel.Information, 0, _state, null, null);
+            logger.Log(LogLevel.Warning, 0, _state, null, null);
+            logger.Log(LogLevel.Error, 0, _state, null, null);
+            logger.Log(LogLevel.Critical, 0, _state, null, null);
+
+            // Assert
+            Assert.AreEqual(6, sink.Writes.Count);
+            Assert.AreEqual(LogEventLevel.Verbose, sink.Writes[0].Level);
+            Assert.AreEqual(LogEventLevel.Debug, sink.Writes[1].Level);
+            Assert.AreEqual(LogEventLevel.Information, sink.Writes[2].Level);
+            Assert.AreEqual(LogEventLevel.Warning, sink.Writes[3].Level);
+            Assert.AreEqual(LogEventLevel.Error, sink.Writes[4].Level);
+            Assert.AreEqual(LogEventLevel.Fatal, sink.Writes[5].Level);
+        }
+
+        [Test]
+        [TestCase(LogLevel.Verbose, LogLevel.Verbose, 1)]
+        [TestCase(LogLevel.Verbose, LogLevel.Information, 1)]
+        [TestCase(LogLevel.Verbose, LogLevel.Warning, 1)]
+        [TestCase(LogLevel.Verbose, LogLevel.Error, 1)]
+        [TestCase(LogLevel.Verbose, LogLevel.Critical, 1)]
+        [TestCase(LogLevel.Information, LogLevel.Verbose, 0)]
+        [TestCase(LogLevel.Information, LogLevel.Information, 1)]
+        [TestCase(LogLevel.Information, LogLevel.Warning, 1)]
+        [TestCase(LogLevel.Information, LogLevel.Error, 1)]
+        [TestCase(LogLevel.Information, LogLevel.Critical, 1)]
+        [TestCase(LogLevel.Warning, LogLevel.Verbose, 0)]
+        [TestCase(LogLevel.Warning, LogLevel.Information, 0)]
+        [TestCase(LogLevel.Warning, LogLevel.Warning, 1)]
+        [TestCase(LogLevel.Warning, LogLevel.Error, 1)]
+        [TestCase(LogLevel.Warning, LogLevel.Critical, 1)]
+        [TestCase(LogLevel.Error, LogLevel.Verbose, 0)]
+        [TestCase(LogLevel.Error, LogLevel.Information, 0)]
+        [TestCase(LogLevel.Error, LogLevel.Warning, 0)]
+        [TestCase(LogLevel.Error, LogLevel.Error, 1)]
+        [TestCase(LogLevel.Error, LogLevel.Critical, 1)]
+        [TestCase(LogLevel.Critical, LogLevel.Verbose, 0)]
+        [TestCase(LogLevel.Critical, LogLevel.Information, 0)]
+        [TestCase(LogLevel.Critical, LogLevel.Warning, 0)]
+        [TestCase(LogLevel.Critical, LogLevel.Error, 0)]
+        [TestCase(LogLevel.Critical, LogLevel.Critical, 1)]
+        public void LogsWhenEnabled(LogLevel minLevel, LogLevel logLevel, int expected)
+        {
+            // Arrange
+            var t = SetUp(minLevel);
+            var logger = t.Item1;
+            var sink = t.Item2;
+
+            // Act
+            logger.Log(logLevel, 0, _state, null, null);
+
+            // Assert
+            Assert.AreEqual(expected, sink.Writes.Count);
+        }
+
+
+        [Test]
+        public void LogsCorrectMessage()
+        {
+            // Arrange
+            var t = SetUp(LogLevel.Verbose);
+            var logger = t.Item1;
+            var sink = t.Item2;
+
+            var exception = new Exception();
+
+            // Act
+            logger.Log(LogLevel.Information, 0, null, null, null);
+            logger.Log(LogLevel.Information, 0, _state, null, null);
+
+            // Assert
+            Assert.AreEqual(1, sink.Writes.Count);
+            Assert.AreEqual(_state, sink.Writes[0].RenderMessage());
+        }
+
+        [Test]
+        public void SingleScopeProperty()
+        {
+            // Arrange
+            var t = SetUp(LogLevel.Verbose);
+            var logger = t.Item1;
+            var sink = t.Item2;
+
+            // Act
+            using (logger.BeginScope(new FoodScope("pizza")))
+            {
+                logger.Log(LogLevel.Information, 0, _state, null, null);
+            }
+
+            // Assert
+            Assert.AreEqual(1, sink.Writes.Count);
+            Assert.True(sink.Writes[0].Properties.ContainsKey("Name"));
+            Assert.AreEqual("\"pizza\"", sink.Writes[0].Properties["Name"].ToString());
+        }
+
+        [Test]
+        public void NestedScopeSameProperty()
+        {
+            // Arrange
+            var t = SetUp(LogLevel.Verbose);
+            var logger = t.Item1;
+            var sink = t.Item2;
+
+            // Act
+            using (logger.BeginScope(new FoodScope("avocado")))
+            {
+                using (logger.BeginScope(new FoodScope("bacon")))
+                {
+                    logger.Log(LogLevel.Information, 0, _state, null, null);
+                }
+            }
+
+            // Assert
+            // should retain the property of the most specific scope
+            Assert.AreEqual(1, sink.Writes.Count);
+            Assert.True(sink.Writes[0].Properties.ContainsKey("Name"));
+            Assert.AreEqual("\"bacon\"", sink.Writes[0].Properties["Name"].ToString());
+        }
+
+        [Test]
+        public void NestedScopesDifferentProperties()
+        {
+            // Arrange
+            var t = SetUp(LogLevel.Verbose);
+            var logger = t.Item1;
+            var sink = t.Item2;
+
+            // Act
+            using (logger.BeginScope(new FoodScope("spaghetti")))
+            {
+                using (logger.BeginScope(new LuckyScope(7)))
+                {
+                    logger.Log(LogLevel.Information, 0, _state, null, null);
+                }
+            }
+
+            // Assert
+            Assert.AreEqual(1, sink.Writes.Count);
+            Assert.True(sink.Writes[0].Properties.ContainsKey("Name"));
+            Assert.AreEqual("\"spaghetti\"", sink.Writes[0].Properties["Name"].ToString());
+            Assert.True(sink.Writes[0].Properties.ContainsKey("LuckyNumber"));
+            Assert.AreEqual("7", sink.Writes[0].Properties["LuckyNumber"].ToString());
+        }
+
+        private class FoodScope : ReflectionBasedLogValues
+        {
+            private string _name;
+
+            public FoodScope(string name)
+            {
+                _name = name;
+            }
+
+            public string Name { get { return _name; } }
+
+            // Dev
+            public override string ToString()
+            {
+                return string.Format("Scope {0}", Name);
+            }
+
+            // CTP
+            public override string Format()
+            {
+                return ToString();
+            }
+        }
+
+        private class LuckyScope : ReflectionBasedLogValues
+        {
+            private int _luckyNumber;
+
+            public LuckyScope(int luckyNumber)
+            {
+                _luckyNumber = luckyNumber;
+            }
+
+            public int LuckyNumber { get { return _luckyNumber; } }
+
+            // Dev
+            public override string ToString()
+            {
+                return string.Format("Scope {0}", LuckyNumber);
+            }
+
+            // CTP
+            public override string Format()
+            {
+                return ToString();
+            }
+        }
+    }
+}

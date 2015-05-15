@@ -1,0 +1,33 @@
+﻿{
+    "version": "1.0.0-*",
+    "description": "",
+    "authors": [ "" ],
+    "tags": [ "" ],
+    "projectUrl": "",
+    "licenseUrl": "",
+
+    "dependencies": {
+        "Microsoft.Framework.Logging": "1.0.0-*",
+        "Serilog.Framework.Logging": "1.0.0-*",
+        "Serilog.Sinks.Literate": "1.0.6"
+    },
+
+    "commands": {
+        "Sample": "Sample"
+    },
+
+    "frameworks": {
+        "dnx451": {
+            "Serilog.Framework.Logging": "1.0.0-*"
+        },
+        "dnxcore50": {
+            "dependencies": {
+                "System.Console": "4.0.0-beta-22816",
+                "System.Collections": "4.0.10-beta-22816",
+                "System.Linq": "4.0.0-beta-22816",
+                "System.Threading": "4.0.10-beta-22816",
+                "Microsoft.CSharp": "4.0.0-beta-22816"
+            }
+        }
+    }
+}
