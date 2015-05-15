@@ -1,10 +1,10 @@
 ﻿{
   "version": "1.0.0-*",
-  "description": "",
-  "authors": [ "" ],
-  "tags": [ "" ],
-  "projectUrl": "",
-  "licenseUrl": "",
+  "description": "Serilog provider for Microsoft.Framework.Logging",
+  "authors": [ "Microsoft", "Serilog Contributors" ],
+  "tags": [ "serilog dnx" ],
+  "projectUrl": "https://github.com/serilog/serilog-framework-logging",
+  "licenseUrl": "http://www.apache.org/licenses/LICENSE-2.0",
 
   "dependencies": {
         "Microsoft.Framework.Logging.Interfaces": "1.0.0-beta4",
@@ -13,9 +13,9 @@
 
   "frameworks" : {
     "dnx451": {
-            "frameworkAssemblies": {
-                "System.Runtime": ""
-            }
+        "frameworkAssemblies": {
+            "System.Runtime": ""
+        }
     },
     "dnxcore50" : {
       "dependencies": {
