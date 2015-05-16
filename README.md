@@ -30,7 +30,7 @@ public class Startup
 
 The conditional compilation (`#if`) is necessary if you're targeting the CoreCLR runtime, for which there are currenlty few Serilog sinks. If you're targeting the full .NET framework you can just use `.WriteTo.Trace()`, or any other available sink.
 
-**Finally**, in your `Startup` class's `Configure()` method, call `UseSerilog()` on the provided `loggerFactory`.
+**Finally**, in your `Startup` class's `Configure()` method, call `AddSerilog()` on the provided `loggerFactory`.
 
 ```csharp
   public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerfactory)
