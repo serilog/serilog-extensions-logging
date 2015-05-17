@@ -58,27 +58,22 @@ namespace Serilog.Framework.Logging.Test
         [Test]
         public void LogsWhenNullFilterGiven()
         {
-            // Arrange
             var t = SetUp(LogLevel.Verbose);
             var logger = t.Item1;
             var sink = t.Item2;
 
-            // Act
             logger.Log(LogLevel.Information, 0, _state, null, null);
 
-            // Assert
             Assert.AreEqual(1, sink.Writes.Count);
         }
 
         [Test]
         public void LogsCorrectLevel()
         {
-            // Arrange
             var t = SetUp(LogLevel.Debug);
             var logger = t.Item1;
             var sink = t.Item2;
 
-            // Act
             logger.Log(LogLevel.Debug, 0, _state, null, null);
             logger.Log(LogLevel.Verbose, 0, _state, null, null);
             logger.Log(LogLevel.Information, 0, _state, null, null);
@@ -86,7 +81,6 @@ namespace Serilog.Framework.Logging.Test
             logger.Log(LogLevel.Error, 0, _state, null, null);
             logger.Log(LogLevel.Critical, 0, _state, null, null);
 
-            // Assert
             Assert.AreEqual(6, sink.Writes.Count);
             Assert.AreEqual(LogEventLevel.Verbose, sink.Writes[0].Level);
             Assert.AreEqual(LogEventLevel.Debug, sink.Writes[1].Level);
@@ -124,15 +118,12 @@ namespace Serilog.Framework.Logging.Test
         [TestCase(LogLevel.Critical, LogLevel.Critical, 1)]
         public void LogsWhenEnabled(LogLevel minLevel, LogLevel logLevel, int expected)
         {
-            // Arrange
             var t = SetUp(minLevel);
             var logger = t.Item1;
             var sink = t.Item2;
 
-            // Act
             logger.Log(logLevel, 0, _state, null, null);
 
-            // Assert
             Assert.AreEqual(expected, sink.Writes.Count);
         }
 
@@ -140,18 +131,15 @@ namespace Serilog.Framework.Logging.Test
         [Test]
         public void LogsCorrectMessage()
         {
-            // Arrange
             var t = SetUp(LogLevel.Verbose);
             var logger = t.Item1;
             var sink = t.Item2;
 
             var exception = new Exception();
 
-            // Act
             logger.Log(LogLevel.Information, 0, null, null, null);
             logger.Log(LogLevel.Information, 0, _state, null, null);
 
-            // Assert
             Assert.AreEqual(1, sink.Writes.Count);
             Assert.AreEqual(_state, sink.Writes[0].RenderMessage());
         }
@@ -159,18 +147,15 @@ namespace Serilog.Framework.Logging.Test
         [Test]
         public void SingleScopeProperty()
         {
-            // Arrange
             var t = SetUp(LogLevel.Verbose);
             var logger = t.Item1;
             var sink = t.Item2;
 
-            // Act
-            using (logger.BeginScope(new FoodScope("pizza")))
+            using (logger.BeginScopeImpl(new FoodScope("pizza")))
             {
                 logger.Log(LogLevel.Information, 0, _state, null, null);
             }
 
-            // Assert
             Assert.AreEqual(1, sink.Writes.Count);
             Assert.True(sink.Writes[0].Properties.ContainsKey("Name"));
             Assert.AreEqual("\"pizza\"", sink.Writes[0].Properties["Name"].ToString());
@@ -179,22 +164,19 @@ namespace Serilog.Framework.Logging.Test
         [Test]
         public void NestedScopeSameProperty()
         {
-            // Arrange
             var t = SetUp(LogLevel.Verbose);
             var logger = t.Item1;
             var sink = t.Item2;
 
-            // Act
-            using (logger.BeginScope(new FoodScope("avocado")))
+            using (logger.BeginScopeImpl(new FoodScope("avocado")))
             {
-                using (logger.BeginScope(new FoodScope("bacon")))
+                using (logger.BeginScopeImpl(new FoodScope("bacon")))
                 {
                     logger.Log(LogLevel.Information, 0, _state, null, null);
                 }
             }
 
-            // Assert
-            // should retain the property of the most specific scope
+            // Should retain the property of the most specific scope
             Assert.AreEqual(1, sink.Writes.Count);
             Assert.True(sink.Writes[0].Properties.ContainsKey("Name"));
             Assert.AreEqual("\"bacon\"", sink.Writes[0].Properties["Name"].ToString());
@@ -203,21 +185,18 @@ namespace Serilog.Framework.Logging.Test
         [Test]
         public void NestedScopesDifferentProperties()
         {
-            // Arrange
             var t = SetUp(LogLevel.Verbose);
             var logger = t.Item1;
             var sink = t.Item2;
 
-            // Act
-            using (logger.BeginScope(new FoodScope("spaghetti")))
+            using (logger.BeginScopeImpl(new FoodScope("spaghetti")))
             {
-                using (logger.BeginScope(new LuckyScope(7)))
+                using (logger.BeginScopeImpl(new LuckyScope(7)))
                 {
                     logger.Log(LogLevel.Information, 0, _state, null, null);
                 }
             }
 
-            // Assert
             Assert.AreEqual(1, sink.Writes.Count);
             Assert.True(sink.Writes[0].Properties.ContainsKey("Name"));
             Assert.AreEqual("\"spaghetti\"", sink.Writes[0].Properties["Name"].ToString());
@@ -236,16 +215,9 @@ namespace Serilog.Framework.Logging.Test
 
             public string Name { get { return _name; } }
 
-            // Dev
             public override string ToString()
             {
                 return string.Format("Scope {0}", Name);
-            }
-
-            // CTP
-            public override string Format()
-            {
-                return ToString();
             }
         }
 
@@ -260,16 +232,9 @@ namespace Serilog.Framework.Logging.Test
 
             public int LuckyNumber { get { return _luckyNumber; } }
 
-            // Dev
             public override string ToString()
             {
                 return string.Format("Scope {0}", LuckyNumber);
-            }
-
-            // CTP
-            public override string Format()
-            {
-                return ToString();
             }
         }
     }

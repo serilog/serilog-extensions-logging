@@ -38,14 +38,7 @@ namespace Serilog.Framework.Logging
             }
         }
 
-        // On CTP
-        public IDisposable BeginScope(object state)
-        {
-            return BeginScopeImpl(state);
-        }
-
-        // Dev
-        IDisposable BeginScopeImpl(object state)
+        public IDisposable BeginScopeImpl(object state)
         {
             return _provider.BeginScopeImpl(_name, state);
         }

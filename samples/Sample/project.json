@@ -7,7 +7,7 @@
     "licenseUrl": "",
 
     "dependencies": {
-        "Microsoft.Framework.Logging": "1.0.0-*",
+        "Microsoft.Framework.Logging": "1.0.0-beta5-11361",
         "Serilog.Framework.Logging": "1.0.0-*",
         "Serilog.Sinks.Literate": "1.0.6"
     },

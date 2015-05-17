@@ -42,7 +42,6 @@ namespace MvcSample
 
             if (env.IsEnvironment("Development"))
             {
-                app.UseBrowserLink();
                 app.UseErrorPage(ErrorPageOptions.ShowAll);
             }
             else

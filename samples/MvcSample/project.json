@@ -3,18 +3,17 @@
     "version": "1.0.0-*",
 
     "dependencies": {
-        "Microsoft.AspNet.Diagnostics": "1.0.0-beta4",
-        "Microsoft.AspNet.Mvc": "6.0.0-beta4",
-        "Microsoft.AspNet.Mvc.TagHelpers": "6.0.0-beta4",
-        "Microsoft.AspNet.Server.IIS": "1.0.0-beta4",
-        "Microsoft.AspNet.Server.WebListener": "1.0.0-beta4",
-        "Microsoft.AspNet.StaticFiles": "1.0.0-beta4",
-        "Microsoft.AspNet.Tooling.Razor": "1.0.0-beta4",
-        "Microsoft.Framework.ConfigurationModel.Json": "1.0.0-beta4",
-        "Microsoft.Framework.CodeGenerators.Mvc": "1.0.0-beta4",
-        "Microsoft.Framework.Logging": "1.0.0-beta4",
-        "Microsoft.Framework.Logging.Console": "1.0.0-beta4",
-        "Microsoft.VisualStudio.Web.BrowserLink.Loader": "14.0.0-beta4",
+        "Microsoft.AspNet.Diagnostics": "1.0.0-beta5-13065",
+        "Microsoft.AspNet.Mvc": "6.0.0-beta5-13890",
+        "Microsoft.AspNet.Mvc.TagHelpers": "6.0.0-beta5-13890",
+        "Microsoft.AspNet.Server.IIS": "1.0.0-beta5-11775",
+        "Microsoft.AspNet.Server.WebListener": "1.0.0-beta5-12160",
+        "Microsoft.AspNet.StaticFiles": "1.0.0-beta5-11935",
+        "Microsoft.AspNet.Tooling.Razor": "1.0.0-beta5-13375",
+        "Microsoft.Framework.ConfigurationModel.Json": "1.0.0-beta5-11337",
+        "Microsoft.Framework.CodeGenerators.Mvc": "1.0.0-beta5-12298",
+        "Microsoft.Framework.Logging": "1.0.0-beta5-11361",
+        "Microsoft.Framework.Logging.Console": "1.0.0-beta5-11361",
         "Serilog.Framework.Logging": "1.0.0-*"
     },
 
@@ -28,20 +27,20 @@
         "dnxcore50": { }
     },
 
-  "exclude": [
-    "wwwroot",
-    "node_modules",
-    "bower_components"
-  ],
-  "publishExclude": [
-    "node_modules",
-    "bower_components",
-    "**.xproj",
-    "**.user",
-    "**.vspscc"
-  ],
-  "scripts": {
-    "postrestore": [ "npm install", "bower install" ],
-    "prepare": [ "gulp copy" ]
-  }
+    "exclude": [
+        "wwwroot",
+        "node_modules",
+        "bower_components"
+    ],
+    "publishExclude": [
+        "node_modules",
+        "bower_components",
+        "**.xproj",
+        "**.user",
+        "**.vspscc"
+    ],
+    "scripts": {
+        "postrestore": [ "npm install", "bower install" ],
+        "prepare": [ "gulp copy" ]
+    }
 }

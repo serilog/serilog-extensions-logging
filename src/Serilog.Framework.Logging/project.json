@@ -7,8 +7,8 @@
   "licenseUrl": "http://www.apache.org/licenses/LICENSE-2.0",
 
   "dependencies": {
-        "Microsoft.Framework.Logging.Interfaces": "1.0.0-beta4",
-        "Serilog": "1.5.5"
+        "Serilog": "1.5.5",
+        "Microsoft.Framework.Logging.Abstractions": "1.0.0-beta5-11361"
   },
 
   "frameworks" : {
@@ -22,7 +22,7 @@
         "System.Collections": "4.0.10-beta-22816",
         "System.Linq": "4.0.0-beta-22816",
         "System.Threading": "4.0.10-beta-22816",
-        "Microsoft.CSharp": "4.0.0-beta-22816"
+        "Microsoft.CSharp": "4.0.0-beta-22913"
       }
     }
   }
