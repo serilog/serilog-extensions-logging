@@ -60,7 +60,7 @@ If you want to get more information from the log you'll need to bump up the leve
 Two things:
 
  * You need to set `MinimumLevel` on **both** the Serilog `LoggerConfiguration` and the `ILoggerFactory`
- * Serilog and ASP.NET assign different priorities to the `Debug` and `Trace` levels; Serilog's `Debug` is ASP.NET's `Trace`, and vice-versa
+ * Serilog and ASP.NET assign different priorities to the `Debug` and `Verbose` levels; Serilog's `Debug` is ASP.NET's `Verbose`, and vice-versa
 
 ### Building from source
 
