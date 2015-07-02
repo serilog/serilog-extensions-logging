@@ -58,14 +58,14 @@ namespace Sample
             }
 
             var endTime = DateTimeOffset.UtcNow;
-            _logger.LogInformation(2, "Stopping at '{StopTime}'", endTime);
+            _logger.LogInformation(2, "Stopping at {StopTime}", endTime);
 
             _logger.LogInformation("Stopping");
 
             _logger.LogInformation(Environment.NewLine);
-            _logger.LogInformation("{Result,-10}{StartTime,15}{EndTime,15}{Duration,15}", "RESULT", "START TIME", "END TIME", "DURATION(ms)");
-            _logger.LogInformation("{Result,-10}{StartTime,15}{EndTime,15}{Duration,15}", "------", "----- ----", "--- ----", "------------");
-            _logger.LogInformation("{Result,-10}{StartTime,15:mm:s tt}{EndTime,15:mm:s tt}{Duration,15}", "SUCCESS", startTime, endTime, (endTime - startTime).TotalMilliseconds);
+            _logger.LogInformation("{Result,-10:l}{StartTime,15:l}{EndTime,15:l}{Duration,15:l}", "RESULT", "START TIME", "END TIME", "DURATION(ms)");
+            _logger.LogInformation("{Result,-10:l}{StartTime,15:l}{EndTime,15:l}{Duration,15:l}", "------", "----- ----", "--- ----", "------------");
+            _logger.LogInformation("{Result,-10:l}{StartTime,15:mm:s tt}{EndTime,15:mm:s tt}{Duration,15}", "SUCCESS", startTime, endTime, (endTime - startTime).TotalMilliseconds);
         }
     }
 }
