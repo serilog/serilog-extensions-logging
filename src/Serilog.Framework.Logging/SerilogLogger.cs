@@ -68,10 +68,14 @@ namespace Serilog.Framework.Logging
                     {
                         messageTemplate = (string)property.Value;
                     }
+                    else if (property.Key.StartsWith("@"))
+                    {
+                        logger = logger.ForContext(property.Key.Substring(1), property.Value, destructureObjects: true);
+                    }
                     else
                     {
                         logger = logger.ForContext(property.Key, property.Value);
-                    }
+                    }                    
                 }
 
                 var stateType = state.GetType();

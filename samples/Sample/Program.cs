@@ -33,7 +33,7 @@ namespace Sample
             _logger.LogInformation("Starting");
 
             var startTime = DateTimeOffset.UtcNow;
-            _logger.LogInformation(1, "Started at '{StartTime}' and 0x{Hello:X} is hex of 42", startTime, 42);
+            _logger.LogInformation(1, "Started at {StartTime} and 0x{Hello:X} is hex of 42", startTime, 42);
 
             try
             {
@@ -51,10 +51,9 @@ namespace Sample
 
             using (_logger.BeginScope("Main"))
             {
-                Console.WriteLine("Hello World");
-
                 _logger.LogInformation("Waiting for user input");
-                Console.ReadLine();
+                var key = Console.Read();
+                _logger.LogInformation("User pressed {@KeyInfo}", new { Key = key, KeyChar = (char)key });
             }
 
             var endTime = DateTimeOffset.UtcNow;
