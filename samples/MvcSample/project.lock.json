@@ -919,7 +919,7 @@
           "lib/dnx451/Microsoft.Framework.CodeGenerators.Mvc.dll": {}
         }
       },
-      "Microsoft.Framework.CommandLineUtils.Sources/1.0.0-beta5-11749": {
+      "Microsoft.Framework.CommandLineUtils.Sources/1.0.0-beta5": {
         "frameworkAssemblies": [
           "mscorlib",
           "System",
@@ -2207,10 +2207,10 @@
           "lib/dnxcore50/Microsoft.Framework.CodeGenerators.Mvc.dll": {}
         }
       },
-      "Microsoft.Framework.CommandLineUtils.Sources/1.0.0-beta5-11749": {
+      "Microsoft.Framework.CommandLineUtils.Sources/1.0.0-beta5": {
         "dependencies": {
-          "System.Collections": "4.0.10-beta-22910",
-          "System.Runtime": "4.0.20-beta-22910"
+          "System.Collections": "4.0.10-beta-23019",
+          "System.Runtime": "4.0.20-beta-23019"
         },
         "compile": {
           "lib/dnxcore50/Microsoft.Framework.CommandLineUtils.Sources.dll": {}
@@ -4418,11 +4418,11 @@
         "Templates/ViewGenerator/List.cshtml"
       ]
     },
-    "Microsoft.Framework.CommandLineUtils.Sources/1.0.0-beta5-11749": {
-      "sha512": "p5BKgSXoul11gV8GhsALFF0och8SqajPiVx6QUtYZY9TqVdGbl0t7HAomaRUNQGuaE15W4SNdx3BYiLQFB+WOQ==",
+    "Microsoft.Framework.CommandLineUtils.Sources/1.0.0-beta5": {
+      "sha512": "sZIlSWm9r2CFDI5JB21lKwa8Hq7DZPBYx3LcBnuxZnhSh2AwrhrS88YUZSMP6QCV+PHMwj0udTdnS1eZ2DbM7w==",
       "files": [
-        "Microsoft.Framework.CommandLineUtils.Sources.1.0.0-beta5-11749.nupkg",
-        "Microsoft.Framework.CommandLineUtils.Sources.1.0.0-beta5-11749.nupkg.sha512",
+        "Microsoft.Framework.CommandLineUtils.Sources.1.0.0-beta5.nupkg",
+        "Microsoft.Framework.CommandLineUtils.Sources.1.0.0-beta5.nupkg.sha512",
         "Microsoft.Framework.CommandLineUtils.Sources.nuspec",
         "lib/dnx451/Microsoft.Framework.CommandLineUtils.Sources.dll",
         "lib/dnx451/Microsoft.Framework.CommandLineUtils.Sources.xml",
