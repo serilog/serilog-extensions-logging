@@ -33,7 +33,9 @@ The conditional compilation (`#if`) is necessary if you're targeting the CoreCLR
 **Finally**, in your `Startup` class's `Configure()` method, call `AddSerilog()` on the provided `loggerFactory`.
 
 ```csharp
-  public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerfactory)
+  public void Configure(IApplicationBuilder app,
+                        IHostingEnvironment env,
+                        ILoggerFactory loggerfactory)
   {
       loggerfactory.AddSerilog();
 ```
