@@ -1,4 +1,4 @@
-# Serilog.Framework.Logging
+# Serilog.Framework.Logging [![Build status](https://ci.appveyor.com/api/projects/status/865nohxfiq1rnby0/branch/master?svg=true)](https://ci.appveyor.com/project/serilog/serilog-framework-logging/branch/master)
 
 A serilog provider for [Microsoft.Framework.Logging](https://www.nuget.org/packages/Microsoft.Framework.Logging), the logging subsystem used by ASP.NET 5.
 
