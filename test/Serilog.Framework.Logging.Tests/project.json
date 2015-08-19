@@ -1,6 +1,6 @@
 ﻿{
     "dependencies": {
-        "Microsoft.Framework.Logging": "1.0.0-beta5",
+        "Microsoft.Framework.Logging": "1.0.0-beta6",
         "Serilog.Framework.Logging": "1.0.0-*",
         "NUnitTestAdapter.WithFramework": "2.0.0"
     },

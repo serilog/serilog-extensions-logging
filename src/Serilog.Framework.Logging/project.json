@@ -8,7 +8,7 @@
 
     "dependencies": {
         "Serilog": "1.5.7",
-        "Microsoft.Framework.Logging.Abstractions": "1.0.0-beta5"
+        "Microsoft.Framework.Logging.Abstractions": "1.0.0-beta6"
     },
 
     "frameworks": {

@@ -19,7 +19,7 @@ namespace Sample
                 .Enrich.WithMachineName()
                 .Enrich.WithProcessId()
                 .Enrich.WithThreadId()
-                .WriteTo.LiterateConsole()
+                .WriteTo.ColoredConsole()
 #endif
                 .CreateLogger();
 

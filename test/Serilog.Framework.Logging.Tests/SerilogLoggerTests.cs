@@ -6,6 +6,7 @@ using System.Globalization;
 using Serilog.Events;
 using Microsoft.Framework.Logging;
 using NUnit.Framework;
+using System.Collections.Generic;
 
 namespace Serilog.Framework.Logging.Test
 {
@@ -204,7 +205,7 @@ namespace Serilog.Framework.Logging.Test
             Assert.AreEqual("7", sink.Writes[0].Properties["LuckyNumber"].ToString());
         }
 
-        private class FoodScope : ReflectionBasedLogValues
+        private class FoodScope : ILogValues
         {
             private string _name;
 
@@ -213,15 +214,13 @@ namespace Serilog.Framework.Logging.Test
                 _name = name;
             }
 
-            public string Name { get { return _name; } }
-
-            public override string ToString()
+            public IEnumerable<KeyValuePair<string, object>> GetValues()
             {
-                return string.Format("Scope {0}", Name);
+                yield return new KeyValuePair<string, object>("Name", _name);
             }
         }
 
-        private class LuckyScope : ReflectionBasedLogValues
+        private class LuckyScope : ILogValues
         {
             private int _luckyNumber;
 
@@ -230,11 +229,9 @@ namespace Serilog.Framework.Logging.Test
                 _luckyNumber = luckyNumber;
             }
 
-            public int LuckyNumber { get { return _luckyNumber; } }
-
-            public override string ToString()
+            public IEnumerable<KeyValuePair<string, object>> GetValues()
             {
-                return string.Format("Scope {0}", LuckyNumber);
+                yield return new KeyValuePair<string, object>("LuckyNumber", _luckyNumber);
             }
         }
     }

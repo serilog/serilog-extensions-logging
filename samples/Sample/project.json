@@ -7,9 +7,8 @@
     "licenseUrl": "",
 
     "dependencies": {
-        "Microsoft.Framework.Logging": "1.0.0-beta5",
-        "Serilog.Framework.Logging": "1.0.0-*",
-        "Serilog.Sinks.Literate": "1.0.6"
+        "Microsoft.Framework.Logging": "1.0.0-beta6",
+        "Serilog.Framework.Logging": "1.0.0-*"
     },
 
     "commands": {
@@ -17,9 +16,7 @@
     },
 
     "frameworks": {
-        "dnx451": {
-            "Serilog.Framework.Logging": "1.0.0-*"
-        },
+        "dnx451": {},
         "dnxcore50": {
             "dependencies": {
                 "System.Console": "4.0.0-beta-23019",
