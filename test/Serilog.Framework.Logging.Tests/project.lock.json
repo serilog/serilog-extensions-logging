@@ -1,14 +1,14 @@
 {
   "locked": false,
-  "version": -9996,
+  "version": 1,
   "targets": {
     "DNX,Version=v4.5.1": {
-      "Microsoft.Framework.DependencyInjection.Abstractions/1.0.0-beta5": {
+      "Microsoft.Framework.DependencyInjection.Abstractions/1.0.0-beta6": {
         "frameworkAssemblies": [
+          "Microsoft.CSharp",
           "mscorlib",
           "System",
-          "System.Core",
-          "Microsoft.CSharp"
+          "System.Core"
         ],
         "compile": {
           "lib/dnx451/Microsoft.Framework.DependencyInjection.Abstractions.dll": {}
@@ -17,17 +17,17 @@
           "lib/dnx451/Microsoft.Framework.DependencyInjection.Abstractions.dll": {}
         }
       },
-      "Microsoft.Framework.Logging/1.0.0-beta5": {
+      "Microsoft.Framework.Logging/1.0.0-beta6": {
         "dependencies": {
-          "Microsoft.Framework.DependencyInjection.Abstractions": "1.0.0-beta5",
-          "Microsoft.Framework.Logging.Abstractions": "1.0.0-beta5"
+          "Microsoft.Framework.DependencyInjection.Abstractions": "1.0.0-beta6",
+          "Microsoft.Framework.Logging.Abstractions": "1.0.0-beta6"
         },
         "frameworkAssemblies": [
-          "System.Collections.Concurrent",
+          "Microsoft.CSharp",
           "mscorlib",
           "System",
-          "System.Core",
-          "Microsoft.CSharp"
+          "System.Collections.Concurrent",
+          "System.Core"
         ],
         "compile": {
           "lib/dnx451/Microsoft.Framework.Logging.dll": {}
@@ -36,12 +36,12 @@
           "lib/dnx451/Microsoft.Framework.Logging.dll": {}
         }
       },
-      "Microsoft.Framework.Logging.Abstractions/1.0.0-beta5": {
+      "Microsoft.Framework.Logging.Abstractions/1.0.0-beta6": {
         "frameworkAssemblies": [
+          "Microsoft.CSharp",
           "mscorlib",
           "System",
-          "System.Core",
-          "Microsoft.CSharp"
+          "System.Core"
         ],
         "compile": {
           "lib/dnx451/Microsoft.Framework.Logging.Abstractions.dll": {}
@@ -79,72 +79,72 @@
     }
   },
   "libraries": {
-    "Microsoft.Framework.DependencyInjection.Abstractions/1.0.0-beta5": {
+    "Microsoft.Framework.DependencyInjection.Abstractions/1.0.0-beta6": {
       "serviceable": true,
-      "sha512": "/WgY/P0YftvScIfLyLee36H7fb6EUG2L6p5qZMp7quJ3aUEHUolZpXBbYQ9XP21KuX4ab0/zH8DD0mpMKjGDsw==",
+      "sha512": "pNgCgGRkqJ+f8OCN6eRsuOXormaafBec69QvVoKXnlYNwSGU2THLYgkc41li4YofRMgyfPWdnPk2goTtlL5waA==",
       "files": [
-        "Microsoft.Framework.DependencyInjection.Abstractions.1.0.0-beta5.nupkg",
-        "Microsoft.Framework.DependencyInjection.Abstractions.1.0.0-beta5.nupkg.sha512",
-        "Microsoft.Framework.DependencyInjection.Abstractions.nuspec",
         "lib/dnx451/Microsoft.Framework.DependencyInjection.Abstractions.dll",
         "lib/dnx451/Microsoft.Framework.DependencyInjection.Abstractions.xml",
         "lib/dotnet/Microsoft.Framework.DependencyInjection.Abstractions.dll",
         "lib/dotnet/Microsoft.Framework.DependencyInjection.Abstractions.xml",
         "lib/net45/Microsoft.Framework.DependencyInjection.Abstractions.dll",
-        "lib/net45/Microsoft.Framework.DependencyInjection.Abstractions.xml"
+        "lib/net45/Microsoft.Framework.DependencyInjection.Abstractions.xml",
+        "Microsoft.Framework.DependencyInjection.Abstractions.1.0.0-beta6.nupkg",
+        "Microsoft.Framework.DependencyInjection.Abstractions.1.0.0-beta6.nupkg.sha512",
+        "Microsoft.Framework.DependencyInjection.Abstractions.nuspec",
+        "repo.json"
       ]
     },
-    "Microsoft.Framework.Logging/1.0.0-beta5": {
+    "Microsoft.Framework.Logging/1.0.0-beta6": {
       "serviceable": true,
-      "sha512": "YbfHijwmKd3PsNSJ6iYRARwSeCPwkZKY9s3qb+jNFqom2QnD9PDq9q0yIZZBWZMJ3EAsRIZa92FYuKnNKPfX9g==",
+      "sha512": "AdnzPvyTNMIW3N495hVivo7iW4A22aHnGCU/koy87xgipT5JjE8tiCrSZxtTY3j/dUSqWtatyhgxm11VQEPMLw==",
       "files": [
-        "Microsoft.Framework.Logging.1.0.0-beta5.nupkg",
-        "Microsoft.Framework.Logging.1.0.0-beta5.nupkg.sha512",
-        "Microsoft.Framework.Logging.nuspec",
         "lib/dnx451/Microsoft.Framework.Logging.dll",
         "lib/dnx451/Microsoft.Framework.Logging.xml",
         "lib/dotnet/Microsoft.Framework.Logging.dll",
         "lib/dotnet/Microsoft.Framework.Logging.xml",
         "lib/net45/Microsoft.Framework.Logging.dll",
-        "lib/net45/Microsoft.Framework.Logging.xml"
+        "lib/net45/Microsoft.Framework.Logging.xml",
+        "Microsoft.Framework.Logging.1.0.0-beta6.nupkg",
+        "Microsoft.Framework.Logging.1.0.0-beta6.nupkg.sha512",
+        "Microsoft.Framework.Logging.nuspec",
+        "repo.json"
       ]
     },
-    "Microsoft.Framework.Logging.Abstractions/1.0.0-beta5": {
+    "Microsoft.Framework.Logging.Abstractions/1.0.0-beta6": {
       "serviceable": true,
-      "sha512": "roTRT5h5eSEIS1on9K4M+IhI/YD1vXDpslXXebmxWqRN+9TbAd2xc/j5KgAOZd0hBem1R5rPiiBkBnNa+FSeBA==",
+      "sha512": "2wMEtQlwOcMunmryFHoX0CdL+fwbEELk90xztNH0GxvXYFCXcmWymbba9AzTna6qqFMZBJfvMtTo2Cf/kWfRyQ==",
       "files": [
-        "Microsoft.Framework.Logging.Abstractions.1.0.0-beta5.nupkg",
-        "Microsoft.Framework.Logging.Abstractions.1.0.0-beta5.nupkg.sha512",
-        "Microsoft.Framework.Logging.Abstractions.nuspec",
         "lib/dnx451/Microsoft.Framework.Logging.Abstractions.dll",
         "lib/dnx451/Microsoft.Framework.Logging.Abstractions.xml",
         "lib/dotnet/Microsoft.Framework.Logging.Abstractions.dll",
         "lib/dotnet/Microsoft.Framework.Logging.Abstractions.xml",
         "lib/net45/Microsoft.Framework.Logging.Abstractions.dll",
-        "lib/net45/Microsoft.Framework.Logging.Abstractions.xml"
+        "lib/net45/Microsoft.Framework.Logging.Abstractions.xml",
+        "Microsoft.Framework.Logging.Abstractions.1.0.0-beta6.nupkg",
+        "Microsoft.Framework.Logging.Abstractions.1.0.0-beta6.nupkg.sha512",
+        "Microsoft.Framework.Logging.Abstractions.nuspec",
+        "repo.json"
       ]
     },
     "NUnitTestAdapter.WithFramework/2.0.0": {
       "sha512": "K4c5RuLsj6jybgVt9QV/sm3F0vBvLLMoxFK0dj1vhP3R4JhRE8OMkMBu6M8NAGkBwykZUCxvZIyZCsXRd3DVDg==",
       "files": [
-        "NUnitTestAdapter.WithFramework.2.0.0.nupkg",
-        "NUnitTestAdapter.WithFramework.2.0.0.nupkg.sha512",
-        "NUnitTestAdapter.WithFramework.nuspec",
         "lib/nunit.core.dll",
         "lib/nunit.core.interfaces.dll",
         "lib/nunit.framework.dll",
         "lib/nunit.framework.xml",
         "lib/nunit.util.dll",
         "lib/NUnit.VisualStudio.TestAdapter.dll",
+        "NUnitTestAdapter.WithFramework.2.0.0.nupkg",
+        "NUnitTestAdapter.WithFramework.2.0.0.nupkg.sha512",
+        "NUnitTestAdapter.WithFramework.nuspec",
         "tools/install.ps1"
       ]
     },
     "Serilog/1.5.7": {
       "sha512": "OEF9TLKMf3TScnIOaZ49Us/0CJ2sdxHSAXu2AGCUGFcY1NvXt8i4Ur0WylezMmxdXC5nZiJ7EFMydQieDJuA0g==",
       "files": [
-        "Serilog.1.5.7.nupkg",
-        "Serilog.1.5.7.nupkg.sha512",
-        "Serilog.nuspec",
         "lib/net40/Serilog.dll",
         "lib/net40/Serilog.FullNetFx.dll",
         "lib/net40/Serilog.FullNetFx.pdb",
@@ -159,13 +159,16 @@
         "lib/net45/Serilog.XML",
         "lib/portable-net45+win+wpa81+wp80+MonoAndroid10+MonoTouch10/Serilog.dll",
         "lib/portable-net45+win+wpa81+wp80+MonoAndroid10+MonoTouch10/Serilog.pdb",
-        "lib/portable-net45+win+wpa81+wp80+MonoAndroid10+MonoTouch10/Serilog.XML"
+        "lib/portable-net45+win+wpa81+wp80+MonoAndroid10+MonoTouch10/Serilog.XML",
+        "Serilog.1.5.7.nupkg",
+        "Serilog.1.5.7.nupkg.sha512",
+        "Serilog.nuspec"
       ]
     }
   },
   "projectFileDependencyGroups": {
     "": [
-      "Microsoft.Framework.Logging >= 1.0.0-beta5",
+      "Microsoft.Framework.Logging >= 1.0.0-beta6",
       "Serilog.Framework.Logging >= 1.0.0-*",
       "NUnitTestAdapter.WithFramework >= 2.0.0"
     ],
