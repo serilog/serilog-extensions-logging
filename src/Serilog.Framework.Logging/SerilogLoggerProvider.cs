@@ -81,5 +81,7 @@ namespace Serilog.Framework.Logging
             }
         }
 #endif
+
+        public void Dispose() { }
     }
 }
