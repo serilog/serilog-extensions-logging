@@ -64,7 +64,7 @@ namespace Serilog.Framework.Logging
             {
                 foreach (var property in structure.GetValues())
                 {
-                    if (property.Key == "{OriginalFormat}" && property.Value is string)
+                    if (property.Key == SerilogLoggerProvider.OriginalFormatPropertyName && property.Value is string)
                     {
                         messageTemplate = (string)property.Value;
                     }

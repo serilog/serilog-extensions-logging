@@ -17,6 +17,8 @@ namespace Serilog.Framework.Logging
 {
     public class SerilogLoggerProvider : ILoggerProvider, ILogEventEnricher
     {
+        public const string OriginalFormatPropertyName = "{OriginalFormat}";
+
         // May be null; if it is, Log.Logger will be lazily used
         readonly ILogger _logger;
 
@@ -45,6 +47,9 @@ namespace Serilog.Framework.Logging
                 {
                     foreach (var keyValue in stateStructure.GetValues())
                     {
+                        if (keyValue.Key == OriginalFormatPropertyName && keyValue.Value is string)
+                            continue;
+
                         var property = propertyFactory.CreateProperty(keyValue.Key, keyValue.Value);
                         logEvent.AddPropertyIfAbsent(property);
                     }
