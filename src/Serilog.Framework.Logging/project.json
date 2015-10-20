@@ -1,29 +1,34 @@
 ﻿{
-    "version": "1.0.0-beta7-*",
-    "description": "Serilog provider for Microsoft.Framework.Logging",
-    "authors": [ "Microsoft", "Serilog Contributors" ],
-    "tags": [ "serilog dnx" ],
-    "projectUrl": "https://github.com/serilog/serilog-framework-logging",
-    "licenseUrl": "http://www.apache.org/licenses/LICENSE-2.0",
+  "version": "1.0.0-beta7-*",
+  "description": "Serilog provider for Microsoft.Framework.Logging",
+  "authors": [ "Microsoft", "Serilog Contributors" ],
+  "tags": [ "serilog dnx" ],
+  "projectUrl": "https://github.com/serilog/serilog-framework-logging",
+  "licenseUrl": "http://www.apache.org/licenses/LICENSE-2.0",
 
-    "dependencies": {
-        "Serilog": "1.5.7",
-        "Microsoft.Framework.Logging.Abstractions": "1.0.0-beta7"
+  "dependencies": {
+    "Serilog": "1.5.7",
+    "Microsoft.Framework.Logging.Abstractions": "1.0.0-beta7"
+  },
+
+  "frameworks": {
+    "net45": {
+      "frameworkAssemblies": {
+        "System.Runtime": ""
+      }
     },
-
-    "frameworks": {
-        "dnx451": {
-            "frameworkAssemblies": {
-                "System.Runtime": ""
-            }
-        },
-        "dnxcore50": {
-            "dependencies": {
-                "System.Collections": "4.0.10-beta-23019",
-                "System.Linq": "4.0.0-beta-23019",
-                "System.Threading": "4.0.10-beta-23019",
-                "Microsoft.CSharp": "4.0.0-beta-23019"
-            }
-        }
+    "dnx451": {
+      "frameworkAssemblies": {
+        "System.Runtime": ""
+      }
+    },
+    "dnxcore50": {
+      "dependencies": {
+        "System.Collections": "4.0.10-beta-23019",
+        "System.Linq": "4.0.0-beta-23019",
+        "System.Threading": "4.0.10-beta-23019",
+        "Microsoft.CSharp": "4.0.0-beta-23019"
+      }
     }
+  }
 }
