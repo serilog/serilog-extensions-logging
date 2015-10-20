@@ -1,30 +1,30 @@
 ﻿{
-    "version": "1.0.0-*",
-    "description": "",
-    "authors": [ "" ],
-    "tags": [ "" ],
-    "projectUrl": "",
-    "licenseUrl": "",
+  "version": "1.0.0-*",
+  "description": "",
+  "authors": [ "" ],
+  "tags": [ "" ],
+  "projectUrl": "",
+  "licenseUrl": "",
 
-    "dependencies": {
-        "Microsoft.Framework.Logging": "1.0.0-beta7",
-        "Serilog.Framework.Logging": "1.0.0-*"
-    },
+  "dependencies": {
+    "Microsoft.Framework.Logging": "1.0.0-beta8",
+    "Serilog.Framework.Logging": "1.0.0-*"
+  },
 
-    "commands": {
-        "Sample": "Sample"
-    },
+  "commands": {
+    "Sample": "Sample"
+  },
 
-    "frameworks": {
-        "dnx451": {},
-        "dnxcore50": {
-            "dependencies": {
-                "System.Console": "4.0.0-beta-23019",
-                "System.Collections": "4.0.10-beta-23019",
-                "System.Linq": "4.0.0-beta-23019",
-                "System.Threading": "4.0.10-beta-23019",
-                "Microsoft.CSharp": "4.0.0-beta-23019"
-            }
-        }
+  "frameworks": {
+    "dnx451": {},
+    "dnxcore50": {
+      "dependencies": {
+        "System.Console": "4.0.0-beta-23019",
+        "System.Collections": "4.0.10-beta-23019",
+        "System.Linq": "4.0.0-beta-23019",
+        "System.Threading": "4.0.10-beta-23019",
+        "Microsoft.CSharp": "4.0.0-beta-23019"
+      }
     }
+  }
 }
