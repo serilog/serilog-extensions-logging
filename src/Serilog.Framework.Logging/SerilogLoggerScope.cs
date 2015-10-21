@@ -2,10 +2,6 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
-#if DNX451
-using System.Runtime.Remoting;
-using System.Runtime.Remoting.Messaging;
-#endif
 
 namespace Serilog.Framework.Logging
 {
@@ -13,7 +9,7 @@ namespace Serilog.Framework.Logging
     {
         private readonly SerilogLoggerProvider _provider;
 
-        public SerilogLoggerScope(SerilogLoggerProvider provider, SerilogLoggerScope parent, string name, object state)
+        public SerilogLoggerScope(SerilogLoggerProvider provider, string name, object state)
         {
             _provider = provider;
             Name = name;
@@ -23,7 +19,7 @@ namespace Serilog.Framework.Logging
             _provider.CurrentScope = this;
         }
 
-        public SerilogLoggerScope Parent { get; private set; }
+        public SerilogLoggerScope Parent { get; }
         public string Name { get; private set; }
         public object State { get; private set; }
 
@@ -38,7 +34,7 @@ namespace Serilog.Framework.Logging
             }
         }
 
-        private bool _disposedValue = false; // To detect redundant calls
+        private bool _disposedValue; // To detect redundant calls
 
         public void Dispose()
         {

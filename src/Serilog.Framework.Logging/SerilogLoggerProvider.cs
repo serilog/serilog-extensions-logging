@@ -2,7 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
-#if DNX451
+#if NET45 || DNX451
 using System.Runtime.Remoting;
 using System.Runtime.Remoting.Messaging;
 #else
@@ -33,7 +33,7 @@ namespace Serilog.Framework.Logging
 
         public IDisposable BeginScopeImpl(string name, object state)
         {
-            return new SerilogLoggerScope(this, CurrentScope, name, state);
+            return new SerilogLoggerScope(this, name, state);
         }
 
         public void Enrich(LogEvent logEvent, ILogEventPropertyFactory propertyFactory)

@@ -21,7 +21,7 @@ namespace Serilog.Framework.Logging
             ILogger logger = null,
             string name = null)
         {
-            if (provider == null) throw new ArgumentNullException("provider");
+            if (provider == null) throw new ArgumentNullException(nameof(provider));
             _provider = provider;
             _name = name;
             _logger = logger;
@@ -100,7 +100,7 @@ namespace Serilog.Framework.Logging
 
             if (eventId != 0)
             {
-                logger = logger.ForContext("EventId", eventId, false);
+                logger = logger.ForContext("EventId", eventId);
             }
 
             logger.Write(level, exception, messageTemplate);
@@ -120,7 +120,6 @@ namespace Serilog.Framework.Logging
                     return LogEventLevel.Information;
                 case LogLevel.Verbose:
                     return LogEventLevel.Debug;
-                case LogLevel.Debug:
                 default:
                     return LogEventLevel.Verbose;
             }
