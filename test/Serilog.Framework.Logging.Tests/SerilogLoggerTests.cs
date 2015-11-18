@@ -4,7 +4,7 @@
 using System;
 using System.Globalization;
 using Serilog.Events;
-using Microsoft.Framework.Logging;
+using Microsoft.Extensions.Logging;
 using NUnit.Framework;
 using System.Collections.Generic;
 

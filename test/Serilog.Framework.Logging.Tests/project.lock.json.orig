@@ -3,7 +3,11 @@
   "version": 2,
   "targets": {
     "DNX,Version=v4.5.1": {
+<<<<<<< HEAD
+      "Microsoft.Framework.DependencyInjection.Abstractions/1.0.0-beta8": {
+=======
       "Microsoft.Extensions.DependencyInjection.Abstractions/1.0.0-rc1-final": {
+>>>>>>> 16befd32de7d8bb67a17565271e1d2f87d1b4854
         "type": "package",
         "frameworkAssemblies": [
           "Microsoft.CSharp",
@@ -12,6 +16,19 @@
           "System.Core"
         ],
         "compile": {
+<<<<<<< HEAD
+          "lib/dnx451/Microsoft.Framework.DependencyInjection.Abstractions.dll": {}
+        },
+        "runtime": {
+          "lib/dnx451/Microsoft.Framework.DependencyInjection.Abstractions.dll": {}
+        }
+      },
+      "Microsoft.Framework.Logging/1.0.0-beta8": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.Framework.DependencyInjection.Abstractions": "1.0.0-beta8",
+          "Microsoft.Framework.Logging.Abstractions": "1.0.0-beta8"
+=======
           "lib/net451/Microsoft.Extensions.DependencyInjection.Abstractions.dll": {}
         },
         "runtime": {
@@ -23,6 +40,7 @@
         "dependencies": {
           "Microsoft.Extensions.DependencyInjection.Abstractions": "1.0.0-rc1-final",
           "Microsoft.Extensions.Logging.Abstractions": "1.0.0-rc1-final"
+>>>>>>> 16befd32de7d8bb67a17565271e1d2f87d1b4854
         },
         "frameworkAssemblies": [
           "Microsoft.CSharp",
@@ -32,6 +50,15 @@
           "System.Core"
         ],
         "compile": {
+<<<<<<< HEAD
+          "lib/dnx451/Microsoft.Framework.Logging.dll": {}
+        },
+        "runtime": {
+          "lib/dnx451/Microsoft.Framework.Logging.dll": {}
+        }
+      },
+      "Microsoft.Framework.Logging.Abstractions/1.0.0-beta8": {
+=======
           "lib/net451/Microsoft.Extensions.Logging.dll": {}
         },
         "runtime": {
@@ -39,6 +66,7 @@
         }
       },
       "Microsoft.Extensions.Logging.Abstractions/1.0.0-rc1-final": {
+>>>>>>> 16befd32de7d8bb67a17565271e1d2f87d1b4854
         "type": "package",
         "frameworkAssemblies": [
           "Microsoft.CSharp",
@@ -47,10 +75,17 @@
           "System.Core"
         ],
         "compile": {
+<<<<<<< HEAD
+          "lib/dnx451/Microsoft.Framework.Logging.Abstractions.dll": {}
+        },
+        "runtime": {
+          "lib/dnx451/Microsoft.Framework.Logging.Abstractions.dll": {}
+=======
           "lib/net451/Microsoft.Extensions.Logging.Abstractions.dll": {}
         },
         "runtime": {
           "lib/net451/Microsoft.Extensions.Logging.Abstractions.dll": {}
+>>>>>>> 16befd32de7d8bb67a17565271e1d2f87d1b4854
         }
       },
       "NUnitTestAdapter.WithFramework/2.0.0": {
@@ -81,11 +116,19 @@
           "lib/net45/Serilog.FullNetFx.dll": {}
         }
       },
+<<<<<<< HEAD
+      "Serilog.Framework.Logging/1.0.0-beta8": {
+        "type": "project",
+        "framework": "DNX,Version=v4.5.1",
+        "dependencies": {
+          "Microsoft.Framework.Logging.Abstractions": "1.0.0-beta8",
+=======
       "Serilog.Framework.Logging/1.0.0-rc1-final": {
         "type": "project",
         "framework": "DNX,Version=v4.5.1",
         "dependencies": {
           "Microsoft.Extensions.Logging": "1.0.0-rc1-final",
+>>>>>>> 16befd32de7d8bb67a17565271e1d2f87d1b4854
           "Serilog": "1.5.11"
         },
         "frameworkAssemblies": [
@@ -94,7 +137,11 @@
       }
     },
     "DNX,Version=v4.5.1/win7-x86": {
+<<<<<<< HEAD
+      "Microsoft.Framework.DependencyInjection.Abstractions/1.0.0-beta8": {
+=======
       "Microsoft.Extensions.DependencyInjection.Abstractions/1.0.0-rc1-final": {
+>>>>>>> 16befd32de7d8bb67a17565271e1d2f87d1b4854
         "type": "package",
         "frameworkAssemblies": [
           "Microsoft.CSharp",
@@ -103,6 +150,19 @@
           "System.Core"
         ],
         "compile": {
+<<<<<<< HEAD
+          "lib/dnx451/Microsoft.Framework.DependencyInjection.Abstractions.dll": {}
+        },
+        "runtime": {
+          "lib/dnx451/Microsoft.Framework.DependencyInjection.Abstractions.dll": {}
+        }
+      },
+      "Microsoft.Framework.Logging/1.0.0-beta8": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.Framework.DependencyInjection.Abstractions": "1.0.0-beta8",
+          "Microsoft.Framework.Logging.Abstractions": "1.0.0-beta8"
+=======
           "lib/net451/Microsoft.Extensions.DependencyInjection.Abstractions.dll": {}
         },
         "runtime": {
@@ -114,6 +174,7 @@
         "dependencies": {
           "Microsoft.Extensions.DependencyInjection.Abstractions": "1.0.0-rc1-final",
           "Microsoft.Extensions.Logging.Abstractions": "1.0.0-rc1-final"
+>>>>>>> 16befd32de7d8bb67a17565271e1d2f87d1b4854
         },
         "frameworkAssemblies": [
           "Microsoft.CSharp",
@@ -123,6 +184,15 @@
           "System.Core"
         ],
         "compile": {
+<<<<<<< HEAD
+          "lib/dnx451/Microsoft.Framework.Logging.dll": {}
+        },
+        "runtime": {
+          "lib/dnx451/Microsoft.Framework.Logging.dll": {}
+        }
+      },
+      "Microsoft.Framework.Logging.Abstractions/1.0.0-beta8": {
+=======
           "lib/net451/Microsoft.Extensions.Logging.dll": {}
         },
         "runtime": {
@@ -130,6 +200,7 @@
         }
       },
       "Microsoft.Extensions.Logging.Abstractions/1.0.0-rc1-final": {
+>>>>>>> 16befd32de7d8bb67a17565271e1d2f87d1b4854
         "type": "package",
         "frameworkAssemblies": [
           "Microsoft.CSharp",
@@ -138,10 +209,17 @@
           "System.Core"
         ],
         "compile": {
+<<<<<<< HEAD
+          "lib/dnx451/Microsoft.Framework.Logging.Abstractions.dll": {}
+        },
+        "runtime": {
+          "lib/dnx451/Microsoft.Framework.Logging.Abstractions.dll": {}
+=======
           "lib/net451/Microsoft.Extensions.Logging.Abstractions.dll": {}
         },
         "runtime": {
           "lib/net451/Microsoft.Extensions.Logging.Abstractions.dll": {}
+>>>>>>> 16befd32de7d8bb67a17565271e1d2f87d1b4854
         }
       },
       "NUnitTestAdapter.WithFramework/2.0.0": {
@@ -172,11 +250,19 @@
           "lib/net45/Serilog.FullNetFx.dll": {}
         }
       },
+<<<<<<< HEAD
+      "Serilog.Framework.Logging/1.0.0-beta8": {
+        "type": "project",
+        "framework": "DNX,Version=v4.5.1",
+        "dependencies": {
+          "Microsoft.Framework.Logging.Abstractions": "1.0.0-beta8",
+=======
       "Serilog.Framework.Logging/1.0.0-rc1-final": {
         "type": "project",
         "framework": "DNX,Version=v4.5.1",
         "dependencies": {
           "Microsoft.Extensions.Logging": "1.0.0-rc1-final",
+>>>>>>> 16befd32de7d8bb67a17565271e1d2f87d1b4854
           "Serilog": "1.5.11"
         },
         "frameworkAssemblies": [
@@ -185,7 +271,11 @@
       }
     },
     "DNX,Version=v4.5.1/win7-x64": {
+<<<<<<< HEAD
+      "Microsoft.Framework.DependencyInjection.Abstractions/1.0.0-beta8": {
+=======
       "Microsoft.Extensions.DependencyInjection.Abstractions/1.0.0-rc1-final": {
+>>>>>>> 16befd32de7d8bb67a17565271e1d2f87d1b4854
         "type": "package",
         "frameworkAssemblies": [
           "Microsoft.CSharp",
@@ -194,6 +284,19 @@
           "System.Core"
         ],
         "compile": {
+<<<<<<< HEAD
+          "lib/dnx451/Microsoft.Framework.DependencyInjection.Abstractions.dll": {}
+        },
+        "runtime": {
+          "lib/dnx451/Microsoft.Framework.DependencyInjection.Abstractions.dll": {}
+        }
+      },
+      "Microsoft.Framework.Logging/1.0.0-beta8": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.Framework.DependencyInjection.Abstractions": "1.0.0-beta8",
+          "Microsoft.Framework.Logging.Abstractions": "1.0.0-beta8"
+=======
           "lib/net451/Microsoft.Extensions.DependencyInjection.Abstractions.dll": {}
         },
         "runtime": {
@@ -205,6 +308,7 @@
         "dependencies": {
           "Microsoft.Extensions.DependencyInjection.Abstractions": "1.0.0-rc1-final",
           "Microsoft.Extensions.Logging.Abstractions": "1.0.0-rc1-final"
+>>>>>>> 16befd32de7d8bb67a17565271e1d2f87d1b4854
         },
         "frameworkAssemblies": [
           "Microsoft.CSharp",
@@ -214,6 +318,15 @@
           "System.Core"
         ],
         "compile": {
+<<<<<<< HEAD
+          "lib/dnx451/Microsoft.Framework.Logging.dll": {}
+        },
+        "runtime": {
+          "lib/dnx451/Microsoft.Framework.Logging.dll": {}
+        }
+      },
+      "Microsoft.Framework.Logging.Abstractions/1.0.0-beta8": {
+=======
           "lib/net451/Microsoft.Extensions.Logging.dll": {}
         },
         "runtime": {
@@ -221,6 +334,7 @@
         }
       },
       "Microsoft.Extensions.Logging.Abstractions/1.0.0-rc1-final": {
+>>>>>>> 16befd32de7d8bb67a17565271e1d2f87d1b4854
         "type": "package",
         "frameworkAssemblies": [
           "Microsoft.CSharp",
@@ -229,10 +343,17 @@
           "System.Core"
         ],
         "compile": {
+<<<<<<< HEAD
+          "lib/dnx451/Microsoft.Framework.Logging.Abstractions.dll": {}
+        },
+        "runtime": {
+          "lib/dnx451/Microsoft.Framework.Logging.Abstractions.dll": {}
+=======
           "lib/net451/Microsoft.Extensions.Logging.Abstractions.dll": {}
         },
         "runtime": {
           "lib/net451/Microsoft.Extensions.Logging.Abstractions.dll": {}
+>>>>>>> 16befd32de7d8bb67a17565271e1d2f87d1b4854
         }
       },
       "NUnitTestAdapter.WithFramework/2.0.0": {
@@ -263,11 +384,19 @@
           "lib/net45/Serilog.FullNetFx.dll": {}
         }
       },
+<<<<<<< HEAD
+      "Serilog.Framework.Logging/1.0.0-beta8": {
+        "type": "project",
+        "framework": "DNX,Version=v4.5.1",
+        "dependencies": {
+          "Microsoft.Framework.Logging.Abstractions": "1.0.0-beta8",
+=======
       "Serilog.Framework.Logging/1.0.0-rc1-final": {
         "type": "project",
         "framework": "DNX,Version=v4.5.1",
         "dependencies": {
           "Microsoft.Extensions.Logging": "1.0.0-rc1-final",
+>>>>>>> 16befd32de7d8bb67a17565271e1d2f87d1b4854
           "Serilog": "1.5.11"
         },
         "frameworkAssemblies": [
@@ -277,6 +406,64 @@
     }
   },
   "libraries": {
+<<<<<<< HEAD
+    "Serilog.Framework.Logging/1.0.0-beta8": {
+      "type": "project",
+      "path": "../../src/Serilog.Framework.Logging/project.json"
+    },
+    "Microsoft.Framework.DependencyInjection.Abstractions/1.0.0-beta8": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "7WL9hy+7bYDyBtIrrW5tw57dChBcizjSyuD0p5pVkay+gSseLqvAk72a4KldMmRgH//7t74d/YVrTvLhw83b7w==",
+      "files": [
+        "lib/dnx451/Microsoft.Framework.DependencyInjection.Abstractions.dll",
+        "lib/dnx451/Microsoft.Framework.DependencyInjection.Abstractions.xml",
+        "lib/dnxcore50/Microsoft.Framework.DependencyInjection.Abstractions.dll",
+        "lib/dnxcore50/Microsoft.Framework.DependencyInjection.Abstractions.xml",
+        "lib/dotnet/Microsoft.Framework.DependencyInjection.Abstractions.dll",
+        "lib/dotnet/Microsoft.Framework.DependencyInjection.Abstractions.xml",
+        "lib/net45/Microsoft.Framework.DependencyInjection.Abstractions.dll",
+        "lib/net45/Microsoft.Framework.DependencyInjection.Abstractions.xml",
+        "Microsoft.Framework.DependencyInjection.Abstractions.1.0.0-beta8.nupkg",
+        "Microsoft.Framework.DependencyInjection.Abstractions.1.0.0-beta8.nupkg.sha512",
+        "Microsoft.Framework.DependencyInjection.Abstractions.nuspec"
+      ]
+    },
+    "Microsoft.Framework.Logging/1.0.0-beta8": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "4PpVGirfXovwJjlLfgvM3kKgXUSSnOhqwlIFxAl6v1yTEVrrYrAxVmZ2YVz7EzTDUaeRpElm4AgCoyqHcZty4A==",
+      "files": [
+        "lib/dnx451/Microsoft.Framework.Logging.dll",
+        "lib/dnx451/Microsoft.Framework.Logging.xml",
+        "lib/dnxcore50/Microsoft.Framework.Logging.dll",
+        "lib/dnxcore50/Microsoft.Framework.Logging.xml",
+        "lib/dotnet/Microsoft.Framework.Logging.dll",
+        "lib/dotnet/Microsoft.Framework.Logging.xml",
+        "lib/net45/Microsoft.Framework.Logging.dll",
+        "lib/net45/Microsoft.Framework.Logging.xml",
+        "Microsoft.Framework.Logging.1.0.0-beta8.nupkg",
+        "Microsoft.Framework.Logging.1.0.0-beta8.nupkg.sha512",
+        "Microsoft.Framework.Logging.nuspec"
+      ]
+    },
+    "Microsoft.Framework.Logging.Abstractions/1.0.0-beta8": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "m0NE8yhLNYlHlXfVRdfkwv+aR1a3oL06jf4sXejQKTnhE3hg6Biy7a3/W19ao6IaSyk640ARxrrt2jBEJzeUjg==",
+      "files": [
+        "lib/dnx451/Microsoft.Framework.Logging.Abstractions.dll",
+        "lib/dnx451/Microsoft.Framework.Logging.Abstractions.xml",
+        "lib/dnxcore50/Microsoft.Framework.Logging.Abstractions.dll",
+        "lib/dnxcore50/Microsoft.Framework.Logging.Abstractions.xml",
+        "lib/dotnet/Microsoft.Framework.Logging.Abstractions.dll",
+        "lib/dotnet/Microsoft.Framework.Logging.Abstractions.xml",
+        "lib/net45/Microsoft.Framework.Logging.Abstractions.dll",
+        "lib/net45/Microsoft.Framework.Logging.Abstractions.xml",
+        "Microsoft.Framework.Logging.Abstractions.1.0.0-beta8.nupkg",
+        "Microsoft.Framework.Logging.Abstractions.1.0.0-beta8.nupkg.sha512",
+        "Microsoft.Framework.Logging.Abstractions.nuspec"
+=======
     "Serilog.Framework.Logging/1.0.0-rc1-final": {
       "type": "project",
       "path": "../../src/Serilog.Framework.Logging/project.json"
@@ -327,6 +514,7 @@
         "Microsoft.Extensions.Logging.Abstractions.1.0.0-rc1-final.nupkg",
         "Microsoft.Extensions.Logging.Abstractions.1.0.0-rc1-final.nupkg.sha512",
         "Microsoft.Extensions.Logging.Abstractions.nuspec"
+>>>>>>> 16befd32de7d8bb67a17565271e1d2f87d1b4854
       ]
     },
     "NUnitTestAdapter.WithFramework/2.0.0": {
@@ -347,7 +535,11 @@
     },
     "Serilog/1.5.11": {
       "type": "package",
+<<<<<<< HEAD
+      "sha512": "n+U19G0/9oZ+6pxnk9URbgrd+dk3hTyTzTo0lkEPRzmzXfU+Je8hmKqRSB9cLDZUF79jxZZNfA9Sp1YmKAZu4g==",
+=======
       "sha512": "XNMHuP9eRWk7ffNtEAtACoBqqrSGfioQnEbeK/boi/qtamh3ZgYXvUwH9/PytJdg3LGOIT0quyTiCNaqYlJUuQ==",
+>>>>>>> 16befd32de7d8bb67a17565271e1d2f87d1b4854
       "files": [
         "lib/net40/Serilog.dll",
         "lib/net40/Serilog.FullNetFx.dll",
@@ -372,6 +564,10 @@
   },
   "projectFileDependencyGroups": {
     "": [
+<<<<<<< HEAD
+      "Microsoft.Framework.Logging >= 1.0.0-beta8",
+=======
+>>>>>>> 16befd32de7d8bb67a17565271e1d2f87d1b4854
       "Serilog.Framework.Logging >= 1.0.0-*",
       "NUnitTestAdapter.WithFramework >= 2.0.0"
     ],
