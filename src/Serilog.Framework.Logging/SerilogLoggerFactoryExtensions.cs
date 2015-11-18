@@ -4,7 +4,7 @@
 using System;
 using Serilog.Framework.Logging;
 
-namespace Microsoft.Framework.Logging
+namespace Microsoft.Extensions.Logging
 {
     /// <summary>
     /// Extends <see cref="ILoggerFactory"/> with Serilog configuration methods.
