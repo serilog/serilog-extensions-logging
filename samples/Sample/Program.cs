@@ -1,6 +1,6 @@
 ﻿using System;
-using Microsoft.Framework.Logging;
-using ILogger = Microsoft.Framework.Logging.ILogger;
+using Microsoft.Extensions.Logging;
+using ILogger = Microsoft.Extensions.Logging.ILogger;
 using Serilog;
 
 namespace Sample

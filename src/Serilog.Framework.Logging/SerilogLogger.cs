@@ -1,11 +1,11 @@
 // Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
-using Microsoft.Framework.Logging;
+using Microsoft.Extensions.Logging;
 using System;
 using Serilog.Core;
 using Serilog.Events;
-using FrameworkLogger = Microsoft.Framework.Logging.ILogger;
+using FrameworkLogger = Microsoft.Extensions.Logging.ILogger;
 using System.Reflection;
 
 namespace Serilog.Framework.Logging

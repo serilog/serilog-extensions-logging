@@ -8,10 +8,10 @@ using System.Runtime.Remoting.Messaging;
 #else
 using System.Threading;
 #endif
-using Microsoft.Framework.Logging;
+using Microsoft.Extensions.Logging;
 using Serilog.Core;
 using Serilog.Events;
-using FrameworkLogger = Microsoft.Framework.Logging.ILogger;
+using FrameworkLogger = Microsoft.Extensions.Logging.ILogger;
 
 namespace Serilog.Framework.Logging
 {
@@ -56,9 +56,9 @@ namespace Serilog.Framework.Logging
                 }
             }
         }
-
+        
 #if DNXCORE50
-        private AsyncLocal<SerilogLoggerScope> _value = new AsyncLocal<SerilogLoggerScope>();
+        private System.Threading.AsyncLocal<SerilogLoggerScope> _value = new System.Threading.AsyncLocal<SerilogLoggerScope>();
         public SerilogLoggerScope CurrentScope
         {
             get
