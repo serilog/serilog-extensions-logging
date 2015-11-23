@@ -2,7 +2,7 @@
 [![Build status](https://ci.appveyor.com/api/projects/status/865nohxfiq1rnby0/branch/master?svg=true)](https://ci.appveyor.com/project/serilog/serilog-framework-logging/branch/master) [![NuGet Version](http://img.shields.io/nuget/v/Serilog.Framework.Logging.svg?style=flat)](https://www.nuget.org/packages/Serilog.Framework.Logging/) 
 
 
-A serilog provider for [Microsoft.Framework.Logging](https://www.nuget.org/packages/Microsoft.Framework.Logging), the logging subsystem used by ASP.NET 5.
+A serilog provider for [Microsoft.Extensions.Logging](https://www.nuget.org/packages/Microsoft.Extensions.Logging), the logging subsystem used by ASP.NET 5. (Previously known as [Microsoft.Framework.Logging](https://github.com/aspnet/Logging/issues/257)).
 
 This package routes ASP.NET log messages through Serilog, so you can get information about ASP.NET's internal operations logged to the same Serilog sinks as your application events.
 
@@ -68,7 +68,7 @@ Two things:
 
 ### Building from source
 
-To build the `dev` branch, which tracks the `dev` branch of _Microsoft.Framework.Logging_, you must add https://www.myget.org/F/aspnetvnext/ to your package sources.
+To build the `dev` branch, which tracks the `dev` branch of _Microsoft.Extensions.Logging_, you must add https://www.myget.org/F/aspnetvnext/ to your package sources.
 
 ### Credits
 
