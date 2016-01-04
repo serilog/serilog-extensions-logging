@@ -347,7 +347,7 @@
     },
     "Serilog/1.5.11": {
       "type": "package",
-      "sha512": "XNMHuP9eRWk7ffNtEAtACoBqqrSGfioQnEbeK/boi/qtamh3ZgYXvUwH9/PytJdg3LGOIT0quyTiCNaqYlJUuQ==",
+      "sha512": "n+U19G0/9oZ+6pxnk9URbgrd+dk3hTyTzTo0lkEPRzmzXfU+Je8hmKqRSB9cLDZUF79jxZZNfA9Sp1YmKAZu4g==",
       "files": [
         "lib/net40/Serilog.dll",
         "lib/net40/Serilog.FullNetFx.dll",
