@@ -20,11 +20,7 @@ public class Startup
   public Startup(IHostingEnvironment env)
   {
     Log.Logger = new LoggerConfiguration()
-#if DNXCORE50
-      .WriteTo.TextWriter(Console.Out)
-#else
-      .WriteTo.Trace()
-#endif
+      .WriteTo.Console()
       .CreateLogger();
       
     // Other startup code
