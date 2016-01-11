@@ -70,15 +70,20 @@
           "lib/NUnit.VisualStudio.TestAdapter.dll": {}
         }
       },
-      "Serilog/1.5.11": {
+      "Serilog/2.0.0-beta-423": {
         "type": "package",
+        "frameworkAssemblies": [
+          "Microsoft.CSharp",
+          "mscorlib",
+          "System",
+          "System.Configuration",
+          "System.Core"
+        ],
         "compile": {
-          "lib/net45/Serilog.dll": {},
-          "lib/net45/Serilog.FullNetFx.dll": {}
+          "lib/net45/Serilog.dll": {}
         },
         "runtime": {
-          "lib/net45/Serilog.dll": {},
-          "lib/net45/Serilog.FullNetFx.dll": {}
+          "lib/net45/Serilog.dll": {}
         }
       },
       "Serilog.Framework.Logging/1.0.0-rc1-final": {
@@ -86,7 +91,7 @@
         "framework": "DNX,Version=v4.5.1",
         "dependencies": {
           "Microsoft.Extensions.Logging": "1.0.0-rc1-final",
-          "Serilog": "1.5.11"
+          "Serilog": "2.0.0-beta-423"
         },
         "frameworkAssemblies": [
           "System.Runtime"
@@ -161,15 +166,20 @@
           "lib/NUnit.VisualStudio.TestAdapter.dll": {}
         }
       },
-      "Serilog/1.5.11": {
+      "Serilog/2.0.0-beta-423": {
         "type": "package",
+        "frameworkAssemblies": [
+          "Microsoft.CSharp",
+          "mscorlib",
+          "System",
+          "System.Configuration",
+          "System.Core"
+        ],
         "compile": {
-          "lib/net45/Serilog.dll": {},
-          "lib/net45/Serilog.FullNetFx.dll": {}
+          "lib/net45/Serilog.dll": {}
         },
         "runtime": {
-          "lib/net45/Serilog.dll": {},
-          "lib/net45/Serilog.FullNetFx.dll": {}
+          "lib/net45/Serilog.dll": {}
         }
       },
       "Serilog.Framework.Logging/1.0.0-rc1-final": {
@@ -177,7 +187,7 @@
         "framework": "DNX,Version=v4.5.1",
         "dependencies": {
           "Microsoft.Extensions.Logging": "1.0.0-rc1-final",
-          "Serilog": "1.5.11"
+          "Serilog": "2.0.0-beta-423"
         },
         "frameworkAssemblies": [
           "System.Runtime"
@@ -252,15 +262,20 @@
           "lib/NUnit.VisualStudio.TestAdapter.dll": {}
         }
       },
-      "Serilog/1.5.11": {
+      "Serilog/2.0.0-beta-423": {
         "type": "package",
+        "frameworkAssemblies": [
+          "Microsoft.CSharp",
+          "mscorlib",
+          "System",
+          "System.Configuration",
+          "System.Core"
+        ],
         "compile": {
-          "lib/net45/Serilog.dll": {},
-          "lib/net45/Serilog.FullNetFx.dll": {}
+          "lib/net45/Serilog.dll": {}
         },
         "runtime": {
-          "lib/net45/Serilog.dll": {},
-          "lib/net45/Serilog.FullNetFx.dll": {}
+          "lib/net45/Serilog.dll": {}
         }
       },
       "Serilog.Framework.Logging/1.0.0-rc1-final": {
@@ -268,7 +283,7 @@
         "framework": "DNX,Version=v4.5.1",
         "dependencies": {
           "Microsoft.Extensions.Logging": "1.0.0-rc1-final",
-          "Serilog": "1.5.11"
+          "Serilog": "2.0.0-beta-423"
         },
         "frameworkAssemblies": [
           "System.Runtime"
@@ -345,27 +360,20 @@
         "tools/install.ps1"
       ]
     },
-    "Serilog/1.5.11": {
+    "Serilog/2.0.0-beta-423": {
       "type": "package",
-      "sha512": "n+U19G0/9oZ+6pxnk9URbgrd+dk3hTyTzTo0lkEPRzmzXfU+Je8hmKqRSB9cLDZUF79jxZZNfA9Sp1YmKAZu4g==",
+      "sha512": "qR92J+eD+Z5Z9EJG0il8WMnqjJ/KPNDvazC0+ucy6EJKo4JzqQuDHpKubec5iG+GUVCHU2OWTxLSVg0nDvufXw==",
       "files": [
+        "lib/dotnet5.1/Serilog.dll",
+        "lib/dotnet5.1/Serilog.xml",
+        "lib/dotnet5.4/Serilog.dll",
+        "lib/dotnet5.4/Serilog.xml",
         "lib/net40/Serilog.dll",
-        "lib/net40/Serilog.FullNetFx.dll",
-        "lib/net40/Serilog.FullNetFx.pdb",
-        "lib/net40/Serilog.FullNetFx.XML",
-        "lib/net40/Serilog.pdb",
-        "lib/net40/Serilog.XML",
+        "lib/net40/Serilog.xml",
         "lib/net45/Serilog.dll",
-        "lib/net45/Serilog.FullNetFx.dll",
-        "lib/net45/Serilog.FullNetFx.pdb",
-        "lib/net45/Serilog.FullNetFx.XML",
-        "lib/net45/Serilog.pdb",
-        "lib/net45/Serilog.XML",
-        "lib/portable-net45+win+wpa81+wp80+MonoAndroid10+MonoTouch10/Serilog.dll",
-        "lib/portable-net45+win+wpa81+wp80+MonoAndroid10+MonoTouch10/Serilog.pdb",
-        "lib/portable-net45+win+wpa81+wp80+MonoAndroid10+MonoTouch10/Serilog.XML",
-        "Serilog.1.5.11.nupkg",
-        "Serilog.1.5.11.nupkg.sha512",
+        "lib/net45/Serilog.xml",
+        "Serilog.2.0.0-beta-423.nupkg",
+        "Serilog.2.0.0-beta-423.nupkg.sha512",
         "Serilog.nuspec"
       ]
     }
