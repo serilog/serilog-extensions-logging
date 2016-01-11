@@ -4,14 +4,13 @@
 using System;
 using Serilog.Events;
 using Microsoft.Extensions.Logging;
-using NUnit.Framework;
 using System.Collections.Generic;
 using System.IO;
 using Serilog.Debugging;
+using Xunit;
 
 namespace Serilog.Framework.Logging.Test
 {
-    [TestFixture]
     public class SerilogLoggerTest
     {
         private const string Name = "test";
@@ -61,7 +60,7 @@ namespace Serilog.Framework.Logging.Test
             }
         }
 
-        [Test]
+        [Fact]
         public void LogsWhenNullFilterGiven()
         {
             var t = SetUp(LogLevel.Verbose);
@@ -70,10 +69,10 @@ namespace Serilog.Framework.Logging.Test
 
             logger.Log(LogLevel.Information, 0, TestMessage, null, null);
 
-            Assert.AreEqual(1, sink.Writes.Count);
+            Assert.Equal(1, sink.Writes.Count);
         }
 
-        [Test]
+        [Fact]
         public void LogsCorrectLevel()
         {
             var t = SetUp(LogLevel.Debug);
@@ -87,41 +86,41 @@ namespace Serilog.Framework.Logging.Test
             logger.Log(LogLevel.Error, 0, TestMessage, null, null);
             logger.Log(LogLevel.Critical, 0, TestMessage, null, null);
 
-            Assert.AreEqual(6, sink.Writes.Count);
-            Assert.AreEqual(LogEventLevel.Verbose, sink.Writes[0].Level);
-            Assert.AreEqual(LogEventLevel.Debug, sink.Writes[1].Level);
-            Assert.AreEqual(LogEventLevel.Information, sink.Writes[2].Level);
-            Assert.AreEqual(LogEventLevel.Warning, sink.Writes[3].Level);
-            Assert.AreEqual(LogEventLevel.Error, sink.Writes[4].Level);
-            Assert.AreEqual(LogEventLevel.Fatal, sink.Writes[5].Level);
+            Assert.Equal(6, sink.Writes.Count);
+            Assert.Equal(LogEventLevel.Verbose, sink.Writes[0].Level);
+            Assert.Equal(LogEventLevel.Debug, sink.Writes[1].Level);
+            Assert.Equal(LogEventLevel.Information, sink.Writes[2].Level);
+            Assert.Equal(LogEventLevel.Warning, sink.Writes[3].Level);
+            Assert.Equal(LogEventLevel.Error, sink.Writes[4].Level);
+            Assert.Equal(LogEventLevel.Fatal, sink.Writes[5].Level);
         }
 
-        [Test]
-        [TestCase(LogLevel.Verbose, LogLevel.Verbose, 1)]
-        [TestCase(LogLevel.Verbose, LogLevel.Information, 1)]
-        [TestCase(LogLevel.Verbose, LogLevel.Warning, 1)]
-        [TestCase(LogLevel.Verbose, LogLevel.Error, 1)]
-        [TestCase(LogLevel.Verbose, LogLevel.Critical, 1)]
-        [TestCase(LogLevel.Information, LogLevel.Verbose, 0)]
-        [TestCase(LogLevel.Information, LogLevel.Information, 1)]
-        [TestCase(LogLevel.Information, LogLevel.Warning, 1)]
-        [TestCase(LogLevel.Information, LogLevel.Error, 1)]
-        [TestCase(LogLevel.Information, LogLevel.Critical, 1)]
-        [TestCase(LogLevel.Warning, LogLevel.Verbose, 0)]
-        [TestCase(LogLevel.Warning, LogLevel.Information, 0)]
-        [TestCase(LogLevel.Warning, LogLevel.Warning, 1)]
-        [TestCase(LogLevel.Warning, LogLevel.Error, 1)]
-        [TestCase(LogLevel.Warning, LogLevel.Critical, 1)]
-        [TestCase(LogLevel.Error, LogLevel.Verbose, 0)]
-        [TestCase(LogLevel.Error, LogLevel.Information, 0)]
-        [TestCase(LogLevel.Error, LogLevel.Warning, 0)]
-        [TestCase(LogLevel.Error, LogLevel.Error, 1)]
-        [TestCase(LogLevel.Error, LogLevel.Critical, 1)]
-        [TestCase(LogLevel.Critical, LogLevel.Verbose, 0)]
-        [TestCase(LogLevel.Critical, LogLevel.Information, 0)]
-        [TestCase(LogLevel.Critical, LogLevel.Warning, 0)]
-        [TestCase(LogLevel.Critical, LogLevel.Error, 0)]
-        [TestCase(LogLevel.Critical, LogLevel.Critical, 1)]
+        [Theory]
+        [InlineData(LogLevel.Verbose, LogLevel.Verbose, 1)]
+        [InlineData(LogLevel.Verbose, LogLevel.Information, 1)]
+        [InlineData(LogLevel.Verbose, LogLevel.Warning, 1)]
+        [InlineData(LogLevel.Verbose, LogLevel.Error, 1)]
+        [InlineData(LogLevel.Verbose, LogLevel.Critical, 1)]
+        [InlineData(LogLevel.Information, LogLevel.Verbose, 0)]
+        [InlineData(LogLevel.Information, LogLevel.Information, 1)]
+        [InlineData(LogLevel.Information, LogLevel.Warning, 1)]
+        [InlineData(LogLevel.Information, LogLevel.Error, 1)]
+        [InlineData(LogLevel.Information, LogLevel.Critical, 1)]
+        [InlineData(LogLevel.Warning, LogLevel.Verbose, 0)]
+        [InlineData(LogLevel.Warning, LogLevel.Information, 0)]
+        [InlineData(LogLevel.Warning, LogLevel.Warning, 1)]
+        [InlineData(LogLevel.Warning, LogLevel.Error, 1)]
+        [InlineData(LogLevel.Warning, LogLevel.Critical, 1)]
+        [InlineData(LogLevel.Error, LogLevel.Verbose, 0)]
+        [InlineData(LogLevel.Error, LogLevel.Information, 0)]
+        [InlineData(LogLevel.Error, LogLevel.Warning, 0)]
+        [InlineData(LogLevel.Error, LogLevel.Error, 1)]
+        [InlineData(LogLevel.Error, LogLevel.Critical, 1)]
+        [InlineData(LogLevel.Critical, LogLevel.Verbose, 0)]
+        [InlineData(LogLevel.Critical, LogLevel.Information, 0)]
+        [InlineData(LogLevel.Critical, LogLevel.Warning, 0)]
+        [InlineData(LogLevel.Critical, LogLevel.Error, 0)]
+        [InlineData(LogLevel.Critical, LogLevel.Critical, 1)]
         public void LogsWhenEnabled(LogLevel minLevel, LogLevel logLevel, int expected)
         {
             var t = SetUp(minLevel);
@@ -130,10 +129,10 @@ namespace Serilog.Framework.Logging.Test
 
             logger.Log(logLevel, 0, TestMessage, null, null);
 
-            Assert.AreEqual(expected, sink.Writes.Count);
+            Assert.Equal(expected, sink.Writes.Count);
         }
 
-        [Test]
+        [Fact]
         public void LogsCorrectMessage()
         {
             var t = SetUp(LogLevel.Verbose);
@@ -143,11 +142,11 @@ namespace Serilog.Framework.Logging.Test
             logger.Log(LogLevel.Information, 0, null, null, null);
             logger.Log(LogLevel.Information, 0, TestMessage, null, null);
 
-            Assert.AreEqual(1, sink.Writes.Count);
-            Assert.AreEqual(TestMessage, sink.Writes[0].RenderMessage());
+            Assert.Equal(1, sink.Writes.Count);
+            Assert.Equal(TestMessage, sink.Writes[0].RenderMessage());
         }
 
-        [Test]
+        [Fact]
         public void CarriesException()
         {
             var t = SetUp(LogLevel.Verbose);
@@ -158,11 +157,11 @@ namespace Serilog.Framework.Logging.Test
 
             logger.Log(LogLevel.Information, 0, "Test", exception, null);
 
-            Assert.AreEqual(1, sink.Writes.Count);
-            Assert.AreSame(exception, sink.Writes[0].Exception);
+            Assert.Equal(1, sink.Writes.Count);
+            Assert.Same(exception, sink.Writes[0].Exception);
         }
 
-        [Test]
+        [Fact]
         public void SingleScopeProperty()
         {
             var t = SetUp(LogLevel.Verbose);
@@ -174,12 +173,12 @@ namespace Serilog.Framework.Logging.Test
                 logger.Log(LogLevel.Information, 0, TestMessage, null, null);
             }
 
-            Assert.AreEqual(1, sink.Writes.Count);
+            Assert.Equal(1, sink.Writes.Count);
             Assert.True(sink.Writes[0].Properties.ContainsKey("Name"));
-            Assert.AreEqual("\"pizza\"", sink.Writes[0].Properties["Name"].ToString());
+            Assert.Equal("\"pizza\"", sink.Writes[0].Properties["Name"].ToString());
         }
 
-        [Test]
+        [Fact]
         public void NestedScopeSameProperty()
         {
             var t = SetUp(LogLevel.Verbose);
@@ -195,12 +194,12 @@ namespace Serilog.Framework.Logging.Test
             }
 
             // Should retain the property of the most specific scope
-            Assert.AreEqual(1, sink.Writes.Count);
+            Assert.Equal(1, sink.Writes.Count);
             Assert.True(sink.Writes[0].Properties.ContainsKey("Name"));
-            Assert.AreEqual("\"bacon\"", sink.Writes[0].Properties["Name"].ToString());
+            Assert.Equal("\"bacon\"", sink.Writes[0].Properties["Name"].ToString());
         }
 
-        [Test]
+        [Fact]
         public void NestedScopesDifferentProperties()
         {
             var t = SetUp(LogLevel.Verbose);
@@ -215,14 +214,14 @@ namespace Serilog.Framework.Logging.Test
                 }
             }
 
-            Assert.AreEqual(1, sink.Writes.Count);
+            Assert.Equal(1, sink.Writes.Count);
             Assert.True(sink.Writes[0].Properties.ContainsKey("Name"));
-            Assert.AreEqual("\"spaghetti\"", sink.Writes[0].Properties["Name"].ToString());
+            Assert.Equal("\"spaghetti\"", sink.Writes[0].Properties["Name"].ToString());
             Assert.True(sink.Writes[0].Properties.ContainsKey("LuckyNumber"));
-            Assert.AreEqual("7", sink.Writes[0].Properties["LuckyNumber"].ToString());
+            Assert.Equal("7", sink.Writes[0].Properties["LuckyNumber"].ToString());
         }
 
-        [Test]
+        [Fact]
         public void CarriesMessageTemplateProperties()
         {
             var selfLog = new StringWriter();
@@ -235,11 +234,11 @@ namespace Serilog.Framework.Logging.Test
             logger.LogInformation("Hello, {Recipient}", "World");
 
             Assert.True(sink.Writes[0].Properties.ContainsKey("Recipient"));
-            Assert.AreEqual("\"World\"", sink.Writes[0].Properties["Recipient"].ToString());
-            Assert.AreEqual("Hello, {Recipient}", sink.Writes[0].MessageTemplate.Text);
+            Assert.Equal("\"World\"", sink.Writes[0].Properties["Recipient"].ToString());
+            Assert.Equal("Hello, {Recipient}", sink.Writes[0].MessageTemplate.Text);
 
             SelfLog.Out = null;
-            Assert.IsEmpty(selfLog.ToString());
+            Assert.Empty(selfLog.ToString());
         }
 
         private class FoodScope : ILogValues
