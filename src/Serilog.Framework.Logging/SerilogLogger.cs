@@ -3,10 +3,12 @@
 
 using Microsoft.Extensions.Logging;
 using System;
+using System.Linq;
 using Serilog.Core;
 using Serilog.Events;
 using FrameworkLogger = Microsoft.Extensions.Logging.ILogger;
 using System.Reflection;
+using Serilog.Parsing;
 
 namespace Serilog.Framework.Logging
 {
@@ -15,6 +17,8 @@ namespace Serilog.Framework.Logging
         readonly SerilogLoggerProvider _provider;
         readonly string _name;
         readonly ILogger _logger;
+
+        static readonly MessageTemplateParser _messageTemplateParser = new MessageTemplateParser();
 
         public SerilogLogger(
             SerilogLoggerProvider provider,
@@ -26,11 +30,8 @@ namespace Serilog.Framework.Logging
             _name = name;
             _logger = logger;
 
-            if (_logger == null)
-            {
-                // If a logger was passed, the provider has already added itself as an enricher
-                _logger = Serilog.Log.Logger.ForContext(new[] { provider });
-            }
+            // If a logger was passed, the provider has already added itself as an enricher
+            _logger = _logger ?? Serilog.Log.Logger.ForContext(new[] { provider });
 
             if (_name != null)
             {
@@ -103,7 +104,9 @@ namespace Serilog.Framework.Logging
                 logger = logger.ForContext("EventId", eventId);
             }
 
-            logger.Write(level, exception, messageTemplate);
+            var parsedTemplate = _messageTemplateParser.Parse(messageTemplate);
+            var evt = new LogEvent(DateTimeOffset.Now, level, exception, parsedTemplate, Enumerable.Empty<LogEventProperty>());
+            logger.Write(evt);
         }
 
         private LogEventLevel ConvertLevel(LogLevel logLevel)

@@ -2,20 +2,20 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
-using System.Globalization;
 using Serilog.Events;
 using Microsoft.Extensions.Logging;
 using NUnit.Framework;
 using System.Collections.Generic;
+using System.IO;
+using Serilog.Debugging;
 
 namespace Serilog.Framework.Logging.Test
 {
     [TestFixture]
     public class SerilogLoggerTest
     {
-        private const string _name = "test";
-        private const string _state = "This is a test";
-        private static readonly Func<object, Exception, string> TheMessageAndError = (message, error) => string.Format(CultureInfo.CurrentCulture, "{0}:{1}", message, error);
+        private const string Name = "test";
+        private const string TestMessage = "This is a test";
 
         private Tuple<SerilogLogger, SerilogSink> SetUp(LogLevel logLevel)
         {
@@ -30,29 +30,34 @@ namespace Serilog.Framework.Logging.Test
             SetMinLevel(config, logLevel);
 
             var provider = new SerilogLoggerProvider(config.CreateLogger());
-            var logger = (SerilogLogger)provider.CreateLogger(_name);
+            var logger = (SerilogLogger)provider.CreateLogger(Name);
 
             return new Tuple<SerilogLogger, SerilogSink>(logger, sink);
         }
 
-        private LoggerConfiguration SetMinLevel(LoggerConfiguration serilog, LogLevel logLevel)
+        private void SetMinLevel(LoggerConfiguration serilog, LogLevel logLevel)
+        {
+            serilog.MinimumLevel.Is(MapLevel(logLevel));
+        }
+
+        private LogEventLevel MapLevel(LogLevel logLevel)
         {
             switch (logLevel)
             {
                 case LogLevel.Debug:
-                    return serilog.MinimumLevel.Verbose();
+                    return LogEventLevel.Verbose;
                 case LogLevel.Verbose:
-                    return serilog.MinimumLevel.Debug();
+                    return LogEventLevel.Debug;
                 case LogLevel.Information:
-                    return serilog.MinimumLevel.Information();
+                    return LogEventLevel.Information;
                 case LogLevel.Warning:
-                    return serilog.MinimumLevel.Warning();
+                    return LogEventLevel.Warning;
                 case LogLevel.Error:
-                    return serilog.MinimumLevel.Error();
+                    return LogEventLevel.Error;
                 case LogLevel.Critical:
-                    return serilog.MinimumLevel.Fatal();
+                    return LogEventLevel.Fatal;
                 default:
-                    return serilog.MinimumLevel.Verbose();
+                    return LogEventLevel.Verbose;
             }
         }
 
@@ -63,7 +68,7 @@ namespace Serilog.Framework.Logging.Test
             var logger = t.Item1;
             var sink = t.Item2;
 
-            logger.Log(LogLevel.Information, 0, _state, null, null);
+            logger.Log(LogLevel.Information, 0, TestMessage, null, null);
 
             Assert.AreEqual(1, sink.Writes.Count);
         }
@@ -75,12 +80,12 @@ namespace Serilog.Framework.Logging.Test
             var logger = t.Item1;
             var sink = t.Item2;
 
-            logger.Log(LogLevel.Debug, 0, _state, null, null);
-            logger.Log(LogLevel.Verbose, 0, _state, null, null);
-            logger.Log(LogLevel.Information, 0, _state, null, null);
-            logger.Log(LogLevel.Warning, 0, _state, null, null);
-            logger.Log(LogLevel.Error, 0, _state, null, null);
-            logger.Log(LogLevel.Critical, 0, _state, null, null);
+            logger.Log(LogLevel.Debug, 0, TestMessage, null, null);
+            logger.Log(LogLevel.Verbose, 0, TestMessage, null, null);
+            logger.Log(LogLevel.Information, 0, TestMessage, null, null);
+            logger.Log(LogLevel.Warning, 0, TestMessage, null, null);
+            logger.Log(LogLevel.Error, 0, TestMessage, null, null);
+            logger.Log(LogLevel.Critical, 0, TestMessage, null, null);
 
             Assert.AreEqual(6, sink.Writes.Count);
             Assert.AreEqual(LogEventLevel.Verbose, sink.Writes[0].Level);
@@ -123,11 +128,10 @@ namespace Serilog.Framework.Logging.Test
             var logger = t.Item1;
             var sink = t.Item2;
 
-            logger.Log(logLevel, 0, _state, null, null);
+            logger.Log(logLevel, 0, TestMessage, null, null);
 
             Assert.AreEqual(expected, sink.Writes.Count);
         }
-
 
         [Test]
         public void LogsCorrectMessage()
@@ -136,13 +140,26 @@ namespace Serilog.Framework.Logging.Test
             var logger = t.Item1;
             var sink = t.Item2;
 
-            var exception = new Exception();
-
             logger.Log(LogLevel.Information, 0, null, null, null);
-            logger.Log(LogLevel.Information, 0, _state, null, null);
+            logger.Log(LogLevel.Information, 0, TestMessage, null, null);
 
             Assert.AreEqual(1, sink.Writes.Count);
-            Assert.AreEqual(_state, sink.Writes[0].RenderMessage());
+            Assert.AreEqual(TestMessage, sink.Writes[0].RenderMessage());
+        }
+
+        [Test]
+        public void CarriesException()
+        {
+            var t = SetUp(LogLevel.Verbose);
+            var logger = t.Item1;
+            var sink = t.Item2;
+
+            var exception = new Exception();
+
+            logger.Log(LogLevel.Information, 0, "Test", exception, null);
+
+            Assert.AreEqual(1, sink.Writes.Count);
+            Assert.AreSame(exception, sink.Writes[0].Exception);
         }
 
         [Test]
@@ -154,7 +171,7 @@ namespace Serilog.Framework.Logging.Test
 
             using (logger.BeginScopeImpl(new FoodScope("pizza")))
             {
-                logger.Log(LogLevel.Information, 0, _state, null, null);
+                logger.Log(LogLevel.Information, 0, TestMessage, null, null);
             }
 
             Assert.AreEqual(1, sink.Writes.Count);
@@ -173,7 +190,7 @@ namespace Serilog.Framework.Logging.Test
             {
                 using (logger.BeginScopeImpl(new FoodScope("bacon")))
                 {
-                    logger.Log(LogLevel.Information, 0, _state, null, null);
+                    logger.Log(LogLevel.Information, 0, TestMessage, null, null);
                 }
             }
 
@@ -194,7 +211,7 @@ namespace Serilog.Framework.Logging.Test
             {
                 using (logger.BeginScopeImpl(new LuckyScope(7)))
                 {
-                    logger.Log(LogLevel.Information, 0, _state, null, null);
+                    logger.Log(LogLevel.Information, 0, TestMessage, null, null);
                 }
             }
 
@@ -205,9 +222,29 @@ namespace Serilog.Framework.Logging.Test
             Assert.AreEqual("7", sink.Writes[0].Properties["LuckyNumber"].ToString());
         }
 
+        [Test]
+        public void CarriesMessageTemplateProperties()
+        {
+            var selfLog = new StringWriter();
+            SelfLog.Out = selfLog;
+
+            var t = SetUp(LogLevel.Verbose);
+            var logger = t.Item1;
+            var sink = t.Item2;
+
+            logger.LogInformation("Hello, {Recipient}", "World");
+
+            Assert.True(sink.Writes[0].Properties.ContainsKey("Recipient"));
+            Assert.AreEqual("\"World\"", sink.Writes[0].Properties["Recipient"].ToString());
+            Assert.AreEqual("Hello, {Recipient}", sink.Writes[0].MessageTemplate.Text);
+
+            SelfLog.Out = null;
+            Assert.IsEmpty(selfLog.ToString());
+        }
+
         private class FoodScope : ILogValues
         {
-            private string _name;
+            readonly string _name;
 
             public FoodScope(string name)
             {
@@ -222,7 +259,7 @@ namespace Serilog.Framework.Logging.Test
 
         private class LuckyScope : ILogValues
         {
-            private int _luckyNumber;
+            readonly int _luckyNumber;
 
             public LuckyScope(int luckyNumber)
             {

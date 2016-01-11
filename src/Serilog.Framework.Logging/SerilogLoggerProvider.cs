@@ -78,7 +78,7 @@ namespace Serilog.Framework.Logging
             get
             {
                 var objectHandle = CallContext.LogicalGetData(_currentScopeKey) as ObjectHandle;
-                return objectHandle != null ? objectHandle.Unwrap() as SerilogLoggerScope : null;
+                return objectHandle?.Unwrap() as SerilogLoggerScope;
             }
             set
             {
