@@ -57,7 +57,7 @@ namespace Serilog.Framework.Logging
             }
         }
         
-#if DNXCORE50
+#if NETCORE50 || DOTNET5_4
         private System.Threading.AsyncLocal<SerilogLoggerScope> _value = new System.Threading.AsyncLocal<SerilogLoggerScope>();
         public SerilogLoggerScope CurrentScope
         {

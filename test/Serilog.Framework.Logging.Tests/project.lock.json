@@ -151,14 +151,11 @@
       },
       "Serilog.Framework.Logging/1.0.0-rc1-final": {
         "type": "project",
-        "framework": "DNX,Version=v4.5.1",
+        "framework": ".NETFramework,Version=v4.5.1",
         "dependencies": {
           "Microsoft.Extensions.Logging": "1.0.0-rc1-final",
           "Serilog": "2.0.0-beta-423"
-        },
-        "frameworkAssemblies": [
-          "System.Runtime"
-        ]
+        }
       },
       "xunit/2.1.0": {
         "type": "package",
@@ -478,15 +475,10 @@
       },
       "Serilog.Framework.Logging/1.0.0-rc1-final": {
         "type": "project",
-        "framework": "DNXCore,Version=v5.0",
+        "framework": ".NETPlatform,Version=v5.4",
         "dependencies": {
-          "Microsoft.CSharp": "4.0.0",
           "Microsoft.Extensions.Logging": "1.0.0-rc1-final",
-          "Serilog": "2.0.0-beta-423",
-          "System.Collections": "4.0.10-beta-23516",
-          "System.Console": "4.0.0-beta-23516",
-          "System.Linq": "4.0.0",
-          "System.Threading": "4.0.10-beta-23516"
+          "Serilog": "2.0.0-beta-423"
         }
       },
       "System.Collections/4.0.11-beta-23516": {
@@ -1445,14 +1437,11 @@
       },
       "Serilog.Framework.Logging/1.0.0-rc1-final": {
         "type": "project",
-        "framework": "DNX,Version=v4.5.1",
+        "framework": ".NETFramework,Version=v4.5.1",
         "dependencies": {
           "Microsoft.Extensions.Logging": "1.0.0-rc1-final",
           "Serilog": "2.0.0-beta-423"
-        },
-        "frameworkAssemblies": [
-          "System.Runtime"
-        ]
+        }
       },
       "xunit/2.1.0": {
         "type": "package",
@@ -1716,14 +1705,11 @@
       },
       "Serilog.Framework.Logging/1.0.0-rc1-final": {
         "type": "project",
-        "framework": "DNX,Version=v4.5.1",
+        "framework": ".NETFramework,Version=v4.5.1",
         "dependencies": {
           "Microsoft.Extensions.Logging": "1.0.0-rc1-final",
           "Serilog": "2.0.0-beta-423"
-        },
-        "frameworkAssemblies": [
-          "System.Runtime"
-        ]
+        }
       },
       "xunit/2.1.0": {
         "type": "package",
@@ -2261,15 +2247,10 @@
       },
       "Serilog.Framework.Logging/1.0.0-rc1-final": {
         "type": "project",
-        "framework": "DNXCore,Version=v5.0",
+        "framework": ".NETPlatform,Version=v5.4",
         "dependencies": {
-          "Microsoft.CSharp": "4.0.0",
           "Microsoft.Extensions.Logging": "1.0.0-rc1-final",
-          "Serilog": "2.0.0-beta-423",
-          "System.Collections": "4.0.10-beta-23516",
-          "System.Console": "4.0.0-beta-23516",
-          "System.Linq": "4.0.0",
-          "System.Threading": "4.0.10-beta-23516"
+          "Serilog": "2.0.0-beta-423"
         }
       },
       "System.Collections/4.0.11-beta-23516": {
@@ -3612,15 +3593,10 @@
       },
       "Serilog.Framework.Logging/1.0.0-rc1-final": {
         "type": "project",
-        "framework": "DNXCore,Version=v5.0",
+        "framework": ".NETPlatform,Version=v5.4",
         "dependencies": {
-          "Microsoft.CSharp": "4.0.0",
           "Microsoft.Extensions.Logging": "1.0.0-rc1-final",
-          "Serilog": "2.0.0-beta-423",
-          "System.Collections": "4.0.10-beta-23516",
-          "System.Console": "4.0.0-beta-23516",
-          "System.Linq": "4.0.0",
-          "System.Threading": "4.0.10-beta-23516"
+          "Serilog": "2.0.0-beta-423"
         }
       },
       "System.Collections/4.0.11-beta-23516": {
@@ -6094,7 +6070,7 @@
     "System.Reflection/4.1.0-beta-23225": {
       "type": "package",
       "serviceable": true,
-      "sha512": "WbLtaCxoe5XdqEyZuGpemSQ8YBJ8cj11zx+yxOxJfHbNrmu7oMQ29+J50swaqg3soUc3BVBMqfIhb/7gocDHQA==",
+      "sha512": "nlguo6AocBKGccv4CFSMCOR2/vU+93u/yvzFKO6ViNJ/SBz2VEZ1nOeW93vqKKpOMJkt3YtTvMWmS+kUGz/1bA==",
       "files": [
         "lib/DNXCore50/System.Reflection.dll",
         "lib/MonoAndroid10/_._",
