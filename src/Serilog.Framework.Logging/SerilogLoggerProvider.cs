@@ -56,21 +56,8 @@ namespace Serilog.Framework.Logging
                 }
             }
         }
-        
-#if DNXCORE50
-        private System.Threading.AsyncLocal<SerilogLoggerScope> _value = new System.Threading.AsyncLocal<SerilogLoggerScope>();
-        public SerilogLoggerScope CurrentScope
-        {
-            get
-            {
-                return _value.Value;
-            }
-            set
-            {
-                _value.Value = value;
-            }
-        }
-#else
+
+#if NET451
         private readonly string _currentScopeKey = nameof(SerilogLoggerScope) + "#" + Guid.NewGuid().ToString("n");
 
         public SerilogLoggerScope CurrentScope
@@ -83,6 +70,19 @@ namespace Serilog.Framework.Logging
             set
             {
                 CallContext.LogicalSetData(_currentScopeKey, new ObjectHandle(value));
+            }
+        }
+#else
+        private System.Threading.AsyncLocal<SerilogLoggerScope> _value = new System.Threading.AsyncLocal<SerilogLoggerScope>();
+        public SerilogLoggerScope CurrentScope
+        {
+            get
+            {
+                return _value.Value;
+            }
+            set
+            {
+                _value.Value = value;
             }
         }
 #endif
