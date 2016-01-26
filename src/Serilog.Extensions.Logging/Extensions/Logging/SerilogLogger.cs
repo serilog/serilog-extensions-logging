@@ -59,6 +59,7 @@ namespace Serilog.Extensions.Logging
 
             var logger = _logger;
             string messageTemplate = null;
+            var format = formatter ?? ((s,_) => LogFormatter.Formatter(s, null));
 
             var structure = state as ILogValues;
             if (structure != null)
@@ -81,17 +82,18 @@ namespace Serilog.Extensions.Logging
 
                 var stateType = state.GetType();
                 var stateTypeInfo = stateType.GetTypeInfo();
-                // Imperfect, but at least eliminates `1 and + names
-                if (messageTemplate == null && !stateTypeInfo.IsGenericType && !stateTypeInfo.IsNested)
+                // Imperfect, but at least eliminates `1 names
+                if (messageTemplate == null && !stateTypeInfo.IsGenericType)
                 {
                     messageTemplate = "{" + stateType.Name + ":l}";
-                    logger = logger.ForContext(stateType.Name, LogFormatter.Formatter(state, null));
+                    logger = logger.ForContext(stateType.Name, format(state, null));
                 }
             }
 
             if (messageTemplate == null && state != null)
             {
-                messageTemplate = LogFormatter.Formatter(state, null);
+                messageTemplate = "{State:l}";
+                logger = logger.ForContext("State", format(state, null));
             }
 
             if (string.IsNullOrEmpty(messageTemplate))
