@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using Serilog.Core;
 using Serilog.Events;
 
-namespace Serilog.Framework.Logging.Test
+namespace Serilog.Extensions.Logging.Test
 {
     public class SerilogSink : ILogEventSink
     {

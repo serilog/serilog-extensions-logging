@@ -9,7 +9,7 @@ using System.IO;
 using Serilog.Debugging;
 using Xunit;
 
-namespace Serilog.Framework.Logging.Test
+namespace Serilog.Extensions.Logging.Test
 {
     public class SerilogLoggerTest
     {

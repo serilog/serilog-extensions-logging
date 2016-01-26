@@ -2,14 +2,14 @@
   "version": "1.0.0-rc1-final-*",
   "description": "Serilog provider for Microsoft.Extensions.Logging",
   "authors": [ "Microsoft", "Serilog Contributors" ],
-  "tags": [ "serilog dnx" ],
+  "tags": [ "serilog", "Microsoft.Extensions.Logging" ],
   "projectUrl": "https://github.com/serilog/serilog-framework-logging",
   "licenseUrl": "http://www.apache.org/licenses/LICENSE-2.0",
 
-    "dependencies": {
-        "Serilog": "2.0.0-beta-423",
-        "Microsoft.Extensions.Logging": "1.0.0-rc1-final"
-    },
+  "dependencies": {
+    "Serilog": "2.0.0-beta-465",
+    "Microsoft.Extensions.Logging": "1.0.0-rc1-final"
+  },
 
   "frameworks": {
     "net451": {

@@ -5,9 +5,12 @@
   "tags": [ "" ],
   "projectUrl": "",
   "licenseUrl": "",
-
+  "compilationOptions": {
+    "emitEntryPoint": true
+  },
   "dependencies": {
-    "Serilog.Framework.Logging": "1.0.0-*"
+    "Serilog.Extensions.Logging": "1.0.0-*",
+    "Serilog.Sinks.Literate": "2.0.0-beta-21"
   },
 
   "commands": {
@@ -15,14 +18,14 @@
   },
 
   "frameworks": {
-    "dnx451": {},
+    "dnx451": { },
     "dnxcore50": {
       "dependencies": {
+        "Microsoft.CSharp": "4.0.1-beta-23516",
+        "System.Collections": "4.0.11-beta-23516",
         "System.Console": "4.0.0-beta-23516",
-        "System.Collections": "4.0.0",
-        "System.Linq": "4.0.0",
-        "System.Threading": "4.0.0",
-        "Microsoft.CSharp": "4.0.0"
+        "System.Linq": "4.0.1-beta-23516",
+        "System.Threading": "4.0.11-beta-23516"
       }
     }
   }

@@ -3,7 +3,7 @@
 
 using System;
 
-namespace Serilog.Framework.Logging
+namespace Serilog.Extensions.Logging
 {
     public class SerilogLoggerScope : IDisposable
     {

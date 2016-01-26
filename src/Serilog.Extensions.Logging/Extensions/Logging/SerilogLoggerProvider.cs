@@ -13,7 +13,7 @@ using Serilog.Core;
 using Serilog.Events;
 using FrameworkLogger = Microsoft.Extensions.Logging.ILogger;
 
-namespace Serilog.Framework.Logging
+namespace Serilog.Extensions.Logging
 {
     public class SerilogLoggerProvider : ILoggerProvider, ILogEventEnricher
     {

@@ -2,9 +2,10 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
-using Serilog.Framework.Logging;
+using Microsoft.Extensions.Logging;
+using Serilog.Extensions.Logging;
 
-namespace Microsoft.Extensions.Logging
+namespace Serilog
 {
     /// <summary>
     /// Extends <see cref="ILoggerFactory"/> with Serilog configuration methods.
@@ -19,9 +20,9 @@ namespace Microsoft.Extensions.Logging
         /// <returns>The logger factory.</returns>
         public static ILoggerFactory AddSerilog(
             this ILoggerFactory factory,
-            Serilog.ILogger logger = null)
+            ILogger logger = null)
         {
-            if (factory == null) throw new ArgumentNullException("factory");
+            if (factory == null) throw new ArgumentNullException(nameof(factory));
 
             factory.AddProvider(new SerilogLoggerProvider(logger));
 

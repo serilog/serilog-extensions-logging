@@ -10,7 +10,7 @@ using FrameworkLogger = Microsoft.Extensions.Logging.ILogger;
 using System.Reflection;
 using Serilog.Parsing;
 
-namespace Serilog.Framework.Logging
+namespace Serilog.Extensions.Logging
 {
     public class SerilogLogger : FrameworkLogger
     {

@@ -1,14 +1,19 @@
-# Serilog.Framework.Logging 
-[![Build status](https://ci.appveyor.com/api/projects/status/865nohxfiq1rnby0/branch/master?svg=true)](https://ci.appveyor.com/project/serilog/serilog-framework-logging/branch/master) [![NuGet Version](http://img.shields.io/nuget/v/Serilog.Framework.Logging.svg?style=flat)](https://www.nuget.org/packages/Serilog.Framework.Logging/) 
+# Serilog.Extensions.Logging 
+[![Build status](https://ci.appveyor.com/api/projects/status/865nohxfiq1rnby0/branch/master?svg=true)](https://ci.appveyor.com/project/serilog/serilog-extensions-logging/branch/master) [![NuGet Version](http://img.shields.io/nuget/v/Serilog.Extensions.Logging.svg?style=flat)](https://www.nuget.org/packages/Serilog.Extensions.Logging/) 
 
 
-A serilog provider for [Microsoft.Extensions.Logging](https://www.nuget.org/packages/Microsoft.Extensions.Logging), the logging subsystem used by ASP.NET 5. (Previously known as [Microsoft.Framework.Logging](https://github.com/aspnet/Logging/issues/257)).
+A Serilog provider for [Microsoft.Extensions.Logging](https://www.nuget.org/packages/Microsoft.Extensions.Logging), the logging subsystem used by ASP.NET 5.
 
 This package routes ASP.NET log messages through Serilog, so you can get information about ASP.NET's internal operations logged to the same Serilog sinks as your application events.
 
 ### Instructions
 
-**First**, install the _Serilog.Framework.Logging_ [NuGet package](https://www.nuget.org/packages/Serilog.Framework.Logging) into your web or console app.
+**First**, install the _Serilog.Extensions.Logging_ [NuGet package](https://www.nuget.org/packages/Serilog.Extensions.Logging) into your web or console app. You will need a way to view the log messages - _Serilog.Sinks.Literate_ writes these to the console.
+
+```powershell
+Install-Package Serilog.Extensions.Logging
+Install-Package Serilog.Sinks.Literate
+```
 
 **Next**, in your application's `Startup` method, configure Serilog first:
 
@@ -20,13 +25,11 @@ public class Startup
   public Startup(IHostingEnvironment env)
   {
     Log.Logger = new LoggerConfiguration()
-      .WriteTo.Console()
+      .WriteTo.LiterateConsole()
       .CreateLogger();
       
     // Other startup code
 ```
-
-The conditional compilation (`#if`) is necessary if you're targeting the CoreCLR runtime, for which there are currenlty few Serilog sinks. If you're targeting the full .NET framework you can just use `.WriteTo.Trace()`, or any other available sink.
 
 **Finally**, in your `Startup` class's `Configure()` method, call `AddSerilog()` on the provided `loggerFactory`.
 
@@ -41,16 +44,16 @@ The conditional compilation (`#if`) is necessary if you're targeting the CoreCLR
 That's it! With the level bumped up a little you should see log output like:
 
 ```
-2015-05-15 22:14:44.646 +10:00 [Debug] RouteCollection.RouteAsync
+2015-05-15 22:14:44.646 +10:00 [DBG] RouteCollection.RouteAsync
 	Routes: 
 		Microsoft.AspNet.Mvc.Routing.AttributeRoute
 		{controller=Home}/{action=Index}/{id?}
 	Handled? True
-2015-05-15 22:14:44.647 +10:00 [Debug] RouterMiddleware.Invoke
+2015-05-15 22:14:44.647 +10:00 [DBG] RouterMiddleware.Invoke
 	Handled? True
-2015-05-15 22:14:45.706 +10:00 [Debug] /lib/jquery/jquery.js not modified
-2015-05-15 22:14:45.706 +10:00 [Debug] /css/site.css not modified
-2015-05-15 22:14:45.741 +10:00 [Debug] Handled. Status code: 304 File: /css/site.css
+2015-05-15 22:14:45.706 +10:00 [DBG] /lib/jquery/jquery.js not modified
+2015-05-15 22:14:45.706 +10:00 [DBG] /css/site.css not modified
+2015-05-15 22:14:45.741 +10:00 [DBG] Handled. Status code: 304 File: /css/site.css
 ```
 
 ### Levels
