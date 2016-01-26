@@ -5,7 +5,7 @@
   "tags": [ "serilog", "Microsoft.Extensions.Logging" ],
   "projectUrl": "https://github.com/serilog/serilog-extensions-logging",
   "licenseUrl": "http://www.apache.org/licenses/LICENSE-2.0",
-
+  "iconUrl": "http://serilog.net/images/serilog-extension-nuget.png",
   "dependencies": {
     "Serilog": "2.0.0-beta-465",
     "Microsoft.Extensions.Logging": "1.0.0-rc1-final"
