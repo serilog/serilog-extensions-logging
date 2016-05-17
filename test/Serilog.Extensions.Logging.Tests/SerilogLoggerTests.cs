@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
+using System.Collections;
 using Serilog.Events;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
@@ -21,9 +22,6 @@ namespace Serilog.Extensions.Logging.Test
             var sink = new SerilogSink();
 
             var config = new LoggerConfiguration()
-                .Enrich.WithMachineName()
-                .Enrich.WithProcessId()
-                .Enrich.WithThreadId()
                 .WriteTo.Sink(sink);
 
             SetMinLevel(config, logLevel);
@@ -43,9 +41,9 @@ namespace Serilog.Extensions.Logging.Test
         {
             switch (logLevel)
             {
-                case LogLevel.Debug:
+                case LogLevel.Trace:
                     return LogEventLevel.Verbose;
-                case LogLevel.Verbose:
+                case LogLevel.Debug:
                     return LogEventLevel.Debug;
                 case LogLevel.Information:
                     return LogEventLevel.Information;
@@ -63,7 +61,7 @@ namespace Serilog.Extensions.Logging.Test
         [Fact]
         public void LogsWhenNullFilterGiven()
         {
-            var t = SetUp(LogLevel.Verbose);
+            var t = SetUp(LogLevel.Trace);
             var logger = t.Item1;
             var sink = t.Item2;
 
@@ -75,12 +73,12 @@ namespace Serilog.Extensions.Logging.Test
         [Fact]
         public void LogsCorrectLevel()
         {
-            var t = SetUp(LogLevel.Debug);
+            var t = SetUp(LogLevel.Trace);
             var logger = t.Item1;
             var sink = t.Item2;
 
+            logger.Log(LogLevel.Trace, 0, TestMessage, null, null);
             logger.Log(LogLevel.Debug, 0, TestMessage, null, null);
-            logger.Log(LogLevel.Verbose, 0, TestMessage, null, null);
             logger.Log(LogLevel.Information, 0, TestMessage, null, null);
             logger.Log(LogLevel.Warning, 0, TestMessage, null, null);
             logger.Log(LogLevel.Error, 0, TestMessage, null, null);
@@ -96,27 +94,38 @@ namespace Serilog.Extensions.Logging.Test
         }
 
         [Theory]
-        [InlineData(LogLevel.Verbose, LogLevel.Verbose, 1)]
-        [InlineData(LogLevel.Verbose, LogLevel.Information, 1)]
-        [InlineData(LogLevel.Verbose, LogLevel.Warning, 1)]
-        [InlineData(LogLevel.Verbose, LogLevel.Error, 1)]
-        [InlineData(LogLevel.Verbose, LogLevel.Critical, 1)]
-        [InlineData(LogLevel.Information, LogLevel.Verbose, 0)]
+        [InlineData(LogLevel.Trace, LogLevel.Trace, 1)]
+        [InlineData(LogLevel.Trace, LogLevel.Debug, 1)]
+        [InlineData(LogLevel.Trace, LogLevel.Information, 1)]
+        [InlineData(LogLevel.Trace, LogLevel.Warning, 1)]
+        [InlineData(LogLevel.Trace, LogLevel.Error, 1)]
+        [InlineData(LogLevel.Trace, LogLevel.Critical, 1)]
+        [InlineData(LogLevel.Debug, LogLevel.Trace, 0)]
+        [InlineData(LogLevel.Debug, LogLevel.Debug, 1)]
+        [InlineData(LogLevel.Debug, LogLevel.Information, 1)]
+        [InlineData(LogLevel.Debug, LogLevel.Warning, 1)]
+        [InlineData(LogLevel.Debug, LogLevel.Error, 1)]
+        [InlineData(LogLevel.Debug, LogLevel.Critical, 1)]
+        [InlineData(LogLevel.Information, LogLevel.Trace, 0)]
+        [InlineData(LogLevel.Information, LogLevel.Debug, 0)]
         [InlineData(LogLevel.Information, LogLevel.Information, 1)]
         [InlineData(LogLevel.Information, LogLevel.Warning, 1)]
         [InlineData(LogLevel.Information, LogLevel.Error, 1)]
         [InlineData(LogLevel.Information, LogLevel.Critical, 1)]
-        [InlineData(LogLevel.Warning, LogLevel.Verbose, 0)]
+        [InlineData(LogLevel.Warning, LogLevel.Trace, 0)]
+        [InlineData(LogLevel.Warning, LogLevel.Debug, 0)]
         [InlineData(LogLevel.Warning, LogLevel.Information, 0)]
         [InlineData(LogLevel.Warning, LogLevel.Warning, 1)]
         [InlineData(LogLevel.Warning, LogLevel.Error, 1)]
         [InlineData(LogLevel.Warning, LogLevel.Critical, 1)]
-        [InlineData(LogLevel.Error, LogLevel.Verbose, 0)]
+        [InlineData(LogLevel.Error, LogLevel.Trace, 0)]
+        [InlineData(LogLevel.Error, LogLevel.Debug, 0)]
         [InlineData(LogLevel.Error, LogLevel.Information, 0)]
         [InlineData(LogLevel.Error, LogLevel.Warning, 0)]
         [InlineData(LogLevel.Error, LogLevel.Error, 1)]
         [InlineData(LogLevel.Error, LogLevel.Critical, 1)]
-        [InlineData(LogLevel.Critical, LogLevel.Verbose, 0)]
+        [InlineData(LogLevel.Critical, LogLevel.Trace, 0)]
+        [InlineData(LogLevel.Critical, LogLevel.Debug, 0)]
         [InlineData(LogLevel.Critical, LogLevel.Information, 0)]
         [InlineData(LogLevel.Critical, LogLevel.Warning, 0)]
         [InlineData(LogLevel.Critical, LogLevel.Error, 0)]
@@ -135,11 +144,11 @@ namespace Serilog.Extensions.Logging.Test
         [Fact]
         public void LogsCorrectMessage()
         {
-            var t = SetUp(LogLevel.Verbose);
+            var t = SetUp(LogLevel.Trace);
             var logger = t.Item1;
             var sink = t.Item2;
 
-            logger.Log(LogLevel.Information, 0, null, null, null);
+            logger.Log<object>(LogLevel.Information, 0, null, null, null);
             logger.Log(LogLevel.Information, 0, TestMessage, null, null);
 
             Assert.Equal(1, sink.Writes.Count);
@@ -149,7 +158,7 @@ namespace Serilog.Extensions.Logging.Test
         [Fact]
         public void CarriesException()
         {
-            var t = SetUp(LogLevel.Verbose);
+            var t = SetUp(LogLevel.Trace);
             var logger = t.Item1;
             var sink = t.Item2;
 
@@ -164,11 +173,11 @@ namespace Serilog.Extensions.Logging.Test
         [Fact]
         public void SingleScopeProperty()
         {
-            var t = SetUp(LogLevel.Verbose);
+            var t = SetUp(LogLevel.Trace);
             var logger = t.Item1;
             var sink = t.Item2;
 
-            using (logger.BeginScopeImpl(new FoodScope("pizza")))
+            using (logger.BeginScope(new FoodScope("pizza")))
             {
                 logger.Log(LogLevel.Information, 0, TestMessage, null, null);
             }
@@ -181,13 +190,13 @@ namespace Serilog.Extensions.Logging.Test
         [Fact]
         public void NestedScopeSameProperty()
         {
-            var t = SetUp(LogLevel.Verbose);
+            var t = SetUp(LogLevel.Trace);
             var logger = t.Item1;
             var sink = t.Item2;
 
-            using (logger.BeginScopeImpl(new FoodScope("avocado")))
+            using (logger.BeginScope(new FoodScope("avocado")))
             {
-                using (logger.BeginScopeImpl(new FoodScope("bacon")))
+                using (logger.BeginScope(new FoodScope("bacon")))
                 {
                     logger.Log(LogLevel.Information, 0, TestMessage, null, null);
                 }
@@ -202,13 +211,13 @@ namespace Serilog.Extensions.Logging.Test
         [Fact]
         public void NestedScopesDifferentProperties()
         {
-            var t = SetUp(LogLevel.Verbose);
+            var t = SetUp(LogLevel.Trace);
             var logger = t.Item1;
             var sink = t.Item2;
 
-            using (logger.BeginScopeImpl(new FoodScope("spaghetti")))
+            using (logger.BeginScope(new FoodScope("spaghetti")))
             {
-                using (logger.BeginScopeImpl(new LuckyScope(7)))
+                using (logger.BeginScope(new LuckyScope(7)))
                 {
                     logger.Log(LogLevel.Information, 0, TestMessage, null, null);
                 }
@@ -227,7 +236,7 @@ namespace Serilog.Extensions.Logging.Test
             var selfLog = new StringWriter();
             SelfLog.Out = selfLog;
 
-            var t = SetUp(LogLevel.Verbose);
+            var t = SetUp(LogLevel.Trace);
             var logger = t.Item1;
             var sink = t.Item2;
 
@@ -241,7 +250,7 @@ namespace Serilog.Extensions.Logging.Test
             Assert.Empty(selfLog.ToString());
         }
 
-        private class FoodScope : ILogValues
+        private class FoodScope : IEnumerable<KeyValuePair<string, object>>
         {
             readonly string _name;
 
@@ -250,13 +259,18 @@ namespace Serilog.Extensions.Logging.Test
                 _name = name;
             }
 
-            public IEnumerable<KeyValuePair<string, object>> GetValues()
+            public IEnumerator<KeyValuePair<string, object>> GetEnumerator()
             {
                 yield return new KeyValuePair<string, object>("Name", _name);
             }
+
+            IEnumerator IEnumerable.GetEnumerator()
+            {
+                return GetEnumerator();
+            }
         }
 
-        private class LuckyScope : ILogValues
+        private class LuckyScope : IEnumerable<KeyValuePair<string, object>>
         {
             readonly int _luckyNumber;
 
@@ -265,9 +279,14 @@ namespace Serilog.Extensions.Logging.Test
                 _luckyNumber = luckyNumber;
             }
 
-            public IEnumerable<KeyValuePair<string, object>> GetValues()
+            public IEnumerator<KeyValuePair<string, object>> GetEnumerator()
             {
                 yield return new KeyValuePair<string, object>("LuckyNumber", _luckyNumber);
+            }
+
+            IEnumerator IEnumerable.GetEnumerator()
+            {
+                return GetEnumerator();
             }
         }
     }

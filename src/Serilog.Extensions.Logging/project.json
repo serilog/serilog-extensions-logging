@@ -1,22 +1,27 @@
 ﻿{
-  "version": "1.0.0-rc1-final-*",
+  "version": "1.0.0-rc-*",
   "description": "Serilog provider for Microsoft.Extensions.Logging",
   "authors": [ "Microsoft", "Serilog Contributors" ],
-  "tags": [ "serilog", "Microsoft.Extensions.Logging" ],
-  "projectUrl": "https://github.com/serilog/serilog-extensions-logging",
-  "licenseUrl": "http://www.apache.org/licenses/LICENSE-2.0",
-  "iconUrl": "http://serilog.net/images/serilog-extension-nuget.png",
-  "dependencies": {
-    "Serilog": "2.0.0-beta-465",
-    "Microsoft.Extensions.Logging": "1.0.0-rc1-final"
+  "packOptions": {
+    "tags": [ "serilog", "Microsoft.Extensions.Logging" ],
+    "projectUrl": "https://github.com/serilog/serilog-extensions-logging",
+    "licenseUrl": "http://www.apache.org/licenses/LICENSE-2.0",
+    "iconUrl": "http://serilog.net/images/serilog-extension-nuget.png"
   },
-
+  "dependencies": {
+    "Serilog": "2.0.0-rc-556",
+    "Microsoft.Extensions.Logging": "1.0.0-rc2-final"
+  },
+  "buildOptions": {
+    "keyFile": "../../assets/Serilog.snk",
+    "xmlDoc": true,
+    "warningsAsErrors": true
+  },
   "frameworks": {
-    "net451": {
-    },
-    "dotnet5.4": {
-    },
-    "netcore50": {
+    "netstandard1.3": {
+      "dependencies": {
+        "System.Threading": "4.0.11-rc2-24027"
+      }
     }
   }
 }
