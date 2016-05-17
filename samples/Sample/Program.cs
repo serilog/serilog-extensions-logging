@@ -31,7 +31,7 @@ namespace Sample
                 logger.LogCritical("Unexpected critical error starting application", ex);
                 logger.Log(LogLevel.Critical, 0, "Unexpected critical error", ex, null);
                 // This write should not log anything
-                logger.Log(LogLevel.Critical, 0, null, null, null);
+                logger.Log<object>(LogLevel.Critical, 0, null, null, null);
                 logger.LogError("Unexpected error", ex);
                 logger.LogWarning("Unexpected warning", ex);
             }
