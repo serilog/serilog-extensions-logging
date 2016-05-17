@@ -5,9 +5,10 @@ using System;
 
 namespace Serilog.Extensions.Logging
 {
-    public class SerilogLoggerScope : IDisposable
+    class SerilogLoggerScope : IDisposable
     {
-        private readonly SerilogLoggerProvider _provider;
+        readonly SerilogLoggerProvider _provider;
+        bool _disposedValue; // To detect redundant calls
 
         public SerilogLoggerScope(SerilogLoggerProvider provider, string name, object state)
         {
@@ -33,8 +34,6 @@ namespace Serilog.Extensions.Logging
                 }
             }
         }
-
-        private bool _disposedValue; // To detect redundant calls
 
         public void Dispose()
         {
