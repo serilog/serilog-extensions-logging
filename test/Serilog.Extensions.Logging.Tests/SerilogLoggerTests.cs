@@ -7,6 +7,7 @@ using Serilog.Events;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Serilog.Debugging;
 using Xunit;
 
@@ -248,6 +249,24 @@ namespace Serilog.Extensions.Logging.Test
 
             SelfLog.Out = null;
             Assert.Empty(selfLog.ToString());
+        }
+
+        [Fact]
+        public void CarriesEventIdIfNonzero()
+        {
+            var t = SetUp(LogLevel.Trace);
+            var logger = t.Item1;
+            var sink = t.Item2;
+
+            int expected = 42;
+
+            logger.Log(LogLevel.Information, expected, "Test", null, null);
+
+            Assert.Equal(1, sink.Writes.Count);
+
+            var eventId = (StructureValue) sink.Writes[0].Properties["EventId"];
+            var id = (ScalarValue) eventId.Properties.Single(p => p.Name == "Id").Value;
+            Assert.Equal(42, id.Value);
         }
 
         private class FoodScope : IEnumerable<KeyValuePair<string, object>>

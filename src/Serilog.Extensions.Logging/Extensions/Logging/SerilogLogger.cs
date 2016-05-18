@@ -99,8 +99,8 @@ namespace Serilog.Extensions.Logging
             if (string.IsNullOrEmpty(messageTemplate))
                 return;
 
-            if (eventId.Id != 0)
-                logger = logger.ForContext("EventId", eventId);
+            if (eventId.Id != 0 || eventId.Name != null)
+                logger = logger.ForContext(new[] { new EventIdEnricher(eventId) });
 
             var parsedTemplate = _messageTemplateParser.Parse(messageTemplate);
             var evt = new LogEvent(DateTimeOffset.Now, level, exception, parsedTemplate, Enumerable.Empty<LogEventProperty>());
