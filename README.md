@@ -11,8 +11,8 @@ This package routes ASP.NET log messages through Serilog, so you can get informa
 **First**, install the _Serilog.Extensions.Logging_ [NuGet package](https://www.nuget.org/packages/Serilog.Extensions.Logging) into your web or console app. You will need a way to view the log messages - _Serilog.Sinks.Literate_ writes these to the console.
 
 ```powershell
-Install-Package Serilog.Extensions.Logging
-Install-Package Serilog.Sinks.Literate
+Install-Package Serilog.Extensions.Logging -Pre -DependencyVersion Highest
+Install-Package Serilog.Sinks.Literate -Pre
 ```
 
 **Next**, in your application's `Startup` method, configure Serilog first:
@@ -31,7 +31,8 @@ public class Startup
     // Other startup code
 ```
 
-**Finally**, in your `Startup` class's `Configure()` method, call `AddSerilog()` on the provided `loggerFactory`.
+**Finally**, in your `Startup` class's `Configure()` method, remove the existing logger configuration entries and
+call `AddSerilog()` on the provided `loggerFactory`.
 
 ```csharp
   public void Configure(IApplicationBuilder app,
@@ -55,19 +56,6 @@ That's it! With the level bumped up a little you should see log output like:
 2015-05-15 22:14:45.706 +10:00 [DBG] /css/site.css not modified
 2015-05-15 22:14:45.741 +10:00 [DBG] Handled. Status code: 304 File: /css/site.css
 ```
-
-### Levels
-
-If you want to get more information from the log you'll need to bump up the level.
-
-Two things:
-
- * You need to set `MinimumLevel` on **both** the Serilog `LoggerConfiguration` and the `ILoggerFactory`
- * Serilog and ASP.NET assign different priorities to the `Debug` and `Verbose` levels; Serilog's `Debug` is ASP.NET's `Verbose`, and vice-versa
-
-### Building from source
-
-To build the `dev` branch, which tracks the `dev` branch of _Microsoft.Extensions.Logging_, you must add https://www.myget.org/F/aspnetvnext/ to your package sources.
 
 ### Credits
 

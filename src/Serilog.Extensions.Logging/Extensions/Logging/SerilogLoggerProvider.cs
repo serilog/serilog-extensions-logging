@@ -2,7 +2,6 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
-using System.Collections.Generic;
 #if ASYNCLOCAL
 using System.Threading;
 #else
@@ -34,27 +33,16 @@ namespace Serilog.Extensions.Logging
             return new SerilogLogger(this, _logger, name);
         }
 
-        public IDisposable BeginScope<T>(string name, T state)
+        public IDisposable BeginScope<T>(T state)
         {
-            return new SerilogLoggerScope(this, name, state);
+            return new SerilogLoggerScope(this, state);
         }
 
         public void Enrich(LogEvent logEvent, ILogEventPropertyFactory propertyFactory)
         {
             for (var scope = CurrentScope; scope != null; scope = scope.Parent)
             {
-                var stateStructure = scope.State as IEnumerable<KeyValuePair<string, object>>;
-                if (stateStructure != null)
-                {
-                    foreach (var keyValue in stateStructure)
-                    {
-                        if (keyValue.Key == OriginalFormatPropertyName && keyValue.Value is string)
-                            continue;
-
-                        var property = propertyFactory.CreateProperty(keyValue.Key, keyValue.Value);
-                        logEvent.AddPropertyIfAbsent(property);
-                    }
-                }
+                scope.Enrich(logEvent, propertyFactory);
             }
         }
 
