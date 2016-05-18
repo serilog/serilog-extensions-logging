@@ -3,7 +3,12 @@
 
 using System;
 using System.Collections.Generic;
+#if ASYNCLOCAL
 using System.Threading;
+#else
+using System.Runtime.Remoting;
+using System.Runtime.Remoting.Messaging;
+#endif
 using Microsoft.Extensions.Logging;
 using Serilog.Core;
 using Serilog.Events;
@@ -14,8 +19,6 @@ namespace Serilog.Extensions.Logging
     class SerilogLoggerProvider : ILoggerProvider, ILogEventEnricher
     {
         public const string OriginalFormatPropertyName = "{OriginalFormat}";
-
-        readonly AsyncLocal<SerilogLoggerScope> _value = new AsyncLocal<SerilogLoggerScope>();
 
         // May be null; if it is, Log.Logger will be lazily used
         readonly ILogger _logger;
@@ -55,6 +58,9 @@ namespace Serilog.Extensions.Logging
             }
         }
 
+#if ASYNCLOCAL
+        readonly AsyncLocal<SerilogLoggerScope> _value = new AsyncLocal<SerilogLoggerScope>();
+
         public SerilogLoggerScope CurrentScope
         {
             get
@@ -66,6 +72,22 @@ namespace Serilog.Extensions.Logging
                 _value.Value = value;
             }
         }
+#else
+        readonly string _currentScopeKey = nameof(SerilogLoggerScope) + "#" + Guid.NewGuid().ToString("n");
+
+        public SerilogLoggerScope CurrentScope
+        {
+            get
+            {
+                var objectHandle = CallContext.LogicalGetData(_currentScopeKey) as ObjectHandle;
+                return objectHandle?.Unwrap() as SerilogLoggerScope;
+            }
+            set
+            {
+                CallContext.LogicalSetData(_currentScopeKey, new ObjectHandle(value));
+            }
+        }
+#endif
 
         public void Dispose() { }
     }
