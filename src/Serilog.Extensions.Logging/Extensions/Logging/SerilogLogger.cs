@@ -16,7 +16,6 @@ namespace Serilog.Extensions.Logging
     class SerilogLogger : FrameworkLogger
     {
         readonly SerilogLoggerProvider _provider;
-        readonly string _name;
         readonly ILogger _logger;
 
         static readonly MessageTemplateParser _messageTemplateParser = new MessageTemplateParser();
@@ -28,13 +27,12 @@ namespace Serilog.Extensions.Logging
         {
             if (provider == null) throw new ArgumentNullException(nameof(provider));
             _provider = provider;
-            _name = name;
             _logger = logger;
 
             // If a logger was passed, the provider has already added itself as an enricher
             _logger = _logger ?? Serilog.Log.Logger.ForContext(new[] { provider });
 
-            if (_name != null)
+            if (name != null)
             {
                 _logger = _logger.ForContext(Constants.SourceContextPropertyName, name);
             }
@@ -47,7 +45,7 @@ namespace Serilog.Extensions.Logging
 
         public IDisposable BeginScope<TState>(TState state)
         {
-            return _provider.BeginScope(_name, state);
+            return _provider.BeginScope(state);
         }
 
         public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter)

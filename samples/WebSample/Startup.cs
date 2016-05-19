@@ -22,6 +22,7 @@ namespace WebSample
         {
             Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.Debug()
+                .Enrich.FromLogContext()
                 .WriteTo.Seq("http://localhost:5341")
                 .CreateLogger();
 
