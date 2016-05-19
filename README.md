@@ -25,6 +25,7 @@ public class Startup
   public Startup(IHostingEnvironment env)
   {
     Log.Logger = new LoggerConfiguration()
+      .Enrich.FromLogContext()
       .WriteTo.LiterateConsole()
       .CreateLogger();
       
