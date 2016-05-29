@@ -9,7 +9,7 @@
     "iconUrl": "http://serilog.net/images/serilog-extension-nuget.png"
   },
   "dependencies": {
-    "Microsoft.Extensions.Logging": "1.0.0-rc2-final",
+    "Microsoft.Extensions.Logging.Abstractions": "1.0.0-rc2-final",
     "Serilog": "2.0.0-rc-576"
   },
   "buildOptions": {
@@ -19,9 +19,7 @@
   },
   "frameworks": {
     "net4.5": {
-      "frameworkAssemblies": {
-        "System.Runtime": ""
-      }
+      "dependencies": { "System.Runtime": "4.0.0" }
     },
     "netstandard1.3": {
       "buildOptions": {
