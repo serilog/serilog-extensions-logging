@@ -235,7 +235,7 @@ namespace Serilog.Extensions.Logging.Test
         public void CarriesMessageTemplateProperties()
         {
             var selfLog = new StringWriter();
-            SelfLog.Out = selfLog;
+            SelfLog.Enable(selfLog);
 
             var t = SetUp(LogLevel.Trace);
             var logger = t.Item1;
@@ -247,7 +247,7 @@ namespace Serilog.Extensions.Logging.Test
             Assert.Equal("\"World\"", sink.Writes[0].Properties["Recipient"].ToString());
             Assert.Equal("Hello, {Recipient}", sink.Writes[0].MessageTemplate.Text);
 
-            SelfLog.Out = null;
+            SelfLog.Disable();
             Assert.Empty(selfLog.ToString());
         }
 
