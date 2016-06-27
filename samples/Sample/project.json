@@ -5,15 +5,12 @@
   },
   "dependencies": {
     "Serilog.Extensions.Logging": { "target": "project" },
-    "Serilog.Sinks.Literate": "2.0.0-rc-25"
+    "Serilog.Sinks.Literate": "2.0.0-rc-25",
+    "Microsoft.Extensions.Logging": "1.0.0-rc2-final"
   },
 
   "frameworks": {
-    "net4.6": {
-      "frameworkAssemblies": {
-        "System.Runtime": ""
-      }
-    },
+    "net4.6": {},
     "netcoreapp1.0": {
       "define": [ "ASYNCLOCAL" ],
       "dependencies": {

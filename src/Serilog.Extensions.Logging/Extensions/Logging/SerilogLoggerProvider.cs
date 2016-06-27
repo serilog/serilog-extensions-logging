@@ -2,8 +2,12 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
-using System.Collections.Generic;
+#if ASYNCLOCAL
 using System.Threading;
+#else
+using System.Runtime.Remoting;
+using System.Runtime.Remoting.Messaging;
+#endif
 using Microsoft.Extensions.Logging;
 using Serilog.Core;
 using Serilog.Events;
@@ -14,8 +18,6 @@ namespace Serilog.Extensions.Logging
     class SerilogLoggerProvider : ILoggerProvider, ILogEventEnricher
     {
         public const string OriginalFormatPropertyName = "{OriginalFormat}";
-
-        readonly AsyncLocal<SerilogLoggerScope> _value = new AsyncLocal<SerilogLoggerScope>();
 
         // May be null; if it is, Log.Logger will be lazily used
         readonly ILogger _logger;
@@ -31,29 +33,21 @@ namespace Serilog.Extensions.Logging
             return new SerilogLogger(this, _logger, name);
         }
 
-        public IDisposable BeginScope<T>(string name, T state)
+        public IDisposable BeginScope<T>(T state)
         {
-            return new SerilogLoggerScope(this, name, state);
+            return new SerilogLoggerScope(this, state);
         }
 
         public void Enrich(LogEvent logEvent, ILogEventPropertyFactory propertyFactory)
         {
             for (var scope = CurrentScope; scope != null; scope = scope.Parent)
             {
-                var stateStructure = scope.State as IEnumerable<KeyValuePair<string, object>>;
-                if (stateStructure != null)
-                {
-                    foreach (var keyValue in stateStructure)
-                    {
-                        if (keyValue.Key == OriginalFormatPropertyName && keyValue.Value is string)
-                            continue;
-
-                        var property = propertyFactory.CreateProperty(keyValue.Key, keyValue.Value);
-                        logEvent.AddPropertyIfAbsent(property);
-                    }
-                }
+                scope.Enrich(logEvent, propertyFactory);
             }
         }
+
+#if ASYNCLOCAL
+        readonly AsyncLocal<SerilogLoggerScope> _value = new AsyncLocal<SerilogLoggerScope>();
 
         public SerilogLoggerScope CurrentScope
         {
@@ -66,6 +60,22 @@ namespace Serilog.Extensions.Logging
                 _value.Value = value;
             }
         }
+#else
+        readonly string _currentScopeKey = nameof(SerilogLoggerScope) + "#" + Guid.NewGuid().ToString("n");
+
+        public SerilogLoggerScope CurrentScope
+        {
+            get
+            {
+                var objectHandle = CallContext.LogicalGetData(_currentScopeKey) as ObjectHandle;
+                return objectHandle?.Unwrap() as SerilogLoggerScope;
+            }
+            set
+            {
+                CallContext.LogicalSetData(_currentScopeKey, new ObjectHandle(value));
+            }
+        }
+#endif
 
         public void Dispose() { }
     }
