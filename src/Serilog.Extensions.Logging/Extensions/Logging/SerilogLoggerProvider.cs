@@ -21,11 +21,20 @@ namespace Serilog.Extensions.Logging
 
         // May be null; if it is, Log.Logger will be lazily used
         readonly ILogger _logger;
+        readonly Action _dispose;
 
-        public SerilogLoggerProvider(ILogger logger = null)
+        public SerilogLoggerProvider(ILogger logger = null, bool dispose = false)
         {
             if (logger != null)
                 _logger = logger.ForContext(new[] { this });
+
+            if (dispose)
+            {
+                if (logger != null)
+                    _dispose = () => (logger as IDisposable)?.Dispose();
+                else
+                    _dispose = Log.CloseAndFlush;
+            }
         }
 
         public FrameworkLogger CreateLogger(string name)
@@ -77,6 +86,9 @@ namespace Serilog.Extensions.Logging
         }
 #endif
 
-        public void Dispose() { }
+        public void Dispose()
+        {
+            _dispose?.Invoke();
+        }
     }
 }
