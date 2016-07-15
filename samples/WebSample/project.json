@@ -19,7 +19,11 @@
     "Microsoft.Extensions.Logging.Console": "1.0.0",
     "Microsoft.Extensions.Logging.Debug": "1.0.0",
     "Microsoft.Extensions.Options.ConfigurationExtensions": "1.0.0",
-    "Microsoft.VisualStudio.Web.BrowserLink.Loader": "14.0.0"
+    "Microsoft.VisualStudio.Web.BrowserLink.Loader": "14.0.0",
+    "Serilog.Extensions.Logging": { "target": "project" },
+    "Serilog.Settings.Configuration": "2.1.0-dev-00028",
+    "Serilog.Sinks.Trace": "2.0.0",
+    "Serilog.Sinks.Literate": "2.0.0"
   },
 
   "tools": {
