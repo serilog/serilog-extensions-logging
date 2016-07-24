@@ -39,7 +39,7 @@ call `AddSerilog()` on the provided `loggerFactory`.
   public void Configure(IApplicationBuilder app,
                         IHostingEnvironment env,
                         ILoggerFactory loggerfactory,
-			IApplicationLifetime appLifetime)
+                        IApplicationLifetime appLifetime)
   {
       loggerfactory.AddSerilog();
       
