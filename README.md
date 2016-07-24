@@ -38,9 +38,13 @@ call `AddSerilog()` on the provided `loggerFactory`.
 ```csharp
   public void Configure(IApplicationBuilder app,
                         IHostingEnvironment env,
-                        ILoggerFactory loggerfactory)
+                        ILoggerFactory loggerfactory,
+		        IApplicationLifetime appLifetime)
   {
       loggerfactory.AddSerilog();
+      
+      // Ensure any buffered events are sent at shutdown
+      appLifetime.ApplicationStopped.Register(Log.CloseAndFlush);
 ```
 
 That's it! With the level bumped up a little you should see log output like:
