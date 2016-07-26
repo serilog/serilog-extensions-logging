@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Serilog.Debugging;
+using Serilog.Framework.Logging.Tests.Support;
 using Xunit;
 
 namespace Serilog.Extensions.Logging.Test
@@ -267,6 +268,24 @@ namespace Serilog.Extensions.Logging.Test
             var eventId = (StructureValue) sink.Writes[0].Properties["EventId"];
             var id = (ScalarValue) eventId.Properties.Single(p => p.Name == "Id").Value;
             Assert.Equal(42, id.Value);
+        }
+
+        [Fact]
+        public void WhenDisposeIsFalseProvidedLoggerIsNotDisposed()
+        {
+            var logger = new DisposeTrackingLogger();
+            var provider = new SerilogLoggerProvider(logger, false);
+            provider.Dispose();
+            Assert.False(logger.IsDisposed);
+        }
+
+        [Fact]
+        public void WhenDisposeIsTrueProvidedLoggerIsDisposed()
+        {
+            var logger = new DisposeTrackingLogger();
+            var provider = new SerilogLoggerProvider(logger, true);
+            provider.Dispose();
+            Assert.True(logger.IsDisposed);
         }
 
         private class FoodScope : IEnumerable<KeyValuePair<string, object>>
