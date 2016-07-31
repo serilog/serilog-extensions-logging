@@ -15,14 +15,22 @@ using FrameworkLogger = Microsoft.Extensions.Logging.ILogger;
 
 namespace Serilog.Extensions.Logging
 {
-    class SerilogLoggerProvider : ILoggerProvider, ILogEventEnricher
+    /// <summary>
+    /// An <see cref="ILoggerProvider"/> that pipes events through Serilog.
+    /// </summary>
+    public class SerilogLoggerProvider : ILoggerProvider, ILogEventEnricher
     {
-        public const string OriginalFormatPropertyName = "{OriginalFormat}";
+        internal const string OriginalFormatPropertyName = "{OriginalFormat}";
 
         // May be null; if it is, Log.Logger will be lazily used
         readonly ILogger _logger;
         readonly Action _dispose;
 
+        /// <summary>
+        /// Construct a <see cref="SerilogLoggerProvider"/>.
+        /// </summary>
+        /// <param name="logger">A Serilog logger to pipe events through; if null, the static <see cref="Log"/> class will be used.</param>
+        /// <param name="dispose">If true, the provided logger or static log class will be disposed/closed when the provider is disposed.</param>
         public SerilogLoggerProvider(ILogger logger = null, bool dispose = false)
         {
             if (logger != null)
@@ -37,16 +45,19 @@ namespace Serilog.Extensions.Logging
             }
         }
 
+        /// <inheritdoc />
         public FrameworkLogger CreateLogger(string name)
         {
             return new SerilogLogger(this, _logger, name);
         }
 
+        /// <inheritdoc />
         public IDisposable BeginScope<T>(T state)
         {
             return new SerilogLoggerScope(this, state);
         }
 
+        /// <inheritdoc />
         public void Enrich(LogEvent logEvent, ILogEventPropertyFactory propertyFactory)
         {
             for (var scope = CurrentScope; scope != null; scope = scope.Parent)
@@ -58,7 +69,7 @@ namespace Serilog.Extensions.Logging
 #if ASYNCLOCAL
         readonly AsyncLocal<SerilogLoggerScope> _value = new AsyncLocal<SerilogLoggerScope>();
 
-        public SerilogLoggerScope CurrentScope
+        internal SerilogLoggerScope CurrentScope
         {
             get
             {
@@ -72,7 +83,7 @@ namespace Serilog.Extensions.Logging
 #else
         readonly string _currentScopeKey = nameof(SerilogLoggerScope) + "#" + Guid.NewGuid().ToString("n");
 
-        public SerilogLoggerScope CurrentScope
+        internal SerilogLoggerScope CurrentScope
         {
             get
             {
@@ -86,6 +97,7 @@ namespace Serilog.Extensions.Logging
         }
 #endif
 
+        /// <inheritdoc />
         public void Dispose()
         {
             _dispose?.Invoke();
