@@ -58,7 +58,16 @@ namespace Serilog.Extensions.Logging
                     if (stateProperty.Key == SerilogLoggerProvider.OriginalFormatPropertyName && stateProperty.Value is string)
                         continue;
 
-                    var property = propertyFactory.CreateProperty(stateProperty.Key, stateProperty.Value);
+                    var key = stateProperty.Key;
+                    var destructureObject = false;
+
+                    if (key.StartsWith("@"))
+                    {
+                        key = key.Substring(1);
+                        destructureObject = true;
+                    }
+                    
+                    var property = propertyFactory.CreateProperty(key, stateProperty.Value, destructureObject);
                     logEvent.AddPropertyIfAbsent(property);
                 }
             }
