@@ -288,6 +288,82 @@ namespace Serilog.Extensions.Logging.Test
             Assert.True(logger.IsDisposed);
         }
 
+        [Fact]
+        public void BeginScopeDestructuresObjectsWhenDestructurerIsUsedInMessageTemplate()
+        {
+            var t = SetUp(LogLevel.Trace);
+            var logger = t.Item1;
+            var sink = t.Item2;
+
+            using (logger.BeginScope("{@Person}", new Person { FirstName = "John", LastName = "Smith" }))
+            {
+                logger.Log(LogLevel.Information, 0, TestMessage, null, null);
+            }
+
+            Assert.Equal(1, sink.Writes.Count);
+            Assert.True(sink.Writes[0].Properties.ContainsKey("Person"));
+
+            var person = (StructureValue)sink.Writes[0].Properties["Person"];
+            var firstName = (ScalarValue)person.Properties.Single(p => p.Name == "FirstName").Value;
+            var lastName = (ScalarValue)person.Properties.Single(p => p.Name == "LastName").Value;
+            Assert.Equal("John", firstName.Value);
+            Assert.Equal("Smith", lastName.Value);
+        }
+
+        [Fact]
+        public void BeginScopeDestructuresObjectsWhenDestructurerIsUsedInDictionary()
+        {
+            var t = SetUp(LogLevel.Trace);
+            var logger = t.Item1;
+            var sink = t.Item2;
+            
+            using (logger.BeginScope(new Dictionary<string, object> {{ "@Person", new Person { FirstName = "John", LastName = "Smith" }}}))
+            {
+                logger.Log(LogLevel.Information, 0, TestMessage, null, null);
+            }
+
+            Assert.Equal(1, sink.Writes.Count);
+            Assert.True(sink.Writes[0].Properties.ContainsKey("Person"));
+
+            var person = (StructureValue)sink.Writes[0].Properties["Person"];
+            var firstName = (ScalarValue)person.Properties.Single(p => p.Name == "FirstName").Value;
+            var lastName = (ScalarValue)person.Properties.Single(p => p.Name == "LastName").Value;
+            Assert.Equal("John", firstName.Value);
+            Assert.Equal("Smith", lastName.Value);
+        }
+
+        [Fact]
+        public void BeginScopeDoesNotModifyKeyWhenDestructurerIsNotUsedInMessageTemplate()
+        {
+            var t = SetUp(LogLevel.Trace);
+            var logger = t.Item1;
+            var sink = t.Item2;
+
+            using (logger.BeginScope("{FirstName}", "John"))
+            {
+                logger.Log(LogLevel.Information, 0, TestMessage, null, null);
+            }
+
+            Assert.Equal(1, sink.Writes.Count);
+            Assert.True(sink.Writes[0].Properties.ContainsKey("FirstName"));
+        }
+
+        [Fact]
+        public void BeginScopeDoesNotModifyKeyWhenDestructurerIsNotUsedInDictionary()
+        {
+            var t = SetUp(LogLevel.Trace);
+            var logger = t.Item1;
+            var sink = t.Item2;
+
+            using (logger.BeginScope(new Dictionary<string, object> { { "FirstName", "John"}}))
+            {
+                logger.Log(LogLevel.Information, 0, TestMessage, null, null);
+            }
+
+            Assert.Equal(1, sink.Writes.Count);
+            Assert.True(sink.Writes[0].Properties.ContainsKey("FirstName"));
+        }
+
         private class FoodScope : IEnumerable<KeyValuePair<string, object>>
         {
             readonly string _name;
@@ -326,6 +402,12 @@ namespace Serilog.Extensions.Logging.Test
             {
                 return GetEnumerator();
             }
+        }
+
+        private class Person
+        {
+            public string FirstName { get; set; }
+            public string LastName { get; set; }
         }
     }
 }
