@@ -109,12 +109,13 @@ namespace Serilog.Extensions.Logging
                     if (scope.TryGetName(out name))
                     {
                         names = names ?? new List<ScalarValue>();
-                        names.Insert(0, new ScalarValue(name));
+                        names.Add(new ScalarValue(name));
                     }
                 }
 
                 if (names != null)
                 {
+                    names.Reverse();
                     logEvent.AddPropertyIfAbsent(new LogEventProperty(ScopePropertyName, new SequenceValue(names)));
                 }
             }
