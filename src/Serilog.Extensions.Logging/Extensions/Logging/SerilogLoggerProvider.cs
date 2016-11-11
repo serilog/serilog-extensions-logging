@@ -27,7 +27,7 @@ namespace Serilog.Extensions.Logging
         // May be null; if it is, Log.Logger will be lazily used
         readonly ILogger _logger;
         readonly Action _dispose;
-        readonly bool _includeNamedScopes;
+        readonly bool _ignoreNamedScopes;
 
         /// <summary>
         /// Construct a <see cref="SerilogLoggerProvider"/>.
@@ -61,10 +61,9 @@ namespace Serilog.Extensions.Logging
         /// </summary>
         /// <param name="logger">A Serilog logger to pipe events through; if null, the static <see cref="Log"/> class will be used.</param>
         /// <param name="dispose">If true, the provided logger or static log class will be disposed/closed when the provider is disposed.</param>
-        /// <param name="includeNamedScopes">Indicates whether a <code>Scope</code> property should be generated when
-        /// <see cref="Microsoft.Extensions.Logging.ILogger.BeginScope"/> is called with <see cref="string"/> arguments. The
-        /// default is false.</param>
-        public SerilogLoggerProvider(ILogger logger, bool dispose, bool includeNamedScopes)
+        /// <param name="ignoreNamedScopes">If true, no <code>Scope</code> property will be generated when
+        /// <see cref="Microsoft.Extensions.Logging.ILogger.BeginScope"/> is called with <see cref="string"/> arguments.</param>
+        public SerilogLoggerProvider(ILogger logger, bool dispose, bool ignoreNamedScopes)
         {
             if (logger != null)
                 _logger = logger.ForContext(new[] { this });
@@ -77,7 +76,7 @@ namespace Serilog.Extensions.Logging
                     _dispose = Log.CloseAndFlush;
             }
 
-            _includeNamedScopes = includeNamedScopes;
+            _ignoreNamedScopes = ignoreNamedScopes;
         }
 
         /// <inheritdoc />
@@ -100,7 +99,7 @@ namespace Serilog.Extensions.Logging
                 scope.Enrich(logEvent, propertyFactory);
             }
 
-            if (_includeNamedScopes)
+            if (!_ignoreNamedScopes)
             {
                 List<ScalarValue> names = null;
                 for (var scope = CurrentScope; scope != null; scope = scope.Parent)

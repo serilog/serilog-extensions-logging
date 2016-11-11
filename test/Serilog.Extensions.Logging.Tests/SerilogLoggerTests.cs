@@ -19,7 +19,7 @@ namespace Serilog.Extensions.Logging.Test
         private const string Name = "test";
         private const string TestMessage = "This is a test";
 
-        private Tuple<SerilogLogger, SerilogSink> SetUp(LogLevel logLevel, bool includeNamedScopes = false)
+        private Tuple<SerilogLogger, SerilogSink> SetUp(LogLevel logLevel)
         {
             var sink = new SerilogSink();
 
@@ -28,7 +28,7 @@ namespace Serilog.Extensions.Logging.Test
 
             SetMinLevel(config, logLevel);
 
-            var provider = new SerilogLoggerProvider(config.CreateLogger(), false, includeNamedScopes);
+            var provider = new SerilogLoggerProvider(config.CreateLogger());
             var logger = (SerilogLogger)provider.CreateLogger(Name);
 
             return new Tuple<SerilogLogger, SerilogSink>(logger, sink);
@@ -365,9 +365,9 @@ namespace Serilog.Extensions.Logging.Test
         }
 
         [Fact]
-        public void NamedScopesAreCapturedWhenRequested()
+        public void NamedScopesAreCaptured()
         {
-            var t = SetUp(LogLevel.Trace, includeNamedScopes: true);
+            var t = SetUp(LogLevel.Trace);
             var logger = t.Item1;
             var sink = t.Item2;
 
