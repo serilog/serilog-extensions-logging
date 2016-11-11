@@ -72,5 +72,11 @@ namespace Serilog.Extensions.Logging
                 }
             }
         }
+
+        public bool TryGetName(out string name)
+        {
+            name = _state as string;
+            return name != null;
+        }
     }
 }

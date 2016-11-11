@@ -19,7 +19,7 @@ namespace Serilog.Extensions.Logging.Test
         private const string Name = "test";
         private const string TestMessage = "This is a test";
 
-        private Tuple<SerilogLogger, SerilogSink> SetUp(LogLevel logLevel)
+        private Tuple<SerilogLogger, SerilogSink> SetUp(LogLevel logLevel, bool includeNamedScopes = false)
         {
             var sink = new SerilogSink();
 
@@ -28,7 +28,7 @@ namespace Serilog.Extensions.Logging.Test
 
             SetMinLevel(config, logLevel);
 
-            var provider = new SerilogLoggerProvider(config.CreateLogger());
+            var provider = new SerilogLoggerProvider(config.CreateLogger(), false, includeNamedScopes);
             var logger = (SerilogLogger)provider.CreateLogger(Name);
 
             return new Tuple<SerilogLogger, SerilogSink>(logger, sink);
@@ -362,6 +362,30 @@ namespace Serilog.Extensions.Logging.Test
 
             Assert.Equal(1, sink.Writes.Count);
             Assert.True(sink.Writes[0].Properties.ContainsKey("FirstName"));
+        }
+
+        [Fact]
+        public void NamedScopesAreCapturedWhenRequested()
+        {
+            var t = SetUp(LogLevel.Trace, includeNamedScopes: true);
+            var logger = t.Item1;
+            var sink = t.Item2;
+
+            using (logger.BeginScope("Outer"))
+            using (logger.BeginScope("Inner"))
+            {
+                logger.Log(LogLevel.Information, 0, TestMessage, null, null);
+            }
+
+            Assert.Equal(1, sink.Writes.Count);
+
+            LogEventPropertyValue scopeValue;
+            Assert.True(sink.Writes[0].Properties.TryGetValue(SerilogLoggerProvider.ScopePropertyName, out scopeValue));
+
+            var items = (scopeValue as SequenceValue)?.Elements.Select(e => ((ScalarValue)e).Value).Cast<string>().ToArray();
+            Assert.Equal(2, items.Length);
+            Assert.Equal("Outer", items[0]);
+            Assert.Equal("Inner", items[1]);
         }
 
         private class FoodScope : IEnumerable<KeyValuePair<string, object>>
