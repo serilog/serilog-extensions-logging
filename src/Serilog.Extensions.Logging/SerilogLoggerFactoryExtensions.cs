@@ -20,19 +20,15 @@ namespace Serilog
         /// <param name="dispose">When true, dispose <paramref name="logger"/> when the framework disposes the provider. If the
         /// logger is not specified but <paramref name="dispose"/> is true, the <see cref="Log.CloseAndFlush()"/> method will be
         /// called on the static <see cref="Log"/> class instead.</param>
-        /// <param name="ignoreNamedScopes">If true, no <code>Scope</code> property will be generated when
-        /// <see cref="Microsoft.Extensions.Logging.ILogger.BeginScope"/> is called with <see cref="string"/> arguments. The
-        /// default is to generate the property.</param>
         /// <returns>The logger factory.</returns>
         public static ILoggerFactory AddSerilog(
             this ILoggerFactory factory,
             ILogger logger = null,
-            bool dispose = false,
-            bool ignoreNamedScopes = false)
+            bool dispose = false)
         {
             if (factory == null) throw new ArgumentNullException(nameof(factory));
 
-            factory.AddProvider(new SerilogLoggerProvider(logger, dispose, ignoreNamedScopes));
+            factory.AddProvider(new SerilogLoggerProvider(logger, dispose));
 
             return factory;
         }

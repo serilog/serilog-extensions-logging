@@ -13,6 +13,7 @@ using Serilog.Core;
 using Serilog.Events;
 using FrameworkLogger = Microsoft.Extensions.Logging.ILogger;
 using System.Collections.Generic;
+using Serilog.Context;
 
 namespace Serilog.Extensions.Logging
 {
@@ -27,43 +28,13 @@ namespace Serilog.Extensions.Logging
         // May be null; if it is, Log.Logger will be lazily used
         readonly ILogger _logger;
         readonly Action _dispose;
-        readonly bool _ignoreNamedScopes;
-
-        /// <summary>
-        /// Construct a <see cref="SerilogLoggerProvider"/>.
-        /// </summary>
-        public SerilogLoggerProvider()
-            : this(null)
-        {
-        }
-
-        /// <summary>
-        /// Construct a <see cref="SerilogLoggerProvider"/>.
-        /// </summary>
-        /// <param name="logger">A Serilog logger to pipe events through; if null, the static <see cref="Log"/> class will be used.</param>
-        public SerilogLoggerProvider(ILogger logger)
-            : this(logger, false)
-        {
-        }
 
         /// <summary>
         /// Construct a <see cref="SerilogLoggerProvider"/>.
         /// </summary>
         /// <param name="logger">A Serilog logger to pipe events through; if null, the static <see cref="Log"/> class will be used.</param>
         /// <param name="dispose">If true, the provided logger or static log class will be disposed/closed when the provider is disposed.</param>
-        public SerilogLoggerProvider(ILogger logger, bool dispose)
-            : this(logger, dispose, false)
-        {
-        }
-
-        /// <summary>
-        /// Construct a <see cref="SerilogLoggerProvider"/>.
-        /// </summary>
-        /// <param name="logger">A Serilog logger to pipe events through; if null, the static <see cref="Log"/> class will be used.</param>
-        /// <param name="dispose">If true, the provided logger or static log class will be disposed/closed when the provider is disposed.</param>
-        /// <param name="ignoreNamedScopes">If true, no <code>Scope</code> property will be generated when
-        /// <see cref="Microsoft.Extensions.Logging.ILogger.BeginScope"/> is called with <see cref="string"/> arguments.</param>
-        public SerilogLoggerProvider(ILogger logger, bool dispose, bool ignoreNamedScopes)
+        public SerilogLoggerProvider(ILogger logger = null, bool dispose = false)
         {
             if (logger != null)
                 _logger = logger.ForContext(new[] { this });
@@ -75,8 +46,6 @@ namespace Serilog.Extensions.Logging
                 else
                     _dispose = Log.CloseAndFlush;
             }
-
-            _ignoreNamedScopes = ignoreNamedScopes;
         }
 
         /// <inheritdoc />
@@ -88,35 +57,36 @@ namespace Serilog.Extensions.Logging
         /// <inheritdoc />
         public IDisposable BeginScope<T>(T state)
         {
-            return new SerilogLoggerScope(this, state);
+            if (CurrentScope != null)
+                return new SerilogLoggerScope(this, state);
+
+            // The outermost scope pushes and pops the Serilog `LogContext` - once
+            // this enricher is on the stack, the `CurrentScope` property takes care
+            // of the rest of the `BeginScope()` stack.
+            var popSerilogContext = LogContext.PushProperties(this);
+            return new SerilogLoggerScope(this, state, popSerilogContext);
         }
 
         /// <inheritdoc />
         public void Enrich(LogEvent logEvent, ILogEventPropertyFactory propertyFactory)
         {
+            List<LogEventPropertyValue> scopeItems = null;
             for (var scope = CurrentScope; scope != null; scope = scope.Parent)
             {
-                scope.Enrich(logEvent, propertyFactory);
+                LogEventPropertyValue scopeItem;
+                scope.EnrichAndCreateScopeItem(logEvent, propertyFactory, out scopeItem);
+
+                if (scopeItem != null)
+                {
+                    scopeItems = scopeItems ?? new List<LogEventPropertyValue>();
+                    scopeItems.Add(scopeItem);
+                }
             }
 
-            if (!_ignoreNamedScopes)
+            if (scopeItems != null)
             {
-                List<ScalarValue> names = null;
-                for (var scope = CurrentScope; scope != null; scope = scope.Parent)
-                {
-                    string name;
-                    if (scope.TryGetName(out name))
-                    {
-                        names = names ?? new List<ScalarValue>();
-                        names.Add(new ScalarValue(name));
-                    }
-                }
-
-                if (names != null)
-                {
-                    names.Reverse();
-                    logEvent.AddPropertyIfAbsent(new LogEventProperty(ScopePropertyName, new SequenceValue(names)));
-                }
+                scopeItems.Reverse();
+                logEvent.AddPropertyIfAbsent(new LogEventProperty(ScopePropertyName, new SequenceValue(scopeItems)));
             }
         }
 
