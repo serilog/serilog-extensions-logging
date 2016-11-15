@@ -12,6 +12,8 @@ using Microsoft.Extensions.Logging;
 using Serilog.Core;
 using Serilog.Events;
 using FrameworkLogger = Microsoft.Extensions.Logging.ILogger;
+using System.Collections.Generic;
+using Serilog.Context;
 
 namespace Serilog.Extensions.Logging
 {
@@ -21,6 +23,7 @@ namespace Serilog.Extensions.Logging
     public class SerilogLoggerProvider : ILoggerProvider, ILogEventEnricher
     {
         internal const string OriginalFormatPropertyName = "{OriginalFormat}";
+        internal const string ScopePropertyName = "Scope";
 
         // May be null; if it is, Log.Logger will be lazily used
         readonly ILogger _logger;
@@ -54,15 +57,36 @@ namespace Serilog.Extensions.Logging
         /// <inheritdoc />
         public IDisposable BeginScope<T>(T state)
         {
-            return new SerilogLoggerScope(this, state);
+            if (CurrentScope != null)
+                return new SerilogLoggerScope(this, state);
+
+            // The outermost scope pushes and pops the Serilog `LogContext` - once
+            // this enricher is on the stack, the `CurrentScope` property takes care
+            // of the rest of the `BeginScope()` stack.
+            var popSerilogContext = LogContext.PushProperties(this);
+            return new SerilogLoggerScope(this, state, popSerilogContext);
         }
 
         /// <inheritdoc />
         public void Enrich(LogEvent logEvent, ILogEventPropertyFactory propertyFactory)
         {
+            List<LogEventPropertyValue> scopeItems = null;
             for (var scope = CurrentScope; scope != null; scope = scope.Parent)
             {
-                scope.Enrich(logEvent, propertyFactory);
+                LogEventPropertyValue scopeItem;
+                scope.EnrichAndCreateScopeItem(logEvent, propertyFactory, out scopeItem);
+
+                if (scopeItem != null)
+                {
+                    scopeItems = scopeItems ?? new List<LogEventPropertyValue>();
+                    scopeItems.Add(scopeItem);
+                }
+            }
+
+            if (scopeItems != null)
+            {
+                scopeItems.Reverse();
+                logEvent.AddPropertyIfAbsent(new LogEventProperty(ScopePropertyName, new SequenceValue(scopeItems)));
             }
         }
 

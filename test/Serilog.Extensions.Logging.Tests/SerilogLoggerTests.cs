@@ -364,6 +364,30 @@ namespace Serilog.Extensions.Logging.Test
             Assert.True(sink.Writes[0].Properties.ContainsKey("FirstName"));
         }
 
+        [Fact]
+        public void NamedScopesAreCaptured()
+        {
+            var t = SetUp(LogLevel.Trace);
+            var logger = t.Item1;
+            var sink = t.Item2;
+
+            using (logger.BeginScope("Outer"))
+            using (logger.BeginScope("Inner"))
+            {
+                logger.Log(LogLevel.Information, 0, TestMessage, null, null);
+            }
+
+            Assert.Equal(1, sink.Writes.Count);
+
+            LogEventPropertyValue scopeValue;
+            Assert.True(sink.Writes[0].Properties.TryGetValue(SerilogLoggerProvider.ScopePropertyName, out scopeValue));
+
+            var items = (scopeValue as SequenceValue)?.Elements.Select(e => ((ScalarValue)e).Value).Cast<string>().ToArray();
+            Assert.Equal(2, items.Length);
+            Assert.Equal("Outer", items[0]);
+            Assert.Equal("Inner", items[1]);
+        }
+
         private class FoodScope : IEnumerable<KeyValuePair<string, object>>
         {
             readonly string _name;
