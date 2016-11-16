@@ -9,8 +9,8 @@
     "iconUrl": "http://serilog.net/images/serilog-extension-nuget.png"
   },
   "dependencies": {
-    "Microsoft.Extensions.Logging.Abstractions": "1.0.0",
-    "Serilog": "2.0.0"
+    "Microsoft.Extensions.Logging.Abstractions": "1.1.0",
+    "Serilog": "2.3.0"
   },
   "buildOptions": {
     "keyFile": "../../assets/Serilog.snk",
