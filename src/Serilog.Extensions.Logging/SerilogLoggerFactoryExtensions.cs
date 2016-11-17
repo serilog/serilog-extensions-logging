@@ -4,6 +4,7 @@
 using System;
 using Microsoft.Extensions.Logging;
 using Serilog.Extensions.Logging;
+using System.ComponentModel;
 
 namespace Serilog
 {
@@ -12,6 +13,21 @@ namespace Serilog
     /// </summary>
     public static class SerilogLoggerFactoryExtensions
     {
+        /// <summary>
+        /// Add Serilog to the logging pipeline.
+        /// </summary>
+        /// <param name="factory">The logger factory to configure.</param>
+        /// <param name="logger">The Serilog logger; if not supplied, the static <see cref="Serilog.Log"/> will be used.</param>
+        /// <returns>The logger factory.</returns>
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public static ILoggerFactory AddSerilog(
+            this ILoggerFactory factory,
+            ILogger logger)
+        {
+            if (factory == null) throw new ArgumentNullException(nameof(factory));
+            return factory.AddSerilog(logger, false);
+        }
+
         /// <summary>
         /// Add Serilog to the logging pipeline.
         /// </summary>
