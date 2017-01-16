@@ -19,10 +19,8 @@
   },
   "frameworks": {
     "net4.5": {
-      "dependencies": { "System.Runtime": "4.0.0" }
     },
     "net4.6": {
-      "dependencies": { "System.Runtime": "4.0.20" },
       "buildOptions": {
         "define": [ "ASYNCLOCAL" ]
       }
@@ -30,9 +28,6 @@
     "netstandard1.3": {
       "buildOptions": {
         "define": ["ASYNCLOCAL"]
-      },
-      "dependencies": {
-        "System.Threading": "4.0.11"
       }
     }
   }
