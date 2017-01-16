@@ -152,9 +152,20 @@ namespace Serilog.Extensions.Logging.Test
 
             logger.Log<object>(LogLevel.Information, 0, null, null, null);
             logger.Log(LogLevel.Information, 0, TestMessage, null, null);
+            logger.Log<object>(LogLevel.Information, 0, null, null, (_, __) => TestMessage);
 
-            Assert.Equal(1, sink.Writes.Count);
-            Assert.Equal(TestMessage, sink.Writes[0].RenderMessage());
+            Assert.Equal(3, sink.Writes.Count);
+
+            Assert.Equal(1, sink.Writes[0].Properties.Count);
+            Assert.Empty(sink.Writes[0].RenderMessage());
+
+            Assert.Equal(2, sink.Writes[1].Properties.Count);
+            Assert.True(sink.Writes[1].Properties.ContainsKey("State"));
+            Assert.Equal(TestMessage, sink.Writes[1].RenderMessage());
+
+            Assert.Equal(2, sink.Writes[2].Properties.Count);
+            Assert.True(sink.Writes[2].Properties.ContainsKey("Message"));
+            Assert.Equal(TestMessage, sink.Writes[2].RenderMessage());
         }
 
         [Fact]
