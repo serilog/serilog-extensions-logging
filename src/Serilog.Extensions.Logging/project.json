@@ -19,8 +19,10 @@
   },
   "frameworks": {
     "net4.5": {
+      "frameworkAssemblies": { "System.Runtime": { "type": "build" } }
     },
     "net4.6": {
+      "frameworkAssemblies": { "System.Runtime": { "type": "build" } }
       "buildOptions": {
         "define": [ "ASYNCLOCAL" ]
       }
