@@ -12,7 +12,10 @@ using Serilog.Parsing;
 
 namespace Serilog.Extensions.Logging
 {
-    class SerilogLogger : FrameworkLogger
+    /// <summary>
+    /// Extends <see cref="FrameworkLogger"/> using an <see cref="ILogger"/> implementation.
+    /// </summary>
+    public class SerilogLogger : FrameworkLogger
     {
         readonly SerilogLoggerProvider _provider;
         readonly ILogger _logger;
