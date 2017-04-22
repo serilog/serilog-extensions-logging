@@ -20,7 +20,7 @@ foreach ($src in ls src/*) {
 
 	echo "build: Packaging project in $src"
 
-    & dotnet pack -c Release -o ..\..\artifacts --version-suffix=$suffix
+    & dotnet pack -c Release --include-symbols -o ..\..\artifacts --version-suffix=$suffix
     if($LASTEXITCODE -ne 0) { exit 1 }    
 
     Pop-Location
