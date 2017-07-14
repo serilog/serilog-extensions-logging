@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging;
 using Serilog.Extensions.Logging;
 using System.ComponentModel;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Serilog
 {
