@@ -4,7 +4,7 @@
     <Description>Serilog provider for Microsoft.Extensions.Logging</Description>
     <VersionPrefix>1.4.1</VersionPrefix>
     <Authors>Microsoft;Serilog Contributors</Authors>
-    <TargetFrameworks>net45;net46;netstandard1.3,netstandard2.0</TargetFrameworks>
+    <TargetFrameworks>net45;net46;netstandard1.3;netstandard2.0</TargetFrameworks>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <AssemblyName>Serilog.Extensions.Logging</AssemblyName>
