@@ -1,8 +1,9 @@
 ﻿using System;
-using Microsoft.Extensions.Logging;
-using Serilog.Extensions.Logging;
 using System.ComponentModel;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Serilog.Extensions.Logging;
+
 
 namespace Serilog
 {
@@ -10,7 +11,7 @@ namespace Serilog
     /// Extends <see cref="IServiceCollection"/> with Serilog configuration methods.
     /// </summary>
     public static class SerilogLoggerServicesExtensions
-    {   
+    {
         /// <summary>
         /// Add Serilog to the logging pipeline.
         /// </summary>
