@@ -17,20 +17,6 @@ namespace Serilog
         /// </summary>
         /// <param name="services">The <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection" /> to add services to.</param>
         /// <param name="logger">The Serilog logger; if not supplied, the static <see cref="Serilog.Log"/> will be used.</param>
-        /// <returns>The logger factory.</returns>
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public static IServiceCollection AddSerilog(this IServiceCollection services, ILogger logger)
-        {
-            if (services == null) throw new ArgumentNullException(nameof(services));
-
-            return services.AddSerilog(logger, false);
-        }
-
-        /// <summary>
-        /// Add Serilog to the logging pipeline.
-        /// </summary>
-        /// <param name="services">The <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection" /> to add services to.</param>
-        /// <param name="logger">The Serilog logger; if not supplied, the static <see cref="Serilog.Log"/> will be used.</param>
         /// <param name="dispose">When true, dispose <paramref name="logger"/> when the framework disposes the provider. If the
         /// logger is not specified but <paramref name="dispose"/> is true, the <see cref="Log.CloseAndFlush()"/> method will be
         /// called on the static <see cref="Log"/> class instead.</param>
