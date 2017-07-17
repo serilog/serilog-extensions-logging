@@ -1,10 +1,11 @@
 ﻿using System;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Serilog;
 
 namespace Sample
 {
-    public static class Program
+    public class Program
     {
         public static void Main(string[] args)
         {
@@ -13,11 +14,15 @@ namespace Sample
                 .WriteTo.LiterateConsole()
                 .CreateLogger();
 
-            var logger = new LoggerFactory()
-                .AddSerilog()
-                .CreateLogger(typeof(Program).FullName);
+            var services = new ServiceCollection()
+                .AddLogging(builder =>
+                {
+                    builder.AddSerilog();
+                });
 
-            logger.LogInformation("Starting");
+            var serviceProvider = services.BuildServiceProvider();
+            // getting the logger using the class's name is conventional
+            var logger = serviceProvider.GetRequiredService<ILogger<Program>>();
 
             var startTime = DateTimeOffset.UtcNow;
             logger.LogInformation(1, "Started at {StartTime} and 0x{Hello:X} is hex of 42", startTime, 42);
