@@ -30,7 +30,7 @@
     <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="1.0.0" />
-    <Compile Remove="SerilogLoggerLogBuilderExtensions.cs" />
+    <Compile Remove="SerilogLoggingBuilderExtensions.cs" />
   </ItemGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'net46' ">
@@ -44,7 +44,7 @@
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.3' ">
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="1.0.0" />
-    <Compile Remove="SerilogLoggerLogBuilderExtensions.cs" />
+    <Compile Remove="SerilogLoggingBuilderExtensions.cs" />
   </ItemGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">

@@ -8,7 +8,7 @@ namespace Serilog
     /// <summary>
     /// Extends <see cref="ILoggingBuilder"/> with Serilog configuration methods.
     /// </summary>
-    public static class SerilogLoggerLogBuilderExtensions
+    public static class SerilogLoggingBuilderExtensions
     {
         /// <summary>
         /// Add Serilog to the logging pipeline.
