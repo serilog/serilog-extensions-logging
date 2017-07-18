@@ -29,7 +29,7 @@ namespace Sample
 
             try
             {
-                throw new Exception("Boom");
+                throw new Exception("Boom!");
             }
             catch (Exception ex)
             {
