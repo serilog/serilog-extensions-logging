@@ -50,7 +50,6 @@
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
     <PackageReference Include="Microsoft.Extensions.Logging" Version="2.0.0-preview2-final" />
     <PackageReference Include="NETStandard.Library" Version="2.0.0-preview2-25401-01" />
-    <Compile Remove="SerilogLoggerFactoryExtensions.cs" />
   </ItemGroup>
 
   <PropertyGroup Condition=" '$(TargetFramework)' == 'net46' ">
