@@ -2,7 +2,6 @@
 using Microsoft.Extensions.Logging;
 using Serilog.Extensions.Logging;
 
-
 namespace Serilog
 {
     /// <summary>
@@ -19,11 +18,13 @@ namespace Serilog
         /// logger is not specified but <paramref name="dispose"/> is true, the <see cref="Log.CloseAndFlush()"/> method will be
         /// called on the static <see cref="Log"/> class instead.</param>
         /// <returns>The logger factory.</returns>
-        public static void AddSerilog(this ILoggingBuilder builder, ILogger logger = null, bool dispose = false)
+        public static ILoggingBuilder AddSerilog(this ILoggingBuilder builder, ILogger logger = null, bool dispose = false)
         {
             if (builder == null) throw new ArgumentNullException(nameof(builder));
 
             builder.AddProvider(new SerilogLoggerProvider(logger, dispose));
+
+            return builder;
         }
     }
 }
