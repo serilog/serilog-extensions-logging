@@ -35,15 +35,10 @@ public class Startup
 call `AddSerilog()` on the provided `loggerFactory`.
 
 ```csharp
-  public void Configure(IApplicationBuilder app,
-                        IHostingEnvironment env,
-                        ILoggerFactory loggerfactory,
-                        IApplicationLifetime appLifetime)
+  public void ConfigureServices(IServiceCollection services)
   {
-      loggerfactory.AddSerilog();
-      
-      // Ensure any buffered events are sent at shutdown
-      appLifetime.ApplicationStopped.Register(Log.CloseAndFlush);
+      services.AddLogging(loggingBuilder =>
+      	loggingBuilder.AddSerilog(dispose: true));
 ```
 
 That's it! With the level bumped up a little you should see log output like:
