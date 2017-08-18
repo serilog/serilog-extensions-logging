@@ -97,12 +97,20 @@ namespace Serilog.Extensions.Logging
 
             if (messageTemplate == null)
             {
-                var propertyName = state != null ? "State" :
-                              (formatter != null ? "Message" : null);
+                string propertyName = null;
+                if (state != null)
+                {
+                    propertyName = "State";
+                    messageTemplate = "{State:l}";
+                }
+                else if (formatter != null)
+                {
+                    propertyName = "Message";
+                    messageTemplate = "{Message:l}";
+                }
 
                 if (propertyName != null)
                 {
-                    messageTemplate = $"{{{propertyName}:l}}";
                     LogEventProperty property;
                     if (logger.BindProperty(propertyName, AsLoggableValue(state, formatter), false, out property))
                         properties.Add(property);
