@@ -39,6 +39,9 @@ call `AddSerilog()` on the provided `loggerFactory`.
   {
       services.AddLogging(loggingBuilder =>
       	loggingBuilder.AddSerilog(dispose: true));
+      
+      // Other services ...
+  }
 ```
 
 That's it! With the level bumped up a little you should see log output like:
