@@ -11,7 +11,7 @@ This package routes ASP.NET log messages through Serilog, so you can get informa
 
 ```powershell
 Install-Package Serilog.Extensions.Logging -DependencyVersion Highest
-Install-Package Serilog.Sinks.Literate
+Install-Package Serilog.Sinks.Console
 ```
 
 **Next**, in your application's `Startup` method, configure Serilog first:
@@ -25,7 +25,7 @@ public class Startup
   {
     Log.Logger = new LoggerConfiguration()
       .Enrich.FromLogContext()
-      .WriteTo.LiterateConsole()
+      .WriteTo.Console()
       .CreateLogger();
       
     // Other startup code
@@ -47,16 +47,16 @@ call `AddSerilog()` on the provided `loggerFactory`.
 That's it! With the level bumped up a little you should see log output like:
 
 ```
-2015-05-15 22:14:44.646 +10:00 [DBG] RouteCollection.RouteAsync
+[22:14:44.646 DBG] RouteCollection.RouteAsync
 	Routes: 
 		Microsoft.AspNet.Mvc.Routing.AttributeRoute
 		{controller=Home}/{action=Index}/{id?}
 	Handled? True
-2015-05-15 22:14:44.647 +10:00 [DBG] RouterMiddleware.Invoke
+[22:14:44.647 DBG] RouterMiddleware.Invoke
 	Handled? True
-2015-05-15 22:14:45.706 +10:00 [DBG] /lib/jquery/jquery.js not modified
-2015-05-15 22:14:45.706 +10:00 [DBG] /css/site.css not modified
-2015-05-15 22:14:45.741 +10:00 [DBG] Handled. Status code: 304 File: /css/site.css
+[22:14:45.706 DBG] /lib/jquery/jquery.js not modified
+[22:14:45.706 DBG] /css/site.css not modified
+[22:14:45.741 DBG] Handled. Status code: 304 File: /css/site.css
 ```
 
 ### Credits
