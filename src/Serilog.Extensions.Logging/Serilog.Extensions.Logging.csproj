@@ -25,9 +25,6 @@
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'net45' or '$(TargetFramework)' == 'net46' or '$(TargetFramework)' == 'netstandard1.3' ">
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="1.0.0" />
-    
-    <Compile Remove="SerilogLoggingBuilderExtensions.cs" />
-    <None Include="SerilogLoggingBuilderExtensions.cs" />
   </ItemGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'net461' or '$(TargetFramework)' == 'netstandard2.0' ">
@@ -39,7 +36,7 @@
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(TargetFramework)' == 'net461' ">
-    <DefineConstants>$(DefineConstants);ASYNCLOCAL</DefineConstants>
+    <DefineConstants>$(DefineConstants);ASYNCLOCAL;LOGGING_BUILDER</DefineConstants>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard1.3' ">
@@ -47,7 +44,7 @@
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
-    <DefineConstants>$(DefineConstants);ASYNCLOCAL</DefineConstants>
+    <DefineConstants>$(DefineConstants);ASYNCLOCAL;LOGGING_BUILDER</DefineConstants>
   </PropertyGroup>
 
 </Project>
