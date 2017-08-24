@@ -6,7 +6,7 @@ The project was created with the following steps.
 ```
 dotnet new webapi
 dotnet add package Serilog.Extensions.Logging
-dotnet add package Serilog.Sinks.Literate
+dotnet add package Serilog.Sinks.Console
 ```
 
 * Extend the logging to include Serilog.  See `Program.cs`
