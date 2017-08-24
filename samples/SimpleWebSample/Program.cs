@@ -1,9 +1,9 @@
 ﻿using System;
 using System.IO;
-using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Serilog;
+
 namespace SimpleWebSample
 {
     public class Program
@@ -41,7 +41,7 @@ namespace SimpleWebSample
             }
             catch (Exception ex)
             {
-                Log.Fatal(ex, "Unhandled exception");
+                Log.Fatal(ex, "Host terminated unexpectedly");
                 return 1;
             }
             finally
