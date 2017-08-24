@@ -1,12 +1,8 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Serilog;
 using Microsoft.Extensions.Logging;
 
-namespace SimpleWebAPISample.Controllers
+namespace SimpleWebSample.Controllers
 {
     [Route("api/[controller]")]
     public class ScopesController : Controller

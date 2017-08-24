@@ -13,6 +13,7 @@ namespace SimpleWebSample
             var configuration = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                .AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")}.json", optional: true)
                 .Build();
 
             Log.Logger = new LoggerConfiguration()
@@ -25,7 +26,10 @@ namespace SimpleWebSample
             {
                 Log.Information("Getting the motors running...");
 
-                var host = WebHost.CreateDefaultBuilder(args)
+                var host = new WebHostBuilder()
+                    .UseKestrel()
+                    .UseContentRoot(Directory.GetCurrentDirectory())
+                    .UseIISIntegration()
                     .UseStartup<Startup>()
                     .UseConfiguration(configuration)
                     .UseSerilog()
