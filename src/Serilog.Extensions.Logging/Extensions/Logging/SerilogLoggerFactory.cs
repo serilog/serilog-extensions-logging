@@ -18,7 +18,7 @@ using Microsoft.Extensions.Logging;
 using Serilog.Debugging;
 using Serilog.Extensions.Logging;
 
-namespace Serilog.Extensions.Logging.Extensions.Logging
+namespace Serilog.Extensions.Logging
 {
     class SerilogLoggerFactory : ILoggerFactory
     {
