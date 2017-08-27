@@ -3,11 +3,15 @@
 
 A Serilog provider for [Microsoft.Extensions.Logging](https://www.nuget.org/packages/Microsoft.Extensions.Logging), the logging subsystem used by ASP.NET Core.
 
-This package routes ASP.NET log messages through Serilog, so you can get information about ASP.NET's internal operations logged to the same Serilog sinks as your application events.
+### ASP.NET Core 2.0+ Instructions
 
-### Instructions
+ASP.NET Core 2.0 applications should prefer [Serilog.AspNetCore](https://github.com/serilog/serilog-aspnetcore) and `UseSerilog()` instead.
 
-**First**, install the _Serilog.Extensions.Logging_ [NuGet package](https://www.nuget.org/packages/Serilog.Extensions.Logging) into your web or console app. You will need a way to view the log messages - _Serilog.Sinks.Literate_ writes these to the console.
+### ASP.NET Core 1.0, 1.1, and Default Provider Integration
+
+The package implements `AddSerilog()` on `ILoggingBuilder` and `ILoggerFactory` to enable the Serilog provider under the default _Microsoft.Extensions.Logging_ implementation.
+
+**First**, install the _Serilog.Extensions.Logging_ [NuGet package](https://www.nuget.org/packages/Serilog.Extensions.Logging) into your web or console app. You will need a way to view the log messages - _Serilog.Sinks.Console_ writes these to the console.
 
 ```powershell
 Install-Package Serilog.Extensions.Logging -DependencyVersion Highest
@@ -32,7 +36,7 @@ public class Startup
 ```
 
 **Finally**, in your `Startup` class's `Configure()` method, remove the existing logger configuration entries and
-call `AddSerilog()` on the provided `loggerFactory`.
+call `AddSerilog()` on the provided `loggingBuilder`.
 
 ```csharp
   public void ConfigureServices(IServiceCollection services)

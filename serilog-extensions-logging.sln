@@ -24,8 +24,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "assets", "assets", "{9C21B9
 		assets\Serilog.snk = assets\Serilog.snk
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleWebSample", "samples\SimpleWebSample\SimpleWebSample.csproj", "{69F9A0ED-7910-4F33-8919-28BB05376FBC}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -44,10 +42,6 @@ Global
 		{65357FBC-9BC4-466D-B621-1C3A19BC2A78}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{65357FBC-9BC4-466D-B621-1C3A19BC2A78}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{65357FBC-9BC4-466D-B621-1C3A19BC2A78}.Release|Any CPU.Build.0 = Release|Any CPU
-		{69F9A0ED-7910-4F33-8919-28BB05376FBC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{69F9A0ED-7910-4F33-8919-28BB05376FBC}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{69F9A0ED-7910-4F33-8919-28BB05376FBC}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{69F9A0ED-7910-4F33-8919-28BB05376FBC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -56,7 +50,6 @@ Global
 		{903CD13A-D54B-4CEC-A55F-E22AE3D93B3B} = {A1893BD1-333D-4DFE-A0F0-DDBB2FE526E0}
 		{37EADF84-5E41-4224-A194-1E3299DCD0B8} = {E30F638E-BBBE-4AD1-93CE-48CC69CFEFE1}
 		{65357FBC-9BC4-466D-B621-1C3A19BC2A78} = {F2407211-6043-439C-8E06-3641634332E7}
-		{69F9A0ED-7910-4F33-8919-28BB05376FBC} = {F2407211-6043-439C-8E06-3641634332E7}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {811E61C5-3871-4633-AFAE-B35B619C8A10}
