@@ -3,15 +3,19 @@
 
 A Serilog provider for [Microsoft.Extensions.Logging](https://www.nuget.org/packages/Microsoft.Extensions.Logging), the logging subsystem used by ASP.NET Core.
 
-This package routes ASP.NET log messages through Serilog, so you can get information about ASP.NET's internal operations logged to the same Serilog sinks as your application events.
+### ASP.NET Core 2.0+ Instructions
 
-### Instructions
+ASP.NET Core 2.0 applications should prefer [Serilog.AspNetCore](https://github.com/serilog/serilog-aspnetcore) and `UseSerilog()` instead.
 
-**First**, install the _Serilog.Extensions.Logging_ [NuGet package](https://www.nuget.org/packages/Serilog.Extensions.Logging) into your web or console app. You will need a way to view the log messages - _Serilog.Sinks.Literate_ writes these to the console.
+### ASP.NET Core 1.0, 1.1, and Default Provider Integration
+
+The package implements `AddSerilog()` on `ILoggingBuilder` and `ILoggerFactory` to enable the Serilog provider under the default _Microsoft.Extensions.Logging_ implementation.
+
+**First**, install the _Serilog.Extensions.Logging_ [NuGet package](https://www.nuget.org/packages/Serilog.Extensions.Logging) into your web or console app. You will need a way to view the log messages - _Serilog.Sinks.Console_ writes these to the console.
 
 ```powershell
 Install-Package Serilog.Extensions.Logging -DependencyVersion Highest
-Install-Package Serilog.Sinks.Literate
+Install-Package Serilog.Sinks.Console
 ```
 
 **Next**, in your application's `Startup` method, configure Serilog first:
@@ -25,40 +29,38 @@ public class Startup
   {
     Log.Logger = new LoggerConfiguration()
       .Enrich.FromLogContext()
-      .WriteTo.LiterateConsole()
+      .WriteTo.Console()
       .CreateLogger();
       
     // Other startup code
 ```
 
 **Finally**, in your `Startup` class's `Configure()` method, remove the existing logger configuration entries and
-call `AddSerilog()` on the provided `loggerFactory`.
+call `AddSerilog()` on the provided `loggingBuilder`.
 
 ```csharp
-  public void Configure(IApplicationBuilder app,
-                        IHostingEnvironment env,
-                        ILoggerFactory loggerfactory,
-                        IApplicationLifetime appLifetime)
+  public void ConfigureServices(IServiceCollection services)
   {
-      loggerfactory.AddSerilog();
+      services.AddLogging(loggingBuilder =>
+      	loggingBuilder.AddSerilog(dispose: true));
       
-      // Ensure any buffered events are sent at shutdown
-      appLifetime.ApplicationStopped.Register(Log.CloseAndFlush);
+      // Other services ...
+  }
 ```
 
 That's it! With the level bumped up a little you should see log output like:
 
 ```
-2015-05-15 22:14:44.646 +10:00 [DBG] RouteCollection.RouteAsync
+[22:14:44.646 DBG] RouteCollection.RouteAsync
 	Routes: 
 		Microsoft.AspNet.Mvc.Routing.AttributeRoute
 		{controller=Home}/{action=Index}/{id?}
 	Handled? True
-2015-05-15 22:14:44.647 +10:00 [DBG] RouterMiddleware.Invoke
+[22:14:44.647 DBG] RouterMiddleware.Invoke
 	Handled? True
-2015-05-15 22:14:45.706 +10:00 [DBG] /lib/jquery/jquery.js not modified
-2015-05-15 22:14:45.706 +10:00 [DBG] /css/site.css not modified
-2015-05-15 22:14:45.741 +10:00 [DBG] Handled. Status code: 304 File: /css/site.css
+[22:14:45.706 DBG] /lib/jquery/jquery.js not modified
+[22:14:45.706 DBG] /css/site.css not modified
+[22:14:45.741 DBG] Handled. Status code: 304 File: /css/site.css
 ```
 
 ### Credits

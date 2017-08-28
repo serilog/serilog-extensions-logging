@@ -199,3 +199,5 @@ project.lock.json
 
 # JetBrains Rider
 .idea
+
+.vscode
