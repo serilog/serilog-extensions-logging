@@ -5,9 +5,9 @@ A Serilog provider for [Microsoft.Extensions.Logging](https://www.nuget.org/pack
 
 ### ASP.NET Core 2.0+ Instructions
 
-ASP.NET Core 2.0 applications should prefer [Serilog.AspNetCore](https://github.com/serilog/serilog-aspnetcore) and `UseSerilog()` instead.
+**ASP.NET Core 2.0 applications should prefer [Serilog.AspNetCore](https://github.com/serilog/serilog-aspnetcore) and `UseSerilog()` instead.**
 
-### ASP.NET Core 1.0, 1.1, and Default Provider Integration
+### ASP.NET Core 1.0, 1.1 and Default Provider Integration
 
 The package implements `AddSerilog()` on `ILoggingBuilder` and `ILoggerFactory` to enable the Serilog provider under the default _Microsoft.Extensions.Logging_ implementation.
 
@@ -35,7 +35,7 @@ public class Startup
     // Other startup code
 ```
 
-**Finally**, in your `Startup` class's `Configure()` method, remove the existing logger configuration entries and
+**Finally, for .NET Core 2.0+**, in your `Startup` class's `Configure()` method, remove the existing logger configuration entries and
 call `AddSerilog()` on the provided `loggingBuilder`.
 
 ```csharp
@@ -46,6 +46,20 @@ call `AddSerilog()` on the provided `loggingBuilder`.
       
       // Other services ...
   }
+```
+
+**For .NET Core 1.0 or 1.1**, in your `Startup` class's `Configure()` method, remove the existing logger configuration entries and call `AddSerilog()` on the provided `loggerFactory`.
+
+```
+  public void Configure(IApplicationBuilder app,
+                        IHostingEnvironment env,
+                        ILoggerFactory loggerfactory,
+                        IApplicationLifetime appLifetime)
+  {
+      loggerfactory.AddSerilog();
+      
+      // Ensure any buffered events are sent at shutdown
+      appLifetime.ApplicationStopped.Register(Log.CloseAndFlush);
 ```
 
 That's it! With the level bumped up a little you should see log output like:
