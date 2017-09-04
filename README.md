@@ -5,9 +5,9 @@ A Serilog provider for [Microsoft.Extensions.Logging](https://www.nuget.org/pack
 
 ### ASP.NET Core 2.0+ Instructions
 
-**ASP.NET Core 2.0 applications should prefer [Serilog.AspNetCore](https://github.com/serilog/serilog-aspnetcore) and `UseSerilog()` instead.**
+**ASP.NET Core 2.0** applications should prefer [Serilog.AspNetCore](https://github.com/serilog/serilog-aspnetcore) and `UseSerilog()` instead.
 
-### ASP.NET Core 1.0, 1.1 and Default Provider Integration
+### .NET Core 1.0, 1.1 and Default Provider Integration
 
 The package implements `AddSerilog()` on `ILoggingBuilder` and `ILoggerFactory` to enable the Serilog provider under the default _Microsoft.Extensions.Logging_ implementation.
 
