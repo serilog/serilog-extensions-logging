@@ -19,6 +19,7 @@ only_commits:
     - src/Serilog.Extensions.Logging/
     - Build.ps1
     - assets/
+    - test/Serilog.Extensions.Logging.Tests/
 deploy:
 - provider: NuGet
   api_key:
