@@ -66,7 +66,7 @@ namespace Serilog.Extensions.Logging
             // The outermost scope pushes and pops the Serilog `LogContext` - once
             // this enricher is on the stack, the `CurrentScope` property takes care
             // of the rest of the `BeginScope()` stack.
-            var popSerilogContext = LogContext.PushProperties(this);
+            var popSerilogContext = LogContext.Push(this);
             return new SerilogLoggerScope(this, state, popSerilogContext);
         }
 
