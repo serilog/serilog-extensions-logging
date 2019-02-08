@@ -21,13 +21,17 @@ namespace Sample
                 .CreateLogger();
 
             var services = new ServiceCollection();
+
+            services.AddSingleton(providers);
             services.AddSingleton<ILoggerFactory>(sc =>
             {
-                // Add providers already registered through IoC
-                foreach (var provider in sc.GetServices<ILoggerProvider>())
-                    providers.AddProvider(provider);
+                var providerCollection = sc.GetService<LoggerProviderCollection>();
+                var factory = new SerilogLoggerFactory(null, true, providerCollection);
 
-                return new SerilogLoggerFactory(null, true, providers);
+                foreach (var provider in sc.GetServices<ILoggerProvider>())
+                    factory.AddProvider(provider);
+
+                return factory;
             });
 
             services.AddLogging(l => l.AddConsole());
