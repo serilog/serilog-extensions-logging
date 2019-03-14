@@ -13,9 +13,12 @@
 // limitations under the License.
 
 using System;
+using System.Linq;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Internal;
 using Serilog.Core;
 using Serilog.Events;
+using Serilog.Parsing;
 
 namespace Serilog.Extensions.Logging
 {
@@ -39,17 +42,31 @@ namespace Serilog.Extensions.Logging
                 categoryName = sourceContext;
             }
 
+            // Allocates like mad, but first make it work, then make it work fast ;-)
+            var flv = new FormattedLogValues(
+                logEvent.MessageTemplate.Text, 
+                logEvent.MessageTemplate.Tokens
+                    .OfType<PropertyToken>()
+                    .Select(p =>
+                    {
+                        if (!logEvent.Properties.TryGetValue(p.PropertyName, out var value))
+                            return null;
+                        if (value is ScalarValue sv)
+                            return sv.Value;
+                        return value;
+                    })
+                    .ToArray());
+
             foreach (var provider in _providers.Providers)
             {
                 var logger = provider.CreateLogger(categoryName);
 
-
                 logger.Log(
                     LevelMapping.ToExtensionsLevel(logEvent.Level), 
                     default(EventId), 
-                    logEvent,
+                    flv,
                     logEvent.Exception,
-                    (s, ex) => s.RenderMessage());
+                    (s, e) => s.ToString());
             }
         }
 
