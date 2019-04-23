@@ -15,6 +15,7 @@
 #if LOGGING_BUILDER
 
 using System;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Serilog.Extensions.Logging;
 
@@ -38,7 +39,15 @@ namespace Serilog
         {
             if (builder == null) throw new ArgumentNullException(nameof(builder));
 
-            builder.AddProvider(new SerilogLoggerProvider(logger, dispose));
+            if (dispose)
+            {
+                builder.Services.AddSingleton<ILoggerProvider, SerilogLoggerProvider>(services => new SerilogLoggerProvider(logger, true));
+            }
+            else
+            {
+                builder.AddProvider(new SerilogLoggerProvider(logger));
+            }
+
             builder.AddFilter<SerilogLoggerProvider>(null, LogLevel.Trace);
 
             return builder;
