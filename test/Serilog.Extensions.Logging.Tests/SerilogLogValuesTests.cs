@@ -20,7 +20,7 @@ namespace Serilog.Extensions.Logging.Tests
         }
 
         [Fact]
-        public void ScalarPropertiesAreSimplfied()
+        public void ScalarPropertiesAreSimplified()
         {
             const string name = "Scalar";
             var scalar = 15;
