@@ -92,6 +92,7 @@ namespace Serilog.Extensions.Logging
         {
             get => _value.Value;
             set => _value.Value = value;
+        }
 
         /// <inheritdoc />
         public void Dispose()
