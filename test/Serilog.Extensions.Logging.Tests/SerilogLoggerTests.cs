@@ -9,10 +9,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Serilog.Debugging;
-using Serilog.Framework.Logging.Tests.Support;
+using Serilog.Extensions.Logging.Tests.Support;
 using Xunit;
 
-namespace Serilog.Extensions.Logging.Test
+namespace Serilog.Extensions.Logging.Tests
 {
     public class SerilogLoggerTest
     {
