@@ -38,7 +38,7 @@ namespace Serilog.Extensions.Logging
                 categoryName = sourceContext;
             }
 
-            var level = LevelMapping.ToExtensionsLevel(logEvent.Level);
+            var level = LevelConvert.ToExtensionsLevel(logEvent.Level);
             var slv = new SerilogLogValues(logEvent.MessageTemplate, logEvent.Properties);
 
             foreach (var provider in _providers.Providers)
