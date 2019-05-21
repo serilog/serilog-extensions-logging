@@ -28,8 +28,4 @@
     <PackageReference Include="Microsoft.Extensions.Logging" Version="2.0.0" />
   </ItemGroup>
 
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
-    <DefineConstants>$(DefineConstants);ASYNCLOCAL;LOGGING_BUILDER</DefineConstants>
-  </PropertyGroup>
-
 </Project>

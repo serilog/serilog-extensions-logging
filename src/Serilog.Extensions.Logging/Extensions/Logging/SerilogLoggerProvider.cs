@@ -2,12 +2,12 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
-using System.Threading;
 using Microsoft.Extensions.Logging;
 using Serilog.Core;
 using Serilog.Events;
 using FrameworkLogger = Microsoft.Extensions.Logging.ILogger;
 using System.Collections.Generic;
+using System.Threading;
 using Serilog.Context;
 
 namespace Serilog.Extensions.Logging
@@ -15,9 +15,7 @@ namespace Serilog.Extensions.Logging
     /// <summary>
     /// An <see cref="ILoggerProvider"/> that pipes events through Serilog.
     /// </summary>
-#if LOGGING_BUILDER
     [ProviderAlias("Serilog")]
-#endif
     public class SerilogLoggerProvider : ILoggerProvider, ILogEventEnricher
     {
         internal const string OriginalFormatPropertyName = "{OriginalFormat}";
@@ -92,15 +90,8 @@ namespace Serilog.Extensions.Logging
 
         internal SerilogLoggerScope CurrentScope
         {
-            get
-            {
-                return _value.Value;
-            }
-            set
-            {
-                _value.Value = value;
-            }
-        }
+            get => _value.Value;
+            set => _value.Value = value;
 
         /// <inheritdoc />
         public void Dispose()
