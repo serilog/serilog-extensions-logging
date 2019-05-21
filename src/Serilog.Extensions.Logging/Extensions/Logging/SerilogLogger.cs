@@ -4,6 +4,7 @@
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Serilog.Core;
 using Serilog.Events;
 using FrameworkLogger = Microsoft.Extensions.Logging.ILogger;
@@ -17,15 +18,19 @@ namespace Serilog.Extensions.Logging
         readonly SerilogLoggerProvider _provider;
         readonly ILogger _logger;
 
-        static readonly MessageTemplateParser _messageTemplateParser = new MessageTemplateParser();
+        static readonly MessageTemplateParser MessageTemplateParser = new MessageTemplateParser();
+
+        // It's rare to see large event ids, as they are category-specific
+        static readonly LogEventProperty[] LowEventIdValues = Enumerable.Range(0, 48)
+            .Select(n => new LogEventProperty("Id", new ScalarValue(n)))
+            .ToArray();
 
         public SerilogLogger(
             SerilogLoggerProvider provider,
             ILogger logger = null,
             string name = null)
         {
-            if (provider == null) throw new ArgumentNullException(nameof(provider));
-            _provider = provider;
+            _provider = provider ?? throw new ArgumentNullException(nameof(provider));
             _logger = logger;
 
             // If a logger was passed, the provider has already added itself as an enricher
@@ -60,25 +65,22 @@ namespace Serilog.Extensions.Logging
 
             var properties = new List<LogEventProperty>();
 
-            var structure = state as IEnumerable<KeyValuePair<string, object>>;
-            if (structure != null)
+            if (state is IEnumerable<KeyValuePair<string, object>> structure)
             {
                 foreach (var property in structure)
                 {
-                    if (property.Key == SerilogLoggerProvider.OriginalFormatPropertyName && property.Value is string)
+                    if (property.Key == SerilogLoggerProvider.OriginalFormatPropertyName && property.Value is string value)
                     {
-                        messageTemplate = (string)property.Value;
+                        messageTemplate = value;
                     }
                     else if (property.Key.StartsWith("@"))
                     {
-                        LogEventProperty destructured;
-                        if (logger.BindProperty(property.Key.Substring(1), property.Value, true, out destructured))
+                        if (logger.BindProperty(property.Key.Substring(1), property.Value, true, out var destructured))
                             properties.Add(destructured);
                     }
                     else
                     {
-                        LogEventProperty bound;
-                        if (logger.BindProperty(property.Key, property.Value, false, out bound))
+                        if (logger.BindProperty(property.Key, property.Value, false, out var bound))
                             properties.Add(bound);
                     }                    
                 }
@@ -89,8 +91,7 @@ namespace Serilog.Extensions.Logging
                 if (messageTemplate == null && !stateTypeInfo.IsGenericType)
                 {
                     messageTemplate = "{" + stateType.Name + ":l}";
-                    LogEventProperty stateTypeProperty;
-                    if (logger.BindProperty(stateType.Name, AsLoggableValue(state, formatter), false, out stateTypeProperty))
+                    if (logger.BindProperty(stateType.Name, AsLoggableValue(state, formatter), false, out var stateTypeProperty))
                         properties.Add(stateTypeProperty);
                 }
             }
@@ -111,8 +112,7 @@ namespace Serilog.Extensions.Logging
 
                 if (propertyName != null)
                 {
-                    LogEventProperty property;
-                    if (logger.BindProperty(propertyName, AsLoggableValue(state, formatter), false, out property))
+                    if (logger.BindProperty(propertyName, AsLoggableValue(state, formatter), false, out var property))
                         properties.Add(property);
                 }
             }
@@ -120,7 +120,7 @@ namespace Serilog.Extensions.Logging
             if (eventId.Id != 0 || eventId.Name != null)
                 properties.Add(CreateEventIdProperty(eventId));
 
-            var parsedTemplate = _messageTemplateParser.Parse(messageTemplate ?? "");
+            var parsedTemplate = MessageTemplateParser.Parse(messageTemplate ?? "");
             var evt = new LogEvent(DateTimeOffset.Now, level, exception, parsedTemplate, properties);
             logger.Write(evt);
         }
@@ -133,13 +133,17 @@ namespace Serilog.Extensions.Logging
             return sobj;
         }
 
-        static LogEventProperty CreateEventIdProperty(EventId eventId)
+        internal static LogEventProperty CreateEventIdProperty(EventId eventId)
         {
             var properties = new List<LogEventProperty>(2);
 
             if (eventId.Id != 0)
             {
-                properties.Add(new LogEventProperty("Id", new ScalarValue(eventId.Id)));
+                if (eventId.Id < LowEventIdValues.Length)
+                    // Avoid some allocations
+                    properties.Add(LowEventIdValues[eventId.Id]);
+                else
+                    properties.Add(new LogEventProperty("Id", new ScalarValue(eventId.Id)));
             }
 
             if (eventId.Name != null)
