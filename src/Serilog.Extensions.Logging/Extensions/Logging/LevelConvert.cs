@@ -15,14 +15,28 @@
 using Microsoft.Extensions.Logging;
 using Serilog.Events;
 
+// ReSharper disable RedundantCaseLabel
+
 namespace Serilog.Extensions.Logging
 {
-    static class LevelMapping
+    /// <summary>
+    /// Converts between Serilog and Microsoft.Extensions.Logging level enum values.
+    /// </summary>
+    public static class LevelConvert
     {
+        /// <summary>
+        /// Convert <paramref name="logLevel"/> to the equivalent Serilog <see cref="LogEventLevel"/>.
+        /// </summary>
+        /// <param name="logLevel">A Microsoft.Extensions.Logging <see cref="LogLevel"/>.</param>
+        /// <returns>The Serilog equivalent of <paramref name="logLevel"/>.</returns>
+        /// <remarks>The <see cref="LogLevel.None"/> value has no Serilog equivalent. It is mapped to
+        /// <see cref="LogEventLevel.Fatal"/> as the closest approximation, but this has entirely
+        /// different semantics.</remarks>
         public static LogEventLevel ToSerilogLevel(LogLevel logLevel)
         {
             switch (logLevel)
             {
+                case LogLevel.None:
                 case LogLevel.Critical:
                     return LogEventLevel.Fatal;
                 case LogLevel.Error:
@@ -33,13 +47,17 @@ namespace Serilog.Extensions.Logging
                     return LogEventLevel.Information;
                 case LogLevel.Debug:
                     return LogEventLevel.Debug;
-                // ReSharper disable once RedundantCaseLabel
                 case LogLevel.Trace:
                 default:
                     return LogEventLevel.Verbose;
             }
         }
 
+        /// <summary>
+        /// Convert <paramref name="logEventLevel"/> to the equivalent Microsoft.Extensions.Logging <see cref="LogLevel"/>.
+        /// </summary>
+        /// <param name="logEventLevel">A Serilog <see cref="LogEventLevel"/>.</param>
+        /// <returns>The Microsoft.Extensions.Logging equivalent of <paramref name="logEventLevel"/>.</returns>
         public static LogLevel ToExtensionsLevel(LogEventLevel logEventLevel)
         {
             switch (logEventLevel)
@@ -54,7 +72,6 @@ namespace Serilog.Extensions.Logging
                     return LogLevel.Information;
                 case LogEventLevel.Debug:
                     return LogLevel.Debug;
-                // ReSharper disable once RedundantCaseLabel
                 case LogEventLevel.Verbose:
                 default:
                     return LogLevel.Trace;
