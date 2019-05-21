@@ -39,7 +39,7 @@ namespace Serilog.Extensions.Logging
 
         public bool IsEnabled(LogLevel logLevel)
         {
-            return _logger.IsEnabled(ConvertLevel(logLevel));
+            return _logger.IsEnabled(LevelMapping.ToSerilogLevel(logLevel));
         }
 
         public IDisposable BeginScope<TState>(TState state)
@@ -49,7 +49,7 @@ namespace Serilog.Extensions.Logging
 
         public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter)
         {
-            var level = ConvertLevel(logLevel);
+            var level = LevelMapping.ToSerilogLevel(logLevel);
             if (!_logger.IsEnabled(level))
             {
                 return;
@@ -131,27 +131,6 @@ namespace Serilog.Extensions.Logging
             if (formatter != null)
                 sobj = formatter(state, null);
             return sobj;
-        }
-
-        static LogEventLevel ConvertLevel(LogLevel logLevel)
-        {
-            switch (logLevel)
-            {
-                case LogLevel.Critical:
-                    return LogEventLevel.Fatal;
-                case LogLevel.Error:
-                    return LogEventLevel.Error;
-                case LogLevel.Warning:
-                    return LogEventLevel.Warning;
-                case LogLevel.Information:
-                    return LogEventLevel.Information;
-                case LogLevel.Debug:
-                    return LogEventLevel.Debug;
-                // ReSharper disable once RedundantCaseLabel
-                case LogLevel.Trace:
-                default:
-                    return LogEventLevel.Verbose;
-            }
         }
 
         static LogEventProperty CreateEventIdProperty(EventId eventId)

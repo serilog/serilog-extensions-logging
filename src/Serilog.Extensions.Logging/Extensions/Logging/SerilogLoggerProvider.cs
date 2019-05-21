@@ -52,7 +52,7 @@ namespace Serilog.Extensions.Logging
             return new SerilogLogger(this, _logger, name);
         }
 
-        /// <inheritdoc />
+        /// <inheritdoc cref="IDisposable" />
         public IDisposable BeginScope<T>(T state)
         {
             if (CurrentScope != null)
