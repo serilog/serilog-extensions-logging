@@ -2,6 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Serilog;
+using Serilog.Extensions.Logging;
 
 namespace Sample
 {
@@ -9,19 +10,33 @@ namespace Sample
     {
         public static void Main(string[] args)
         {
+            // Creating a `LoggerProviderCollection` lets Serilog optionally write
+            // events through other dynamically-added MEL ILoggerProviders.
+            var providers = new LoggerProviderCollection();
+
             Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.Debug()
-                .WriteTo.LiterateConsole()
+                .WriteTo.Console()
+                .WriteTo.Providers(providers)
                 .CreateLogger();
 
-            var services = new ServiceCollection()
-                .AddLogging(builder =>
-                {
-                    builder.AddSerilog();
-                });
+            var services = new ServiceCollection();
+
+            services.AddSingleton(providers);
+            services.AddSingleton<ILoggerFactory>(sc =>
+            {
+                var providerCollection = sc.GetService<LoggerProviderCollection>();
+                var factory = new SerilogLoggerFactory(null, true, providerCollection);
+
+                foreach (var provider in sc.GetServices<ILoggerProvider>())
+                    factory.AddProvider(provider);
+
+                return factory;
+            });
+
+            services.AddLogging(l => l.AddConsole());
 
             var serviceProvider = services.BuildServiceProvider();
-            // getting the logger using the class's name is conventional
             var logger = serviceProvider.GetRequiredService<ILogger<Program>>();
 
             var startTime = DateTimeOffset.UtcNow;
@@ -57,6 +72,8 @@ namespace Sample
             logger.LogInformation("{Result,-10:l}{StartTime,15:l}{EndTime,15:l}{Duration,15:l}", "RESULT", "START TIME", "END TIME", "DURATION(ms)");
             logger.LogInformation("{Result,-10:l}{StartTime,15:l}{EndTime,15:l}{Duration,15:l}", "------", "----- ----", "--- ----", "------------");
             logger.LogInformation("{Result,-10:l}{StartTime,15:mm:s tt}{EndTime,15:mm:s tt}{Duration,15}", "SUCCESS", startTime, endTime, (endTime - startTime).TotalMilliseconds);
+
+            serviceProvider.Dispose();
         }
     }
 }

@@ -3,7 +3,6 @@ dotnet --info
 dotnet restore
 
 for path in src/**/*.csproj; do
-    dotnet build -f netstandard1.3 -c Release ${path}
     dotnet build -f netstandard2.0 -c Release ${path}
     
 done

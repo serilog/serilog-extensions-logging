@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#if LOGGING_BUILDER
-
 using System;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -54,5 +52,3 @@ namespace Serilog
         }
     }
 }
-
-#endif // LOGGING_BUILDER

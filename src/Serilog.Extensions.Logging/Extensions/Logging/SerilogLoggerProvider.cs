@@ -2,17 +2,12 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
-#if ASYNCLOCAL
-using System.Threading;
-#else
-using System.Runtime.Remoting;
-using System.Runtime.Remoting.Messaging;
-#endif
 using Microsoft.Extensions.Logging;
 using Serilog.Core;
 using Serilog.Events;
 using FrameworkLogger = Microsoft.Extensions.Logging.ILogger;
 using System.Collections.Generic;
+using System.Threading;
 using Serilog.Context;
 
 namespace Serilog.Extensions.Logging
@@ -20,9 +15,7 @@ namespace Serilog.Extensions.Logging
     /// <summary>
     /// An <see cref="ILoggerProvider"/> that pipes events through Serilog.
     /// </summary>
-#if LOGGING_BUILDER
     [ProviderAlias("Serilog")]
-#endif
     public class SerilogLoggerProvider : ILoggerProvider, ILogEventEnricher
     {
         internal const string OriginalFormatPropertyName = "{OriginalFormat}";
@@ -57,7 +50,7 @@ namespace Serilog.Extensions.Logging
             return new SerilogLogger(this, _logger, name);
         }
 
-        /// <inheritdoc />
+        /// <inheritdoc cref="IDisposable" />
         public IDisposable BeginScope<T>(T state)
         {
             if (CurrentScope != null)
@@ -66,7 +59,7 @@ namespace Serilog.Extensions.Logging
             // The outermost scope pushes and pops the Serilog `LogContext` - once
             // this enricher is on the stack, the `CurrentScope` property takes care
             // of the rest of the `BeginScope()` stack.
-            var popSerilogContext = LogContext.PushProperties(this);
+            var popSerilogContext = LogContext.Push(this);
             return new SerilogLoggerScope(this, state, popSerilogContext);
         }
 
@@ -93,36 +86,13 @@ namespace Serilog.Extensions.Logging
             }
         }
 
-#if ASYNCLOCAL
         readonly AsyncLocal<SerilogLoggerScope> _value = new AsyncLocal<SerilogLoggerScope>();
 
         internal SerilogLoggerScope CurrentScope
         {
-            get
-            {
-                return _value.Value;
-            }
-            set
-            {
-                _value.Value = value;
-            }
+            get => _value.Value;
+            set => _value.Value = value;
         }
-#else
-        readonly string _currentScopeKey = nameof(SerilogLoggerScope) + "#" + Guid.NewGuid().ToString("n");
-
-        internal SerilogLoggerScope CurrentScope
-        {
-            get
-            {
-                var objectHandle = CallContext.LogicalGetData(_currentScopeKey) as ObjectHandle;
-                return objectHandle?.Unwrap() as SerilogLoggerScope;
-            }
-            set
-            {
-                CallContext.LogicalSetData(_currentScopeKey, new ObjectHandle(value));
-            }
-        }
-#endif
 
         /// <inheritdoc />
         public void Dispose()
