@@ -16,56 +16,28 @@ namespace Serilog.Extensions.Logging.Tests
 {
     public class SerilogLoggerTest
     {
-        private const string Name = "test";
-        private const string TestMessage = "This is a test";
+        const string Name = "test";
+        const string TestMessage = "This is a test";
 
-        private Tuple<SerilogLogger, SerilogSink> SetUp(LogLevel logLevel)
+        static Tuple<SerilogLogger, SerilogSink> SetUp(LogLevel logLevel)
         {
             var sink = new SerilogSink();
 
-            var config = new LoggerConfiguration()
-                .WriteTo.Sink(sink);
+            var serilogLogger = new LoggerConfiguration()
+                .WriteTo.Sink(sink)
+                .MinimumLevel.Is(LevelConvert.ToSerilogLevel(logLevel))
+                .CreateLogger();
 
-            SetMinLevel(config, logLevel);
-
-            var provider = new SerilogLoggerProvider(config.CreateLogger());
+            var provider = new SerilogLoggerProvider(serilogLogger);
             var logger = (SerilogLogger)provider.CreateLogger(Name);
 
             return new Tuple<SerilogLogger, SerilogSink>(logger, sink);
         }
 
-        private void SetMinLevel(LoggerConfiguration serilog, LogLevel logLevel)
-        {
-            serilog.MinimumLevel.Is(MapLevel(logLevel));
-        }
-
-        private LogEventLevel MapLevel(LogLevel logLevel)
-        {
-            switch (logLevel)
-            {
-                case LogLevel.Trace:
-                    return LogEventLevel.Verbose;
-                case LogLevel.Debug:
-                    return LogEventLevel.Debug;
-                case LogLevel.Information:
-                    return LogEventLevel.Information;
-                case LogLevel.Warning:
-                    return LogEventLevel.Warning;
-                case LogLevel.Error:
-                    return LogEventLevel.Error;
-                case LogLevel.Critical:
-                    return LogEventLevel.Fatal;
-                default:
-                    return LogEventLevel.Verbose;
-            }
-        }
-
         [Fact]
         public void LogsWhenNullFilterGiven()
         {
-            var t = SetUp(LogLevel.Trace);
-            var logger = t.Item1;
-            var sink = t.Item2;
+            var (logger, sink) = SetUp(LogLevel.Trace);
 
             logger.Log(LogLevel.Information, 0, TestMessage, null, null);
 
@@ -75,9 +47,7 @@ namespace Serilog.Extensions.Logging.Tests
         [Fact]
         public void LogsCorrectLevel()
         {
-            var t = SetUp(LogLevel.Trace);
-            var logger = t.Item1;
-            var sink = t.Item2;
+            var (logger, sink) = SetUp(LogLevel.Trace);
 
             logger.Log(LogLevel.Trace, 0, TestMessage, null, null);
             logger.Log(LogLevel.Debug, 0, TestMessage, null, null);
@@ -134,9 +104,7 @@ namespace Serilog.Extensions.Logging.Tests
         [InlineData(LogLevel.Critical, LogLevel.Critical, 1)]
         public void LogsWhenEnabled(LogLevel minLevel, LogLevel logLevel, int expected)
         {
-            var t = SetUp(minLevel);
-            var logger = t.Item1;
-            var sink = t.Item2;
+            var (logger, sink) = SetUp(minLevel);
 
             logger.Log(logLevel, 0, TestMessage, null, null);
 
@@ -146,9 +114,7 @@ namespace Serilog.Extensions.Logging.Tests
         [Fact]
         public void LogsCorrectMessage()
         {
-            var t = SetUp(LogLevel.Trace);
-            var logger = t.Item1;
-            var sink = t.Item2;
+            var (logger, sink) = SetUp(LogLevel.Trace);
 
             logger.Log<object>(LogLevel.Information, 0, null, null, null);
             logger.Log(LogLevel.Information, 0, TestMessage, null, null);
@@ -171,9 +137,7 @@ namespace Serilog.Extensions.Logging.Tests
         [Fact]
         public void CarriesException()
         {
-            var t = SetUp(LogLevel.Trace);
-            var logger = t.Item1;
-            var sink = t.Item2;
+            var (logger, sink) = SetUp(LogLevel.Trace);
 
             var exception = new Exception();
 
@@ -186,9 +150,7 @@ namespace Serilog.Extensions.Logging.Tests
         [Fact]
         public void SingleScopeProperty()
         {
-            var t = SetUp(LogLevel.Trace);
-            var logger = t.Item1;
-            var sink = t.Item2;
+            var (logger, sink) = SetUp(LogLevel.Trace);
 
             using (logger.BeginScope(new FoodScope("pizza")))
             {
@@ -203,9 +165,7 @@ namespace Serilog.Extensions.Logging.Tests
         [Fact]
         public void NestedScopeSameProperty()
         {
-            var t = SetUp(LogLevel.Trace);
-            var logger = t.Item1;
-            var sink = t.Item2;
+            var (logger, sink) = SetUp(LogLevel.Trace);
 
             using (logger.BeginScope(new FoodScope("avocado")))
             {
@@ -224,9 +184,7 @@ namespace Serilog.Extensions.Logging.Tests
         [Fact]
         public void NestedScopesDifferentProperties()
         {
-            var t = SetUp(LogLevel.Trace);
-            var logger = t.Item1;
-            var sink = t.Item2;
+            var (logger, sink) = SetUp(LogLevel.Trace);
 
             using (logger.BeginScope(new FoodScope("spaghetti")))
             {
@@ -249,9 +207,7 @@ namespace Serilog.Extensions.Logging.Tests
             var selfLog = new StringWriter();
             SelfLog.Enable(selfLog);
 
-            var t = SetUp(LogLevel.Trace);
-            var logger = t.Item1;
-            var sink = t.Item2;
+            var (logger, sink) = SetUp(LogLevel.Trace);
 
             logger.LogInformation("Hello, {Recipient}", "World");
 
@@ -266,11 +222,9 @@ namespace Serilog.Extensions.Logging.Tests
         [Fact]
         public void CarriesEventIdIfNonzero()
         {
-            var t = SetUp(LogLevel.Trace);
-            var logger = t.Item1;
-            var sink = t.Item2;
+            var (logger, sink) = SetUp(LogLevel.Trace);
 
-            int expected = 42;
+            const int expected = 42;
 
             logger.Log(LogLevel.Information, expected, "Test", null, null);
 
@@ -302,9 +256,7 @@ namespace Serilog.Extensions.Logging.Tests
         [Fact]
         public void BeginScopeDestructuresObjectsWhenDestructurerIsUsedInMessageTemplate()
         {
-            var t = SetUp(LogLevel.Trace);
-            var logger = t.Item1;
-            var sink = t.Item2;
+            var (logger, sink) = SetUp(LogLevel.Trace);
 
             using (logger.BeginScope("{@Person}", new Person { FirstName = "John", LastName = "Smith" }))
             {
@@ -324,9 +276,7 @@ namespace Serilog.Extensions.Logging.Tests
         [Fact]
         public void BeginScopeDestructuresObjectsWhenDestructurerIsUsedInDictionary()
         {
-            var t = SetUp(LogLevel.Trace);
-            var logger = t.Item1;
-            var sink = t.Item2;
+            var (logger, sink) = SetUp(LogLevel.Trace);
             
             using (logger.BeginScope(new Dictionary<string, object> {{ "@Person", new Person { FirstName = "John", LastName = "Smith" }}}))
             {
@@ -346,9 +296,7 @@ namespace Serilog.Extensions.Logging.Tests
         [Fact]
         public void BeginScopeDoesNotModifyKeyWhenDestructurerIsNotUsedInMessageTemplate()
         {
-            var t = SetUp(LogLevel.Trace);
-            var logger = t.Item1;
-            var sink = t.Item2;
+            var (logger, sink) = SetUp(LogLevel.Trace);
 
             using (logger.BeginScope("{FirstName}", "John"))
             {
@@ -362,9 +310,7 @@ namespace Serilog.Extensions.Logging.Tests
         [Fact]
         public void BeginScopeDoesNotModifyKeyWhenDestructurerIsNotUsedInDictionary()
         {
-            var t = SetUp(LogLevel.Trace);
-            var logger = t.Item1;
-            var sink = t.Item2;
+            var (logger, sink) = SetUp(LogLevel.Trace);
 
             using (logger.BeginScope(new Dictionary<string, object> { { "FirstName", "John"}}))
             {
@@ -378,9 +324,7 @@ namespace Serilog.Extensions.Logging.Tests
         [Fact]
         public void NamedScopesAreCaptured()
         {
-            var t = SetUp(LogLevel.Trace);
-            var logger = t.Item1;
-            var sink = t.Item2;
+            var (logger, sink) = SetUp(LogLevel.Trace);
 
             using (logger.BeginScope("Outer"))
             using (logger.BeginScope("Inner"))
@@ -390,16 +334,15 @@ namespace Serilog.Extensions.Logging.Tests
 
             Assert.Equal(1, sink.Writes.Count);
 
-            LogEventPropertyValue scopeValue;
-            Assert.True(sink.Writes[0].Properties.TryGetValue(SerilogLoggerProvider.ScopePropertyName, out scopeValue));
-
-            var items = (scopeValue as SequenceValue)?.Elements.Select(e => ((ScalarValue)e).Value).Cast<string>().ToArray();
+            Assert.True(sink.Writes[0].Properties.TryGetValue(SerilogLoggerProvider.ScopePropertyName, out var scopeValue));
+            var sequence = Assert.IsType<SequenceValue>(scopeValue);
+            var items = sequence.Elements.Select(e => Assert.IsType<ScalarValue>(e).Value).Cast<string>().ToArray();
             Assert.Equal(2, items.Length);
             Assert.Equal("Outer", items[0]);
             Assert.Equal("Inner", items[1]);
         }
 
-        private class FoodScope : IEnumerable<KeyValuePair<string, object>>
+        class FoodScope : IEnumerable<KeyValuePair<string, object>>
         {
             readonly string _name;
 
@@ -419,7 +362,7 @@ namespace Serilog.Extensions.Logging.Tests
             }
         }
 
-        private class LuckyScope : IEnumerable<KeyValuePair<string, object>>
+        class LuckyScope : IEnumerable<KeyValuePair<string, object>>
         {
             readonly int _luckyNumber;
 
@@ -439,10 +382,29 @@ namespace Serilog.Extensions.Logging.Tests
             }
         }
 
-        private class Person
+        class Person
         {
+            // ReSharper disable once UnusedAutoPropertyAccessor.Local
             public string FirstName { get; set; }
+
+            // ReSharper disable once UnusedAutoPropertyAccessor.Local
             public string LastName { get; set; }
+        }
+
+        [Theory]
+        [InlineData(1)]
+        [InlineData(10)]
+        [InlineData(48)]
+        [InlineData(100)]
+        public void LowAndHighNumberedEventIdsAreMapped(int id)
+        {
+            var orig = new EventId(id, "test");
+            var mapped = SerilogLogger.CreateEventIdProperty(orig);
+            var value = Assert.IsType<StructureValue>(mapped.Value);
+            Assert.Equal(2, value.Properties.Count);
+            var idValue = value.Properties.Single(p => p.Name == "Id").Value;
+            var scalar = Assert.IsType<ScalarValue>(idValue);
+            Assert.Equal(id, scalar.Value);
         }
     }
 }
