@@ -25,7 +25,7 @@ namespace Serilog.Extensions.Logging.Tests
 
             var serilogLogger = new LoggerConfiguration()
                 .WriteTo.Sink(sink)
-                .MinimumLevel.Is(LevelMapping.ToSerilogLevel(logLevel))
+                .MinimumLevel.Is(LevelConvert.ToSerilogLevel(logLevel))
                 .CreateLogger();
 
             var provider = new SerilogLoggerProvider(serilogLogger);
