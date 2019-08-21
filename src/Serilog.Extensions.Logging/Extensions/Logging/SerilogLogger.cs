@@ -139,7 +139,7 @@ namespace Serilog.Extensions.Logging
 
             if (eventId.Id != 0)
             {
-                if (eventId.Id < LowEventIdValues.Length)
+                if (eventId.Id >= 0 && eventId.Id < LowEventIdValues.Length)
                     // Avoid some allocations
                     properties.Add(LowEventIdValues[eventId.Id]);
                 else
