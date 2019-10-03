@@ -13,7 +13,7 @@
     <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
     <PackageId>Serilog.Extensions.Logging</PackageId>
     <PackageTags>serilog;Microsoft.Extensions.Logging</PackageTags>
-    <PackageIconUrl>http://serilog.net/images/serilog-extension-nuget.png</PackageIconUrl>
+    <PackageIcon>serilog-extension-nuget.png</PackageIcon>
     <PackageProjectUrl>https://github.com/serilog/serilog-extensions-logging</PackageProjectUrl>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <RepositoryUrl>https://github.com/serilog/serilog-extensions-logging</RepositoryUrl>
@@ -22,6 +22,10 @@
     <RootNamespace>Serilog</RootNamespace>
     <LangVersion>7.3</LangVersion>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\assets\serilog-extension-nuget.png" Pack="true" PackagePath="" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Serilog" Version="2.8.0" />
