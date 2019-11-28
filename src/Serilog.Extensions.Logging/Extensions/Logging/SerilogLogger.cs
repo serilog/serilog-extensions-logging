@@ -78,6 +78,11 @@ namespace Serilog.Extensions.Logging
                         if (logger.BindProperty(property.Key.Substring(1), property.Value, true, out var destructured))
                             properties.Add(destructured);
                     }
+                    else if (property.Key.StartsWith("$"))
+                    {
+                        if (logger.BindProperty(property.Key.Substring(1), property.Value?.ToString() ?? "null", true, out var stringified))
+                            properties.Add(stringified);
+                    }
                     else
                     {
                         if (logger.BindProperty(property.Key, property.Value, false, out var bound))

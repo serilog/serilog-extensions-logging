@@ -220,6 +220,24 @@ namespace Serilog.Extensions.Logging.Tests
         }
 
         [Fact]
+        public void CarriesMessageTemplatePropertiesWhenStringificationIsUsed()
+        {
+            var selfLog = new StringWriter();
+            SelfLog.Enable(selfLog);
+            var (logger, sink) = SetUp(LogLevel.Trace);
+            var array = new[] { 1, 2, 3, 4 };
+
+            logger.LogInformation("{$array}", array);
+
+            Assert.True(sink.Writes[0].Properties.ContainsKey("array"));
+            Assert.Equal("\"System.Int32[]\"", sink.Writes[0].Properties["array"].ToString());
+            Assert.Equal("{$array}", sink.Writes[0].MessageTemplate.Text);
+
+            SelfLog.Disable();
+            Assert.Empty(selfLog.ToString());
+        }
+
+        [Fact]
         public void CarriesEventIdIfNonzero()
         {
             var (logger, sink) = SetUp(LogLevel.Trace);
