@@ -80,7 +80,7 @@ namespace Serilog.Extensions.Logging
                     }
                     else if (property.Key.StartsWith("$"))
                     {
-                        if (logger.BindProperty(property.Key.Substring(1), property.Value?.ToString() ?? "null", true, out var stringified))
+                        if (logger.BindProperty(property.Key.Substring(1), property.Value?.ToString(), true, out var stringified))
                             properties.Add(stringified);
                     }
                     else
