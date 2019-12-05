@@ -78,6 +78,11 @@ namespace Serilog.Extensions.Logging
                         destructureObject = true;
                     }
 
+                    if (key.StartsWith("$"))
+                    {
+                        key = key.Substring(1);
+                    }
+
                     var property = propertyFactory.CreateProperty(key, stateProperty.Value, destructureObject);
                     logEvent.AddPropertyIfAbsent(property);
                 }
