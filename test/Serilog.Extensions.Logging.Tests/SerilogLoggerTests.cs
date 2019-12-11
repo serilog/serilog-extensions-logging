@@ -163,6 +163,21 @@ namespace Serilog.Extensions.Logging.Tests
         }
 
         [Fact]
+        public void StringifyScopeProperty()
+        {
+            var (logger, sink) = SetUp(LogLevel.Trace);
+
+            using (logger.BeginScope("{$values}", new int[] { 1, 2, 3, 4 }))
+            {
+                logger.Log(LogLevel.Information, 0, TestMessage, null, null);
+            }
+
+            Assert.Equal(1, sink.Writes.Count);
+            Assert.True(sink.Writes[0].Properties.ContainsKey("values"));
+            Assert.Equal("\"System.Int32[]\"", sink.Writes[0].Properties["values"].ToString());
+        }
+
+        [Fact]
         public void NestedScopeSameProperty()
         {
             var (logger, sink) = SetUp(LogLevel.Trace);
@@ -214,6 +229,24 @@ namespace Serilog.Extensions.Logging.Tests
             Assert.True(sink.Writes[0].Properties.ContainsKey("Recipient"));
             Assert.Equal("\"World\"", sink.Writes[0].Properties["Recipient"].ToString());
             Assert.Equal("Hello, {Recipient}", sink.Writes[0].MessageTemplate.Text);
+
+            SelfLog.Disable();
+            Assert.Empty(selfLog.ToString());
+        }
+
+        [Fact]
+        public void CarriesMessageTemplatePropertiesWhenStringificationIsUsed()
+        {
+            var selfLog = new StringWriter();
+            SelfLog.Enable(selfLog);
+            var (logger, sink) = SetUp(LogLevel.Trace);
+            var array = new[] { 1, 2, 3, 4 };
+
+            logger.LogInformation("{$array}", array);
+
+            Assert.True(sink.Writes[0].Properties.ContainsKey("array"));
+            Assert.Equal("\"System.Int32[]\"", sink.Writes[0].Properties["array"].ToString());
+            Assert.Equal("{$array}", sink.Writes[0].MessageTemplate.Text);
 
             SelfLog.Disable();
             Assert.Empty(selfLog.ToString());

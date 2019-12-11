@@ -71,6 +71,7 @@ namespace Serilog.Extensions.Logging
 
                     var key = stateProperty.Key;
                     var destructureObject = false;
+                    var value = stateProperty.Value;
 
                     if (key.StartsWith("@"))
                     {
@@ -78,7 +79,13 @@ namespace Serilog.Extensions.Logging
                         destructureObject = true;
                     }
 
-                    var property = propertyFactory.CreateProperty(key, stateProperty.Value, destructureObject);
+                    if (key.StartsWith("$"))
+                    {
+                        key = key.Substring(1);
+                        value = value?.ToString();
+                    }
+
+                    var property = propertyFactory.CreateProperty(key, value, destructureObject);
                     logEvent.AddPropertyIfAbsent(property);
                 }
             }
