@@ -62,72 +62,125 @@ namespace Serilog.Extensions.Logging
 
             var logger = _logger;
             string messageTemplate = null;
+            object[] propertyValues = null;
+            int valuesCount = 0;
 
-            var properties = new List<LogEventProperty>();
-
-            if (state is IEnumerable<KeyValuePair<string, object>> structure)
+            var structure = state as IReadOnlyList<KeyValuePair<string, object>>;
+            if (structure == null && state is IEnumerable<KeyValuePair<string, object>> pairs)
             {
-                foreach (var property in structure)
+                structure = pairs.ToList();
+            }
+
+            if (structure != null)
+            {
+                if (structure.Count > 0)
                 {
-                    if (property.Key == SerilogLoggerProvider.OriginalFormatPropertyName && property.Value is string value)
+                    propertyValues = new object[structure.Count - 1];
+
+                    foreach (var property in structure)
                     {
-                        messageTemplate = value;
+                        if (property.Key == SerilogLoggerProvider.OriginalFormatPropertyName && property.Value is string value)
+                        {
+                            messageTemplate = value;
+                            continue;
+                        }
+
+                        if (propertyValues.Length == valuesCount)
+                        {
+                            var extra = new object[valuesCount + 1];
+                            Array.Copy(propertyValues, extra, valuesCount);
+                            propertyValues = extra;
+                        }
+
+                        propertyValues[valuesCount++] = property.Value;
                     }
-                    else if (property.Key.StartsWith("@"))
-                    {
-                        if (logger.BindProperty(property.Key.Substring(1), property.Value, true, out var destructured))
-                            properties.Add(destructured);
-                    }
-                    else if (property.Key.StartsWith("$"))
-                    {
-                        if (logger.BindProperty(property.Key.Substring(1), property.Value?.ToString(), true, out var stringified))
-                            properties.Add(stringified);
-                    }
-                    else
-                    {
-                        if (logger.BindProperty(property.Key, property.Value, false, out var bound))
-                            properties.Add(bound);
-                    }                    
                 }
 
-                var stateType = state.GetType();
-                var stateTypeInfo = stateType.GetTypeInfo();
-                // Imperfect, but at least eliminates `1 names
-                if (messageTemplate == null && !stateTypeInfo.IsGenericType)
+                if (messageTemplate == null)
                 {
-                    messageTemplate = "{" + stateType.Name + ":l}";
-                    if (logger.BindProperty(stateType.Name, AsLoggableValue(state, formatter), false, out var stateTypeProperty))
-                        properties.Add(stateTypeProperty);
+                    var stateType = state.GetType();
+                    var stateTypeInfo = stateType.GetTypeInfo();
+                    // Imperfect, but at least eliminates `1 names
+
+                    if (!stateTypeInfo.IsGenericType)
+                    {
+                        messageTemplate = "{" + stateType.Name + ":l}";
+                        if (propertyValues == null || propertyValues.Length != 1)
+                        {
+                            propertyValues = new object[1];
+                        }
+                        propertyValues[0] = AsLoggableValue(state, formatter);
+                        valuesCount = 1;
+                    }
                 }
             }
 
             if (messageTemplate == null)
             {
-                string propertyName = null;
                 if (state != null)
                 {
-                    propertyName = "State";
                     messageTemplate = "{State:l}";
                 }
                 else if (formatter != null)
                 {
-                    propertyName = "Message";
                     messageTemplate = "{Message:l}";
                 }
 
-                if (propertyName != null)
+                if (messageTemplate == null)
                 {
-                    if (logger.BindProperty(propertyName, AsLoggableValue(state, formatter), false, out var property))
-                        properties.Add(property);
+                    messageTemplate = "";
+                }
+                else
+                {
+                    if (propertyValues == null || propertyValues.Length != 1)
+                    {
+                        propertyValues = new object[1];
+                    }
+                    propertyValues[0] = AsLoggableValue(state, formatter);
+                    valuesCount = 1;
                 }
             }
 
-            if (eventId.Id != 0 || eventId.Name != null)
-                properties.Add(CreateEventIdProperty(eventId));
+            if (propertyValues == null)
+            {
+                propertyValues = Array.Empty<object>();
+            }
+            else if (propertyValues.Length != valuesCount)
+            {
+                // Trimm the array because PropertyBinder uses all elements in the array
+                if (valuesCount == 0)
+                {
+                    propertyValues = Array.Empty<object>();
+                }
+                else
+                {
+                    var trimmed = new object[valuesCount];
+                    Array.Copy(propertyValues, trimmed, valuesCount);
+                    propertyValues = trimmed;
+                }
+            }
 
-            var parsedTemplate = MessageTemplateParser.Parse(messageTemplate ?? "");
-            var evt = new LogEvent(DateTimeOffset.Now, level, exception, parsedTemplate, properties);
-            logger.Write(evt);
+            if (logger.BindMessageTemplate(messageTemplate, propertyValues, out MessageTemplate parsedTemplate, out IEnumerable<LogEventProperty> properties))
+            {
+                if (eventId.Id != 0 || eventId.Name != null)
+                {
+                    var eventIdProperty = CreateEventIdProperty(eventId);
+                    properties = Concat(properties, eventIdProperty);
+                }
+
+                var evt = new LogEvent(DateTimeOffset.Now, level, exception, parsedTemplate, properties);
+                logger.Write(evt);
+            }
+        }
+
+        static IEnumerable<T> Concat<T>(IEnumerable<T> body, T tail)
+        {
+            foreach (var item in body)
+            {
+                yield return item;
+            }
+
+            yield return tail;
         }
 
         static object AsLoggableValue<TState>(TState state, Func<TState, Exception, string> formatter)
