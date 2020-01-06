@@ -77,8 +77,9 @@ namespace Serilog.Extensions.Logging
                 {
                     propertyValues = new object[structure.Count - 1];
 
-                    foreach (var property in structure)
+                    for (int i = 0; i < structure.Count; i++)
                     {
+                        var property = structure[i];
                         if (property.Key == SerilogLoggerProvider.OriginalFormatPropertyName && property.Value is string value)
                         {
                             messageTemplate = value;
