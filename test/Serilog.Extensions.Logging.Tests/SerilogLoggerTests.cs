@@ -167,7 +167,7 @@ namespace Serilog.Extensions.Logging.Tests
         {
             var (logger, sink) = SetUp(LogLevel.Trace);
 
-            using (logger.BeginScope("{$values}", new int[] { 1, 2, 3, 4 }))
+            using (logger.BeginScope("{$values}", new [] { 1, 2, 3, 4 }))
             {
                 logger.Log(LogLevel.Information, 0, TestMessage, null, null);
             }
@@ -272,6 +272,7 @@ namespace Serilog.Extensions.Logging.Tests
         public void WhenDisposeIsFalseProvidedLoggerIsNotDisposed()
         {
             var logger = new DisposeTrackingLogger();
+            // ReSharper disable once RedundantArgumentDefaultValue
             var provider = new SerilogLoggerProvider(logger, false);
             provider.Dispose();
             Assert.False(logger.IsDisposed);
@@ -438,6 +439,16 @@ namespace Serilog.Extensions.Logging.Tests
             var idValue = value.Properties.Single(p => p.Name == "Id").Value;
             var scalar = Assert.IsType<ScalarValue>(idValue);
             Assert.Equal(id, scalar.Value);
+        }
+        
+        [Fact]
+        public void MismatchedMessageTemplateParameterCountIsHandled()
+        {
+            var (logger, sink) = SetUp(LogLevel.Trace);
+
+            logger.LogInformation("Some test message with {Two} {Properties}", "OneProperty");
+
+            Assert.Equal(0, sink.Writes.Count);
         }
     }
 }

@@ -9,6 +9,7 @@ using Serilog.Core;
 using Serilog.Events;
 using FrameworkLogger = Microsoft.Extensions.Logging.ILogger;
 using System.Reflection;
+using Serilog.Debugging;
 
 namespace Serilog.Extensions.Logging
 {
@@ -59,6 +60,18 @@ namespace Serilog.Extensions.Logging
                 return;
             }
 
+            try
+            {
+                Write(level, eventId, state, exception, formatter);
+            }
+            catch (Exception ex)
+            {
+                SelfLog.WriteLine($"Failed to write event through {typeof(SerilogLogger).Name}: {ex}");
+            }
+        }
+
+        void Write<TState>(LogEventLevel level, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter)
+        {
             var logger = _logger;
             string messageTemplate = null;
 
