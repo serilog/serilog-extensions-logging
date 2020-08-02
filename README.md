@@ -8,7 +8,7 @@ A Serilog provider for [Microsoft.Extensions.Logging](https://www.nuget.org/pack
 
 ### Non-web .NET Core Instructions
 
-**Non-web .NET Core 2.0** applications should prefer [Serilog.Extensions.Hosting](https://github.com/serilog/serilog-extensions-hosting) and `UseSerilog()` instead.
+**Non-web .NET Core** applications should prefer [Serilog.Extensions.Hosting](https://github.com/serilog/serilog-extensions-hosting) and `UseSerilog()` instead.
 
 ### .NET Core 1.0, 1.1 and Default Provider Integration
 
