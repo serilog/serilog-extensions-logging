@@ -121,7 +121,7 @@ using (_logger.BeginScope("TransactionId: {TransactionId}, ResponseJson: {Respon
 
 Not only does this add the unnecessary `Scope` property to your event, but it also duplicates serialized values between `Scope` and the intended properties, as you can see here with `ResponseJson`. If this were "real" JSON like an API response, then a potentially very large block of text would be duplicated within your log event! Moreover, the template string within `BeginScope` is rather arbitrary when all you want to do is add a bag of properties, and you start mixing enriching concerns with formatting concerns.
 
-A far better alternative is to use the `BeginScope<TState>(TState state)` method. If you provide any `IEnumerable<KeyValuePair<string, object>>` to this method, then we will output the key/value pairs as structured properties _without_ the `Scope` property, as in this example:
+A far better alternative is to use the `BeginScope<TState>(TState state)` method. If you provide any `IEnumerable<KeyValuePair<string, object>>` to this method, then Serilog will output the key/value pairs as structured properties _without_ the `Scope` property, as in this example:
 
 ```cs
 var scopeProps = new Dictionary<string, object> {
