@@ -15,7 +15,6 @@ namespace Serilog.Extensions.Logging
     /// <summary>
     /// An <see cref="ILoggerProvider"/> that pipes events through Serilog.
     /// </summary>
-    [ProviderAlias("Serilog")]
     public class SerilogLoggerProvider : ILoggerProvider, ILogEventEnricher
     {
         internal const string OriginalFormatPropertyName = "{OriginalFormat}";

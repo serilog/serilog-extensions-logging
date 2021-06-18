@@ -39,14 +39,14 @@ namespace Serilog
 
             if (dispose)
             {
-                builder.Services.AddSingleton<ILoggerProvider, SerilogLoggerProvider>(services => new SerilogLoggerProvider(logger, true));
+                builder.Services.AddSingleton<ILoggerProvider, SerilogLoggerProvider>(services => new AliasedSerilogLoggerProvider(logger, true));
             }
             else
             {
-                builder.AddProvider(new SerilogLoggerProvider(logger));
+                builder.AddProvider(new AliasedSerilogLoggerProvider(logger));
             }
 
-            builder.AddFilter<SerilogLoggerProvider>(null, LogLevel.Trace);
+            builder.AddFilter<AliasedSerilogLoggerProvider>(null, LogLevel.Trace);
 
             return builder;
         }

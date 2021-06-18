@@ -7,11 +7,11 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <AssemblyName>Serilog.Extensions.Logging</AssemblyName>
+    <AssemblyName>Serilog.Extensions.Logging.Extensions</AssemblyName>
     <AssemblyOriginatorKeyFile>../../assets/Serilog.snk</AssemblyOriginatorKeyFile>
     <SignAssembly>true</SignAssembly>
     <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
-    <PackageId>Serilog.Extensions.Logging</PackageId>
+    <PackageId>Serilog.Extensions.Logging.Extensions</PackageId>
     <PackageTags>serilog;Microsoft.Extensions.Logging</PackageTags>
     <PackageIcon>serilog-extension-nuget.png</PackageIcon>
     <PackageProjectUrl>https://github.com/serilog/serilog-extensions-logging</PackageProjectUrl>
@@ -27,8 +27,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Serilog" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
+    <PackageReference Include="Microsoft.Extensions.Logging" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Serilog.Extensions.Logging\Serilog.Extensions.Logging.csproj" />
   </ItemGroup>
 
 </Project>
