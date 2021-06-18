@@ -1,0 +1,37 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <Description>Low-level Serilog provider for Microsoft.Extensions.Logging</Description>
+    <VersionPrefix>3.0.2</VersionPrefix>
+    <Authors>Microsoft;Serilog Contributors</Authors>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <AssemblyName>Serilog.Extensions.Logging.Extensions</AssemblyName>
+    <AssemblyOriginatorKeyFile>../../assets/Serilog.snk</AssemblyOriginatorKeyFile>
+    <SignAssembly>true</SignAssembly>
+    <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
+    <PackageId>Serilog.Extensions.Logging.Extensions</PackageId>
+    <PackageTags>serilog;Microsoft.Extensions.Logging</PackageTags>
+    <PackageIcon>serilog-extension-nuget.png</PackageIcon>
+    <PackageProjectUrl>https://github.com/serilog/serilog-extensions-logging</PackageProjectUrl>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+    <RepositoryUrl>https://github.com/serilog/serilog-extensions-logging</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
+    <RootNamespace>Serilog</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\assets\serilog-extension-nuget.png" Pack="true" PackagePath="" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Logging" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Serilog.Extensions.Logging\Serilog.Extensions.Logging.csproj" />
+  </ItemGroup>
+
+</Project>
