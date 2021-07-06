@@ -26,7 +26,7 @@ namespace Serilog.Extensions.Logging
     /// </summary>
     public class LoggerProviderCollection : IDisposable
     {
-        volatile ILoggerProvider[] _providers = new ILoggerProvider[0];
+        volatile ILoggerProvider[] _providers = Array.Empty<ILoggerProvider>();
 
         /// <summary>
         /// Add <paramref name="provider"/> to the collection.
@@ -36,16 +36,16 @@ namespace Serilog.Extensions.Logging
         {
             if (provider == null) throw new ArgumentNullException(nameof(provider));
 
-            var existing = _providers;
-            var added = existing.Concat(new[] {provider}).ToArray();
+            ILoggerProvider[] existing, added;
 
-#pragma warning disable 420 // ref to a volatile field
-            while (Interlocked.CompareExchange(ref _providers, added, existing) != existing)
-#pragma warning restore 420
+            do
             {
                 existing = _providers;
                 added = existing.Concat(new[] { provider }).ToArray();
             }
+#pragma warning disable 420 // ref to a volatile field
+            while (Interlocked.CompareExchange(ref _providers, added, existing) != existing);
+#pragma warning restore 420
         }
 
         /// <summary>

@@ -69,8 +69,7 @@ namespace Serilog.Extensions.Logging
             List<LogEventPropertyValue> scopeItems = null;
             for (var scope = CurrentScope; scope != null; scope = scope.Parent)
             {
-                LogEventPropertyValue scopeItem;
-                scope.EnrichAndCreateScopeItem(logEvent, propertyFactory, out scopeItem);
+                scope.EnrichAndCreateScopeItem(logEvent, propertyFactory, out LogEventPropertyValue scopeItem);
 
                 if (scopeItem != null)
                 {

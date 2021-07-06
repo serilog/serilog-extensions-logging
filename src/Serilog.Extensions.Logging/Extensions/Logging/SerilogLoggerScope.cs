@@ -57,8 +57,7 @@ namespace Serilog.Extensions.Logging
                 return;
             }
 
-            var stateProperties = _state as IEnumerable<KeyValuePair<string, object>>;
-            if (stateProperties != null)
+            if (_state is IEnumerable<KeyValuePair<string, object>> stateProperties)
             {
                 scopeItem = null; // Unless it's `FormattedLogValues`, these are treated as property bags rather than scope items.
 
@@ -72,14 +71,21 @@ namespace Serilog.Extensions.Logging
 
                     var key = stateProperty.Key;
                     var destructureObject = false;
+                    var value = stateProperty.Value;
 
                     if (key.StartsWith("@"))
                     {
                         key = key.Substring(1);
                         destructureObject = true;
                     }
-                    
-                    var property = propertyFactory.CreateProperty(key, stateProperty.Value, destructureObject);
+
+                    if (key.StartsWith("$"))
+                    {
+                        key = key.Substring(1);
+                        value = value?.ToString();
+                    }
+
+                    var property = propertyFactory.CreateProperty(key, value, destructureObject);
                     logEvent.AddPropertyIfAbsent(property);
                 }
             }

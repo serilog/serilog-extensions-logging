@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using Microsoft.Extensions.Logging;
 using Serilog.Core;
 using Serilog.Events;
 
@@ -30,12 +31,25 @@ namespace Serilog.Extensions.Logging
         public void Emit(LogEvent logEvent)
         {
             string categoryName = null;
+            EventId eventId = default;
 
             if (logEvent.Properties.TryGetValue("SourceContext", out var sourceContextProperty) &&
                 sourceContextProperty is ScalarValue sourceContextValue &&
                 sourceContextValue.Value is string sourceContext)
             {
                 categoryName = sourceContext;
+            }
+            if (logEvent.Properties.TryGetValue("EventId", out var eventIdPropertyValue) && eventIdPropertyValue is StructureValue structuredEventId)
+            {
+                string name = null;
+                var id = 0;
+                foreach (var item in structuredEventId.Properties)
+                {
+                    if (item.Name == "Id" && item.Value is ScalarValue sv && sv.Value is int i) id = i;
+                    if (item.Name == "Name" && item.Value is ScalarValue sv2 && sv2.Value is string s) name = s;
+                }
+
+                eventId = new EventId(id, name);
             }
 
             var level = LevelConvert.ToExtensionsLevel(logEvent.Level);
@@ -47,7 +61,7 @@ namespace Serilog.Extensions.Logging
 
                 logger.Log(
                     level,
-                    default, 
+                    eventId,
                     slv,
                     logEvent.Exception,
                     (s, e) => s.ToString());
