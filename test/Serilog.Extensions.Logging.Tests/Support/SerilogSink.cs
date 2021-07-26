@@ -9,7 +9,7 @@ namespace Serilog.Extensions.Logging.Tests.Support
 {
     public class SerilogSink : ILogEventSink
     {
-        public List<LogEvent> Writes { get; set; } = new List<LogEvent>();
+        public List<LogEvent> Writes { get; set; } = new();
 
         public void Emit(LogEvent logEvent)
         {

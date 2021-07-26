@@ -22,10 +22,10 @@ namespace Serilog.Extensions.Logging
 {
     class CachingMessageTemplateParser
     {
-        readonly MessageTemplateParser _innerParser = new MessageTemplateParser();
-        
-        readonly object _templatesLock = new object();
-        readonly Hashtable _templates = new Hashtable();
+        readonly MessageTemplateParser _innerParser = new();
+
+        readonly object _templatesLock = new();
+        readonly Hashtable _templates = new();
 
         const int MaxCacheItems = 1000;
         const int MaxCachedTemplateLength = 1024;

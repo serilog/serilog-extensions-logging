@@ -85,7 +85,7 @@ namespace Serilog.Extensions.Logging
             }
         }
 
-        readonly AsyncLocal<SerilogLoggerScope> _value = new AsyncLocal<SerilogLoggerScope>();
+        readonly AsyncLocal<SerilogLoggerScope> _value = new();
 
         internal SerilogLoggerScope CurrentScope
         {

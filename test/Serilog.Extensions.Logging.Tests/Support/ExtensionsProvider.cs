@@ -10,7 +10,7 @@ namespace Serilog.Extensions.Logging.Tests.Support
     public class ExtensionsProvider : ILoggerProvider, Microsoft.Extensions.Logging.ILogger
     {
         private readonly LogLevel enabledLevel;
-        public List<(LogLevel logLevel, EventId eventId, object state, Exception exception, string message)> Writes { get; set; } = new List<(LogLevel logLevel, EventId eventId, object state, Exception exception, string message)>();
+        public List<(LogLevel logLevel, EventId eventId, object state, Exception exception, string message)> Writes { get; set; } = new();
 
         public ExtensionsProvider(LogLevel enabledLevel)
         {

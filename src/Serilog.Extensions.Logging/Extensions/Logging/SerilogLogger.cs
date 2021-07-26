@@ -18,7 +18,7 @@ namespace Serilog.Extensions.Logging
         readonly SerilogLoggerProvider _provider;
         readonly ILogger _logger;
 
-        static readonly CachingMessageTemplateParser MessageTemplateParser = new CachingMessageTemplateParser();
+        static readonly CachingMessageTemplateParser MessageTemplateParser = new();
 
         // It's rare to see large event ids, as they are category-specific
         static readonly LogEventProperty[] LowEventIdValues = Enumerable.Range(0, 48)
