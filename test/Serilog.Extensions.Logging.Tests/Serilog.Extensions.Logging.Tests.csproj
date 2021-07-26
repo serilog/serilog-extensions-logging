@@ -2,11 +2,8 @@
 
   <PropertyGroup>
     <TargetFrameworks>netcoreapp2.0;net472</TargetFrameworks>
-    <AssemblyName>Serilog.Extensions.Logging.Tests</AssemblyName>
     <AssemblyOriginatorKeyFile>../../assets/Serilog.snk</AssemblyOriginatorKeyFile>
     <SignAssembly>true</SignAssembly>
-    <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
-    <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
   </PropertyGroup>
 
   <ItemGroup>
