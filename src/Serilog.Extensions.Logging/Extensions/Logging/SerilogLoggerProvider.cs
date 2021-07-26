@@ -73,7 +73,7 @@ namespace Serilog.Extensions.Logging
 
                 if (scopeItem != null)
                 {
-                    scopeItems = scopeItems ?? new List<LogEventPropertyValue>();
+                    scopeItems ??= new List<LogEventPropertyValue>();
                     scopeItems.Add(scopeItem);
                 }
             }
