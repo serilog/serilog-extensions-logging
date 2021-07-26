@@ -31,10 +31,9 @@ namespace Serilog.Extensions.Logging
             string name = null)
         {
             _provider = provider ?? throw new ArgumentNullException(nameof(provider));
-            _logger = logger;
 
             // If a logger was passed, the provider has already added itself as an enricher
-            _logger = _logger ?? Serilog.Log.Logger.ForContext(new[] { provider });
+            _logger = logger ?? Serilog.Log.Logger.ForContext(new[] { provider });
 
             if (name != null)
             {
@@ -99,7 +98,7 @@ namespace Serilog.Extensions.Logging
                     {
                         if (logger.BindProperty(property.Key, property.Value, false, out var bound))
                             properties.Add(bound);
-                    }                    
+                    }
                 }
 
                 var stateType = state.GetType();
