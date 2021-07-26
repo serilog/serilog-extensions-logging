@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
-using Serilog.Events;
 
 namespace Serilog.Extensions.Logging.Tests.Support
 {
