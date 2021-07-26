@@ -64,7 +64,7 @@ namespace Serilog.Extensions.Logging
                     eventId,
                     slv,
                     logEvent.Exception,
-                    (s, e) => s.ToString());
+                    (s, _) => s.ToString());
             }
         }
 

@@ -118,7 +118,7 @@ namespace Serilog.Extensions.Logging.Tests
 
             logger.Log<object>(LogLevel.Information, 0, null, null, null);
             logger.Log(LogLevel.Information, 0, TestMessage, null, null);
-            logger.Log<object>(LogLevel.Information, 0, null, null, (_, __) => TestMessage);
+            logger.Log<object>(LogLevel.Information, 0, null, null, (_, _) => TestMessage);
 
             Assert.Equal(3, sink.Writes.Count);
 

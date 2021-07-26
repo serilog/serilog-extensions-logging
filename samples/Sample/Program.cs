@@ -8,7 +8,7 @@ namespace Sample
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static void Main()
         {
             // Creating a `LoggerProviderCollection` lets Serilog optionally write
             // events through other dynamically-added MEL ILoggerProviders.
