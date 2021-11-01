@@ -9,7 +9,7 @@ using Serilog.Core;
 using Serilog.Events;
 using FrameworkLogger = Microsoft.Extensions.Logging.ILogger;
 using System.Reflection;
-using Serilog.Parsing;
+using Serilog.Debugging;
 
 namespace Serilog.Extensions.Logging
 {
@@ -18,7 +18,7 @@ namespace Serilog.Extensions.Logging
         readonly SerilogLoggerProvider _provider;
         readonly ILogger _logger;
 
-        static readonly MessageTemplateParser MessageTemplateParser = new MessageTemplateParser();
+        static readonly CachingMessageTemplateParser MessageTemplateParser = new CachingMessageTemplateParser();
 
         // It's rare to see large event ids, as they are category-specific
         static readonly LogEventProperty[] LowEventIdValues = Enumerable.Range(0, 48)
@@ -60,6 +60,18 @@ namespace Serilog.Extensions.Logging
                 return;
             }
 
+            try
+            {
+                Write(level, eventId, state, exception, formatter);
+            }
+            catch (Exception ex)
+            {
+                SelfLog.WriteLine($"Failed to write event through {typeof(SerilogLogger).Name}: {ex}");
+            }
+        }
+
+        void Write<TState>(LogEventLevel level, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter)
+        {
             var logger = _logger;
             string messageTemplate = null;
 
@@ -77,6 +89,11 @@ namespace Serilog.Extensions.Logging
                     {
                         if (logger.BindProperty(property.Key.Substring(1), property.Value, true, out var destructured))
                             properties.Add(destructured);
+                    }
+                    else if (property.Key.StartsWith("$"))
+                    {
+                        if (logger.BindProperty(property.Key.Substring(1), property.Value?.ToString(), true, out var stringified))
+                            properties.Add(stringified);
                     }
                     else
                     {

@@ -163,6 +163,21 @@ namespace Serilog.Extensions.Logging.Tests
         }
 
         [Fact]
+        public void StringifyScopeProperty()
+        {
+            var (logger, sink) = SetUp(LogLevel.Trace);
+
+            using (logger.BeginScope("{$values}", new [] { 1, 2, 3, 4 }))
+            {
+                logger.Log(LogLevel.Information, 0, TestMessage, null, null);
+            }
+
+            Assert.Equal(1, sink.Writes.Count);
+            Assert.True(sink.Writes[0].Properties.ContainsKey("values"));
+            Assert.Equal("\"System.Int32[]\"", sink.Writes[0].Properties["values"].ToString());
+        }
+
+        [Fact]
         public void NestedScopeSameProperty()
         {
             var (logger, sink) = SetUp(LogLevel.Trace);
@@ -220,6 +235,24 @@ namespace Serilog.Extensions.Logging.Tests
         }
 
         [Fact]
+        public void CarriesMessageTemplatePropertiesWhenStringificationIsUsed()
+        {
+            var selfLog = new StringWriter();
+            SelfLog.Enable(selfLog);
+            var (logger, sink) = SetUp(LogLevel.Trace);
+            var array = new[] { 1, 2, 3, 4 };
+
+            logger.LogInformation("{$array}", array);
+
+            Assert.True(sink.Writes[0].Properties.ContainsKey("array"));
+            Assert.Equal("\"System.Int32[]\"", sink.Writes[0].Properties["array"].ToString());
+            Assert.Equal("{$array}", sink.Writes[0].MessageTemplate.Text);
+
+            SelfLog.Disable();
+            Assert.Empty(selfLog.ToString());
+        }
+
+        [Fact]
         public void CarriesEventIdIfNonzero()
         {
             var (logger, sink) = SetUp(LogLevel.Trace);
@@ -239,6 +272,7 @@ namespace Serilog.Extensions.Logging.Tests
         public void WhenDisposeIsFalseProvidedLoggerIsNotDisposed()
         {
             var logger = new DisposeTrackingLogger();
+            // ReSharper disable once RedundantArgumentDefaultValue
             var provider = new SerilogLoggerProvider(logger, false);
             provider.Dispose();
             Assert.False(logger.IsDisposed);
@@ -405,6 +439,16 @@ namespace Serilog.Extensions.Logging.Tests
             var idValue = value.Properties.Single(p => p.Name == "Id").Value;
             var scalar = Assert.IsType<ScalarValue>(idValue);
             Assert.Equal(id, scalar.Value);
+        }
+        
+        [Fact]
+        public void MismatchedMessageTemplateParameterCountIsHandled()
+        {
+            var (logger, sink) = SetUp(LogLevel.Trace);
+
+            logger.LogInformation("Some test message with {Two} {Properties}", "OneProperty");
+
+            Assert.Equal(0, sink.Writes.Count);
         }
     }
 }
