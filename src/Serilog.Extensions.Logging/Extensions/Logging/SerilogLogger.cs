@@ -66,7 +66,7 @@ namespace Serilog.Extensions.Logging
             }
             catch (Exception ex)
             {
-                SelfLog.WriteLine($"Failed to write event through {typeof(SerilogLogger).Name}: {ex}");
+                SelfLog.WriteLine($"Failed to write event through {typeof(SerilogLogger).Name}: {ex}\n{new System.Diagnostics.StackTrace()}");
             }
         }
 
