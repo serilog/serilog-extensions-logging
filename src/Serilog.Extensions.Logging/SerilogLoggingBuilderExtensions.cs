@@ -50,5 +50,26 @@ namespace Serilog
 
             return builder;
         }
+
+        /// <summary>
+        /// Add Serilog to the logging pipeline.
+        /// Disposes the registeterd ILogger when the framework disposes the provider.
+        /// </summary>
+        /// <param name="builder"> The <see cref="T:Microsoft.Extensions.Logging.ILoggingBuilder" /> to add logging provider to. </param>
+        /// <param name="loggerFactory">
+        ///  Implementation provider for the ILogger.
+        ///  This factory can use the underlying <see cref="IServiceProvider"/>
+        /// </param>
+        /// <returns> Reference to the supplied <paramref name="builder"/>. </returns>
+        public static ILoggingBuilder AddSerilog(this ILoggingBuilder builder, Func<IServiceProvider, Serilog.ILogger> loggerFactory)
+        {
+            if (builder == null) throw new ArgumentNullException(nameof(builder));
+
+            builder.Services.AddSingleton<ILoggerProvider, SerilogLoggerProvider>(services => new SerilogLoggerProvider(loggerFactory(services), true));
+
+            builder.AddFilter<SerilogLoggerProvider>(null, LogLevel.Trace);
+
+            return builder;
+        }
     }
 }
