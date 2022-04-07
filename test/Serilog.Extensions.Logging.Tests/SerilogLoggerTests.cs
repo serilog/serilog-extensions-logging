@@ -55,6 +55,7 @@ namespace Serilog.Extensions.Logging.Tests
             logger.Log(LogLevel.Warning, 0, TestMessage, null, null);
             logger.Log(LogLevel.Error, 0, TestMessage, null, null);
             logger.Log(LogLevel.Critical, 0, TestMessage, null, null);
+            logger.Log(LogLevel.None, 0, TestMessage, null, null);
 
             Assert.Equal(6, sink.Writes.Count);
             Assert.Equal(LogEventLevel.Verbose, sink.Writes[0].Level);
@@ -65,6 +66,22 @@ namespace Serilog.Extensions.Logging.Tests
             Assert.Equal(LogEventLevel.Fatal, sink.Writes[5].Level);
         }
 
+
+        [Theory]
+        [InlineData(LogLevel.Trace, true)]
+        [InlineData(LogLevel.Debug, true)]
+        [InlineData(LogLevel.Information, true)]
+        [InlineData(LogLevel.Warning, true)]
+        [InlineData(LogLevel.Error, true)]
+        [InlineData(LogLevel.Critical, true)]
+        [InlineData(LogLevel.None, false)]
+        public void IsEnabledCorrect(LogLevel logLevel, bool isEnabled)
+        {
+            var (logger, _) = SetUp(LogLevel.Trace);
+
+            Assert.Equal(isEnabled, logger.IsEnabled(logLevel));
+        }
+
         [Theory]
         [InlineData(LogLevel.Trace, LogLevel.Trace, 1)]
         [InlineData(LogLevel.Trace, LogLevel.Debug, 1)]
@@ -72,36 +89,42 @@ namespace Serilog.Extensions.Logging.Tests
         [InlineData(LogLevel.Trace, LogLevel.Warning, 1)]
         [InlineData(LogLevel.Trace, LogLevel.Error, 1)]
         [InlineData(LogLevel.Trace, LogLevel.Critical, 1)]
+        [InlineData(LogLevel.Trace, LogLevel.None, 0)]
         [InlineData(LogLevel.Debug, LogLevel.Trace, 0)]
         [InlineData(LogLevel.Debug, LogLevel.Debug, 1)]
         [InlineData(LogLevel.Debug, LogLevel.Information, 1)]
         [InlineData(LogLevel.Debug, LogLevel.Warning, 1)]
         [InlineData(LogLevel.Debug, LogLevel.Error, 1)]
         [InlineData(LogLevel.Debug, LogLevel.Critical, 1)]
+        [InlineData(LogLevel.Debug, LogLevel.None, 0)]
         [InlineData(LogLevel.Information, LogLevel.Trace, 0)]
         [InlineData(LogLevel.Information, LogLevel.Debug, 0)]
         [InlineData(LogLevel.Information, LogLevel.Information, 1)]
         [InlineData(LogLevel.Information, LogLevel.Warning, 1)]
         [InlineData(LogLevel.Information, LogLevel.Error, 1)]
         [InlineData(LogLevel.Information, LogLevel.Critical, 1)]
+        [InlineData(LogLevel.Information, LogLevel.None, 0)]
         [InlineData(LogLevel.Warning, LogLevel.Trace, 0)]
         [InlineData(LogLevel.Warning, LogLevel.Debug, 0)]
         [InlineData(LogLevel.Warning, LogLevel.Information, 0)]
         [InlineData(LogLevel.Warning, LogLevel.Warning, 1)]
         [InlineData(LogLevel.Warning, LogLevel.Error, 1)]
         [InlineData(LogLevel.Warning, LogLevel.Critical, 1)]
+        [InlineData(LogLevel.Warning, LogLevel.None, 0)]
         [InlineData(LogLevel.Error, LogLevel.Trace, 0)]
         [InlineData(LogLevel.Error, LogLevel.Debug, 0)]
         [InlineData(LogLevel.Error, LogLevel.Information, 0)]
         [InlineData(LogLevel.Error, LogLevel.Warning, 0)]
         [InlineData(LogLevel.Error, LogLevel.Error, 1)]
         [InlineData(LogLevel.Error, LogLevel.Critical, 1)]
+        [InlineData(LogLevel.Error, LogLevel.None, 0)]
         [InlineData(LogLevel.Critical, LogLevel.Trace, 0)]
         [InlineData(LogLevel.Critical, LogLevel.Debug, 0)]
         [InlineData(LogLevel.Critical, LogLevel.Information, 0)]
         [InlineData(LogLevel.Critical, LogLevel.Warning, 0)]
         [InlineData(LogLevel.Critical, LogLevel.Error, 0)]
         [InlineData(LogLevel.Critical, LogLevel.Critical, 1)]
+        [InlineData(LogLevel.Critical, LogLevel.None, 0)]
         public void LogsWhenEnabled(LogLevel minLevel, LogLevel logLevel, int expected)
         {
             var (logger, sink) = SetUp(minLevel);

@@ -44,7 +44,7 @@ namespace Serilog.Extensions.Logging
 
         public bool IsEnabled(LogLevel logLevel)
         {
-            return _logger.IsEnabled(LevelConvert.ToSerilogLevel(logLevel));
+            return logLevel != LogLevel.None && _logger.IsEnabled(LevelConvert.ToSerilogLevel(logLevel));
         }
 
         public IDisposable BeginScope<TState>(TState state)
@@ -54,6 +54,10 @@ namespace Serilog.Extensions.Logging
 
         public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter)
         {
+            if (logLevel == LogLevel.None)
+            {
+                return;
+            }
             var level = LevelConvert.ToSerilogLevel(logLevel);
             if (!_logger.IsEnabled(level))
             {
