@@ -4,11 +4,13 @@
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using Serilog.Core;
 using Serilog.Events;
 using FrameworkLogger = Microsoft.Extensions.Logging.ILogger;
 using System.Reflection;
+using System.Text;
 using Serilog.Debugging;
 
 namespace Serilog.Extensions.Logging
@@ -83,6 +85,18 @@ namespace Serilog.Extensions.Logging
 
             if (state is IEnumerable<KeyValuePair<string, object>> structure)
             {
+                int highestPropertyNumber = -1;
+                foreach (var property in structure)
+                {
+                    if (int.TryParse(property.Key, NumberStyles.Integer, CultureInfo.InvariantCulture, out int number))
+                    {
+                        highestPropertyNumber = Math.Max(number, highestPropertyNumber);
+                    }
+                }
+
+
+                bool foundEmptyBracers = false;
+                int propertyNumber = -1;
                 foreach (var property in structure)
                 {
                     if (property.Key == SerilogLoggerProvider.OriginalFormatPropertyName && property.Value is string value)
@@ -101,9 +115,37 @@ namespace Serilog.Extensions.Logging
                     }
                     else
                     {
-                        if (logger.BindProperty(property.Key, property.Value, false, out var bound))
+                        string key = property.Key;
+                        if (key.Length == 0 ||
+                            int.TryParse(property.Key, NumberStyles.Integer, CultureInfo.InvariantCulture, out int _))
+                        {
+                            foundEmptyBracers = true;
+                            propertyNumber++;
+                            key = propertyNumber.ToString(CultureInfo.InvariantCulture);
+                        } 
+                        if (logger.BindProperty(key, property.Value, false, out var bound))
                             properties.Add(bound);
                     }                    
+                }
+
+                // Insert numbers into formatting string
+                if (messageTemplate!=null && foundEmptyBracers)
+                {
+                    int startIndex = 0;
+                    var stringBuilder = new StringBuilder();
+                    int index = messageTemplate.IndexOf("{}", startIndex, StringComparison.InvariantCulture);
+                    int i = highestPropertyNumber + 1;
+                    while (index != -1)
+                    {
+                        stringBuilder.Append(messageTemplate.Substring(startIndex, index+1 - startIndex));
+                        stringBuilder.Append(i);
+                        startIndex = index + 1;
+
+                        index = messageTemplate.IndexOf("{}", startIndex, StringComparison.InvariantCulture);
+                        i++;
+                    }
+                    stringBuilder.Append(messageTemplate.Substring(startIndex));
+                    messageTemplate = stringBuilder.ToString();
                 }
 
                 var stateType = state.GetType();

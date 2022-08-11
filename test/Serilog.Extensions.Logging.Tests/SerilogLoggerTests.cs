@@ -473,5 +473,47 @@ namespace Serilog.Extensions.Logging.Tests
 
             Assert.Equal(0, sink.Writes.Count);
         }
+
+        [Fact]
+        public void ShouldLogValuesInEmptyBracers()
+        {
+            var (logger, sink) = SetUp(LogLevel.Trace);
+            string someData = "some data";
+            logger.LogInformation("Some test message with one empty set of braces {} with text after", someData);
+            Assert.Equal(1,sink.Writes.Count);
+            string renderedMessage = sink.Writes[0].RenderMessage();
+            Assert.Contains(someData,renderedMessage);
+        }
+
+        [Fact]
+        public void ShouldLogValuesInMultipleEmptyBracers()
+        {
+            var (logger, sink) = SetUp(LogLevel.Trace);
+            string someData = "some data";
+            string someOtherData = "some other data";
+            logger.LogInformation("Some test message with two empty set of braces {} with text after {} both", someData, someOtherData);
+            Assert.Equal(1, sink.Writes.Count);
+            string renderedMessage = sink.Writes[0].RenderMessage();
+            Assert.Contains(someData, renderedMessage);
+            Assert.Contains(someOtherData, renderedMessage);
+        }
+
+        [Fact]
+        public void ShouldLogValuesInMultipleEmptyBracersAndOneWithANumber()
+        {
+            var (logger, sink) = SetUp(LogLevel.Trace);
+            string someData = "some data";
+            string someOtherData = "some other data";
+            string moreData = "more data";
+            logger.LogInformation("Some test message with three empty set of braces {1} with text after {0} the first ones {2}", someData, someOtherData, moreData);
+            string expectedString = string.Format("Some test message with three empty set of braces \"{1}\" with text after \"{0}\" the first ones \"{2}\"", someData, someOtherData, moreData);
+            Assert.Equal(1, sink.Writes.Count);
+            string renderedMessage = sink.Writes[0].RenderMessage();
+
+            Assert.Contains(someData, renderedMessage);
+            Assert.Contains(someOtherData, renderedMessage);
+            Assert.Contains(moreData, renderedMessage);
+            Assert.Equal(expectedString,renderedMessage);
+        }
     }
 }
