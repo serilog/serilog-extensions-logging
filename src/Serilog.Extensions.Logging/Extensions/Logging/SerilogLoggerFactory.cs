@@ -25,7 +25,7 @@ namespace Serilog.Extensions.Logging
     {
         readonly LoggerProviderCollection _providerCollection;
         readonly SerilogLoggerProvider _provider;
-        
+
         /// <summary>
         /// Initializes a new instance of the <see cref="SerilogLoggerFactory"/> class.
         /// </summary>

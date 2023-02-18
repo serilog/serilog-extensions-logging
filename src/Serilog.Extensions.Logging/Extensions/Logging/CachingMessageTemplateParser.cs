@@ -23,7 +23,7 @@ namespace Serilog.Extensions.Logging
     class CachingMessageTemplateParser
     {
         readonly MessageTemplateParser _innerParser = new MessageTemplateParser();
-        
+
         readonly object _templatesLock = new object();
         readonly Hashtable _templates = new Hashtable();
 

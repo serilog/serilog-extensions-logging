@@ -103,7 +103,7 @@ namespace Serilog.Extensions.Logging
                     {
                         if (logger.BindProperty(property.Key, property.Value, false, out var bound))
                             properties.Add(bound);
-                    }                    
+                    }
                 }
 
                 var stateType = state.GetType();

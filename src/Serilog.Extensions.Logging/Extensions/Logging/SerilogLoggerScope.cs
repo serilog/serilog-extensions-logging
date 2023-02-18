@@ -30,7 +30,7 @@ namespace Serilog.Extensions.Logging
         }
 
         public SerilogLoggerScope Parent { get; }
-        
+
         public void Dispose()
         {
             if (!_disposed)

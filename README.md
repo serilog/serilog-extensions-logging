@@ -89,7 +89,7 @@ _Microsoft.Extensions.Logging_ provides the `BeginScope` API, which can be used 
 
 Using the extension method will add a `Scope` property to your log events. This is most useful for adding simple "scope strings" to your events, as in the following code:
 
-```cs
+```csharp
 using (_logger.BeginScope("Transaction")) {
     _logger.LogInformation("Beginning...");
     _logger.LogInformation("Completed in {DurationMs}ms...", 30);
@@ -101,7 +101,7 @@ using (_logger.BeginScope("Transaction")) {
 
 If you simply want to add a "bag" of additional properties to your log events, however, this extension method approach can be overly verbose. For example, to add `TransactionId` and `ResponseJson` properties to your log events, you would have to do something like the following:
 
-```cs
+```csharp
 // WRONG! Prefer the dictionary approach below instead
 using (_logger.BeginScope("TransactionId: {TransactionId}, ResponseJson: {ResponseJson}", 12345, jsonString)) {
     _logger.LogInformation("Completed in {DurationMs}ms...", 30);
@@ -119,11 +119,12 @@ using (_logger.BeginScope("TransactionId: {TransactionId}, ResponseJson: {Respon
 // }
 ```
 
-Not only does this add the unnecessary `Scope` property to your event, but it also duplicates serialized values between `Scope` and the intended properties, as you can see here with `ResponseJson`. If this were "real" JSON like an API response, then a potentially very large block of text would be duplicated within your log event! Moreover, the template string within `BeginScope` is rather arbitrary when all you want to do is add a bag of properties, and you start mixing enriching concerns with formatting concerns.
+Not only does this add the unnecessary `Scope` property to your event, but it also duplicates serialized values between `Scope` and the intended properties, as you can see here with `ResponseJson`. If this were "real" JSON like an API response, then a potentially very large block of text would be duplicated within your log event!
+Moreover, the template string within `BeginScope` is rather arbitrary when all you want to do is add a bag of properties, and you start mixing enriching concerns with formatting concerns.
 
 A far better alternative is to use the `BeginScope<TState>(TState state)` method. If you provide any `IEnumerable<KeyValuePair<string, object>>` to this method, then Serilog will output the key/value pairs as structured properties _without_ the `Scope` property, as in this example:
 
-```cs
+```csharp
 var scopeProps = new Dictionary<string, object> {
     { "TransactionId", 12345 },
     { "ResponseJson", jsonString },

@@ -38,7 +38,7 @@ namespace Serilog
         public static LoggerConfiguration Providers(
             this LoggerSinkConfiguration configuration,
             LoggerProviderCollection providers,
-            LogEventLevel restrictedToMinimumLevel = LevelAlias.Minimum, 
+            LogEventLevel restrictedToMinimumLevel = LevelAlias.Minimum,
             LoggingLevelSwitch levelSwitch = null)
         {
             if (configuration == null) throw new ArgumentNullException(nameof(configuration));
