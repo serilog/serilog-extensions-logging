@@ -30,7 +30,7 @@ namespace Serilog.Extensions.Logging
         }
 
         public SerilogLoggerScope Parent { get; }
-        
+
         public void Dispose()
         {
             if (!_disposed)
@@ -51,42 +51,57 @@ namespace Serilog.Extensions.Logging
 
         public void EnrichAndCreateScopeItem(LogEvent logEvent, ILogEventPropertyFactory propertyFactory, out LogEventPropertyValue scopeItem)
         {
+            void AddProperty(KeyValuePair<string, object> stateProperty)
+            {
+                var key = stateProperty.Key;
+                var destructureObject = false;
+                var value = stateProperty.Value;
+
+                if (key.StartsWith("@"))
+                {
+                    key = key.Substring(1);
+                    destructureObject = true;
+                }
+
+                if (key.StartsWith("$"))
+                {
+                    key = key.Substring(1);
+                    value = value?.ToString();
+                }
+
+                var property = propertyFactory.CreateProperty(key, value, destructureObject);
+                logEvent.AddPropertyIfAbsent(property);
+            }
+
             if (_state == null)
             {
                 scopeItem = null;
                 return;
             }
 
-            if (_state is IEnumerable<KeyValuePair<string, object>> stateProperties)
+            // Eliminates boxing of Dictionary<TKey, TValue>.Enumerator for the most common use case
+            if (_state is Dictionary<string, object> dictionary)
+            {
+                scopeItem = null; // Unless it's `FormattedLogValues`, these are treated as property bags rather than scope items.
+
+                foreach (var stateProperty in dictionary)
+                {
+                    if (stateProperty.Key == SerilogLoggerProvider.OriginalFormatPropertyName && stateProperty.Value is string)
+                        scopeItem = new ScalarValue(_state.ToString());
+                    else
+                        AddProperty(stateProperty);
+                }
+            }
+            else if (_state is IEnumerable<KeyValuePair<string, object>> stateProperties)
             {
                 scopeItem = null; // Unless it's `FormattedLogValues`, these are treated as property bags rather than scope items.
 
                 foreach (var stateProperty in stateProperties)
                 {
                     if (stateProperty.Key == SerilogLoggerProvider.OriginalFormatPropertyName && stateProperty.Value is string)
-                    {
                         scopeItem = new ScalarValue(_state.ToString());
-                        continue;
-                    }
-
-                    var key = stateProperty.Key;
-                    var destructureObject = false;
-                    var value = stateProperty.Value;
-
-                    if (key.StartsWith("@"))
-                    {
-                        key = key.Substring(1);
-                        destructureObject = true;
-                    }
-
-                    if (key.StartsWith("$"))
-                    {
-                        key = key.Substring(1);
-                        value = value?.ToString();
-                    }
-
-                    var property = propertyFactory.CreateProperty(key, value, destructureObject);
-                    logEvent.AddPropertyIfAbsent(property);
+                    else
+                        AddProperty(stateProperty);
                 }
             }
             else
