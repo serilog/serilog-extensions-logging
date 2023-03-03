@@ -334,7 +334,7 @@ namespace Serilog.Extensions.Logging.Tests
         public void BeginScopeDestructuresObjectsWhenDestructurerIsUsedInDictionary()
         {
             var (logger, sink) = SetUp(LogLevel.Trace);
-            
+
             using (logger.BeginScope(new Dictionary<string, object> {{ "@Person", new Person { FirstName = "John", LastName = "Smith" }}}))
             {
                 logger.Log(LogLevel.Information, 0, TestMessage, null, null);
@@ -463,7 +463,7 @@ namespace Serilog.Extensions.Logging.Tests
             var scalar = Assert.IsType<ScalarValue>(idValue);
             Assert.Equal(id, scalar.Value);
         }
-        
+
         [Fact]
         public void MismatchedMessageTemplateParameterCountIsHandled()
         {

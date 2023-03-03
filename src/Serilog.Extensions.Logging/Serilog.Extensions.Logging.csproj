@@ -23,7 +23,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="..\..\assets\serilog-extension-nuget.png" Pack="true" PackagePath="" />
+    <None Include="..\..\assets\serilog-extension-nuget.png" Pack="true" PackagePath="" Visible="false" />
   </ItemGroup>
 
   <ItemGroup>
