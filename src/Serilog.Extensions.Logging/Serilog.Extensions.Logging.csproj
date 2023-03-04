@@ -5,28 +5,25 @@
     <VersionPrefix>3.1.1</VersionPrefix>
     <Authors>Microsoft;Serilog Contributors</Authors>
     <TargetFrameworks>netstandard2.0</TargetFrameworks>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <AssemblyName>Serilog.Extensions.Logging</AssemblyName>
-    <AssemblyOriginatorKeyFile>../../assets/Serilog.snk</AssemblyOriginatorKeyFile>
-    <SignAssembly>true</SignAssembly>
-    <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
-    <PackageId>Serilog.Extensions.Logging</PackageId>
     <PackageTags>serilog;Microsoft.Extensions.Logging</PackageTags>
     <PackageIcon>serilog-extension-nuget.png</PackageIcon>
     <PackageProjectUrl>https://github.com/serilog/serilog-extensions-logging</PackageProjectUrl>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
-    <RepositoryUrl>https://github.com/serilog/serilog-extensions-logging</RepositoryUrl>
-    <RepositoryType>git</RepositoryType>
     <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
     <RootNamespace>Serilog</RootNamespace>
+    <RepositoryType>git</RepositoryType>
+    <DebugType>embedded</DebugType>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <ContinuousIntegrationBuild Condition="'$(APPVEYOR)' == 'true'">True</ContinuousIntegrationBuild>
+    <PackageReadmeFile>..\..\README.md</PackageReadmeFile>
   </PropertyGroup>
 
   <ItemGroup>
     <None Include="..\..\assets\serilog-extension-nuget.png" Pack="true" PackagePath="" Visible="false" />
-  </ItemGroup>
-
-  <ItemGroup>
+    <None Include="..\..\README.md" Pack="true" PackagePath="\" Visible="false" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" />
     <PackageReference Include="Serilog" Version="2.9.0" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="2.0.0" />
   </ItemGroup>
