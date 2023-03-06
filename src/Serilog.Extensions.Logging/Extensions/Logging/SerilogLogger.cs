@@ -10,11 +10,15 @@ using Serilog.Events;
 using FrameworkLogger = Microsoft.Extensions.Logging.ILogger;
 using System.Reflection;
 using Serilog.Debugging;
+using System.Collections.Concurrent;
 
 namespace Serilog.Extensions.Logging
 {
     class SerilogLogger : FrameworkLogger
     {
+        internal static readonly ConcurrentDictionary<string, string> DestructureDictionary = new ConcurrentDictionary<string, string>();
+        internal static readonly ConcurrentDictionary<string, string> StringifyDictionary = new ConcurrentDictionary<string, string>();
+
         readonly SerilogLoggerProvider _provider;
         readonly ILogger _logger;
 
@@ -91,12 +95,12 @@ namespace Serilog.Extensions.Logging
                     }
                     else if (property.Key.StartsWith("@"))
                     {
-                        if (logger.BindProperty(property.Key.Substring(1), property.Value, true, out var destructured))
+                        if (logger.BindProperty(DestructureDictionary.GetOrAdd(property.Key, k => k.Substring(1)), property.Value, true, out var destructured))
                             properties.Add(destructured);
                     }
                     else if (property.Key.StartsWith("$"))
                     {
-                        if (logger.BindProperty(property.Key.Substring(1), property.Value?.ToString(), true, out var stringified))
+                        if (logger.BindProperty(StringifyDictionary.GetOrAdd(property.Key, k => k.Substring(1)), property.Value?.ToString(), true, out var stringified))
                             properties.Add(stringified);
                     }
                     else

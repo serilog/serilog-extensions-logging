@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using Serilog.Core;
 using Serilog.Events;
@@ -59,13 +60,12 @@ namespace Serilog.Extensions.Logging
 
                 if (key.StartsWith("@"))
                 {
-                    key = key.Substring(1);
+                    key = SerilogLogger.DestructureDictionary.GetOrAdd(key, k => k.Substring(1));
                     destructureObject = true;
                 }
-
-                if (key.StartsWith("$"))
+                else if (key.StartsWith("$"))
                 {
-                    key = key.Substring(1);
+                    key = SerilogLogger.StringifyDictionary.GetOrAdd(key, k => k.Substring(1));
                     value = value?.ToString();
                 }
 
