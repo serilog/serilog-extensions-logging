@@ -4,7 +4,7 @@
     <Description>Low-level Serilog provider for Microsoft.Extensions.Logging</Description>
     <VersionPrefix>3.1.1</VersionPrefix>
     <Authors>Microsoft;Serilog Contributors</Authors>
-    <TargetFrameworks>netstandard2.0</TargetFrameworks>
+    <TargetFramework>netstandard2.0</TargetFramework>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <PackageTags>serilog;Microsoft.Extensions.Logging</PackageTags>
     <PackageIcon>serilog-extension-nuget.png</PackageIcon>
