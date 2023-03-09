@@ -2,9 +2,6 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using Serilog.Core;
 using Serilog.Events;
 using FrameworkLogger = Microsoft.Extensions.Logging.ILogger;
@@ -22,7 +19,7 @@ namespace Serilog.Extensions.Logging
         readonly SerilogLoggerProvider _provider;
         readonly ILogger _logger;
 
-        static readonly CachingMessageTemplateParser MessageTemplateParser = new CachingMessageTemplateParser();
+        static readonly CachingMessageTemplateParser MessageTemplateParser = new();
 
         // It's rare to see large event ids, as they are category-specific
         static readonly LogEventProperty[] LowEventIdValues = Enumerable.Range(0, 48)
@@ -31,14 +28,14 @@ namespace Serilog.Extensions.Logging
 
         public SerilogLogger(
             SerilogLoggerProvider provider,
-            ILogger logger = null,
-            string name = null)
+            ILogger? logger = null,
+            string? name = null)
         {
             _provider = provider ?? throw new ArgumentNullException(nameof(provider));
-            _logger = logger;
+            _logger = logger!;
 
             // If a logger was passed, the provider has already added itself as an enricher
-            _logger = _logger ?? Serilog.Log.Logger.ForContext(new[] { provider });
+            _logger ??= Serilog.Log.Logger.ForContext(new[] { provider });
 
             if (name != null)
             {
@@ -81,7 +78,7 @@ namespace Serilog.Extensions.Logging
         void Write<TState>(LogEventLevel level, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter)
         {
             var logger = _logger;
-            string messageTemplate = null;
+            string? messageTemplate = null;
 
             var properties = new List<LogEventProperty>();
 
@@ -123,7 +120,7 @@ namespace Serilog.Extensions.Logging
 
             if (messageTemplate == null)
             {
-                string propertyName = null;
+                string? propertyName = null;
                 if (state != null)
                 {
                     propertyName = "State";
@@ -137,7 +134,7 @@ namespace Serilog.Extensions.Logging
 
                 if (propertyName != null)
                 {
-                    if (logger.BindProperty(propertyName, AsLoggableValue(state, formatter), false, out var property))
+                    if (logger.BindProperty(propertyName, AsLoggableValue(state, formatter!), false, out var property))
                         properties.Add(property);
                 }
             }
@@ -150,11 +147,11 @@ namespace Serilog.Extensions.Logging
             logger.Write(evt);
         }
 
-        static object AsLoggableValue<TState>(TState state, Func<TState, Exception, string> formatter)
+        static object? AsLoggableValue<TState>(TState state, Func<TState, Exception, string> formatter)
         {
-            object sobj = state;
+            object? sobj = state;
             if (formatter != null)
-                sobj = formatter(state, null);
+                sobj = formatter(state, null!);
             return sobj;
         }
 

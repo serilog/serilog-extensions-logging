@@ -1,0 +1,23 @@
+root = true
+
+[*]
+trim_trailing_whitespace = true
+insert_final_newline = true
+indent_style = space
+indent_size = 4
+charset = utf-8
+end_of_line = lf
+
+[*.{csproj,json,config,yml,props}]
+indent_size = 2
+
+[*.sh]
+end_of_line = lf
+
+[*.{cmd, bat}]
+end_of_line = crlf
+
+# C# formatting settings - Namespace options
+csharp_style_namespace_declarations = file_scoped:suggestion
+
+csharp_style_prefer_switch_expression = true:suggestion
