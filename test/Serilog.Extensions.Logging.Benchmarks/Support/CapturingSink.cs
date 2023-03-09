@@ -1,4 +1,4 @@
-﻿// Copyright 2019 Serilog Contributors
+// Copyright 2019 Serilog Contributors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,22 +15,21 @@
 using Serilog.Core;
 using Serilog.Events;
 
-namespace Serilog.Extensions.Logging.Benchmarks.Support
+namespace Serilog.Extensions.Logging.Benchmarks.Support;
+
+class CapturingSink : ILogEventSink
 {
-    class CapturingSink : ILogEventSink
+    LogEvent? _emitted;
+
+    public void Emit(LogEvent logEvent)
     {
-        LogEvent _emitted;
+        _emitted = logEvent;
+    }
 
-        public void Emit(LogEvent logEvent)
-        {
-            _emitted = logEvent;
-        }
-
-        public LogEvent Collect()
-        {
-            var collected = _emitted;
-            _emitted = null;
-            return collected;
-        }
+    public LogEvent? Collect()
+    {
+        var collected = _emitted;
+        _emitted = null;
+        return collected;
     }
 }
