@@ -59,12 +59,12 @@ class SerilogLoggerScope : IDisposable
 
             if (key.StartsWith("@"))
             {
-                key = SerilogLogger.DestructureDictionary.GetOrAdd(key, k => k.Substring(1));
+                key = SerilogLogger.GetKeyWithoutFirstSymbol(SerilogLogger.DestructureDictionary, key);
                 destructureObject = true;
             }
             else if (key.StartsWith("$"))
             {
-                key = SerilogLogger.StringifyDictionary.GetOrAdd(key, k => k.Substring(1));
+                key = SerilogLogger.GetKeyWithoutFirstSymbol(SerilogLogger.StringifyDictionary, key);
                 value = value?.ToString();
             }
 

@@ -13,8 +13,17 @@ namespace Serilog.Extensions.Logging;
 
 class SerilogLogger : FrameworkLogger
 {
-    internal static readonly ConcurrentDictionary<string, string> DestructureDictionary = new ConcurrentDictionary<string, string>();
-    internal static readonly ConcurrentDictionary<string, string> StringifyDictionary = new ConcurrentDictionary<string, string>();
+    internal static readonly ConcurrentDictionary<string, string> DestructureDictionary = new();
+    internal static readonly ConcurrentDictionary<string, string> StringifyDictionary = new();
+
+    internal static string GetKeyWithoutFirstSymbol(ConcurrentDictionary<string, string> source, string key)
+    {
+        if (source.TryGetValue(key, out var value))
+            return value;
+        if (source.Count < 1000)
+            return source.GetOrAdd(key, k => k.Substring(1));
+        return key.Substring(1);
+    }
 
     readonly SerilogLoggerProvider _provider;
     readonly ILogger _logger;
@@ -92,12 +101,12 @@ class SerilogLogger : FrameworkLogger
                 }
                 else if (property.Key.StartsWith("@"))
                 {
-                    if (logger.BindProperty(DestructureDictionary.GetOrAdd(property.Key, k => k.Substring(1)), property.Value, true, out var destructured))
+                    if (logger.BindProperty(GetKeyWithoutFirstSymbol(DestructureDictionary, property.Key), property.Value, true, out var destructured))
                         properties.Add(destructured);
                 }
                 else if (property.Key.StartsWith("$"))
                 {
-                    if (logger.BindProperty(StringifyDictionary.GetOrAdd(property.Key, k => k.Substring(1)), property.Value?.ToString(), true, out var stringified))
+                    if (logger.BindProperty(GetKeyWithoutFirstSymbol(StringifyDictionary, property.Key), property.Value?.ToString(), true, out var stringified))
                         properties.Add(stringified);
                 }
                 else

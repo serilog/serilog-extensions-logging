@@ -1,4 +1,4 @@
-﻿// Copyright 2019 Serilog Contributors
+// Copyright 2019 Serilog Contributors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,6 +18,8 @@ using Microsoft.Extensions.Logging;
 using Xunit;
 using IMelLogger = Microsoft.Extensions.Logging.ILogger;
 
+#pragma warning disable xUnit1013 // Public method should be marked as test
+
 namespace Serilog.Extensions.Logging.Benchmarks
 {
     [MemoryDiagnoser]
@@ -25,7 +27,7 @@ namespace Serilog.Extensions.Logging.Benchmarks
     {
         private class Person
         {
-            public string Name { get; set; }
+            public string? Name { get; set; }
             public int Age { get; set; }
             public override string ToString() => "Fixed text";
         }
@@ -36,7 +38,7 @@ namespace Serilog.Extensions.Logging.Benchmarks
         public LogEventBenchmark()
         {
             var underlyingLogger = new LoggerConfiguration().CreateLogger();
-            _melLogger = new SerilogLoggerProvider(underlyingLogger).CreateLogger(GetType().FullName);
+            _melLogger = new SerilogLoggerProvider(underlyingLogger).CreateLogger(GetType().FullName!);
             _bob = new Person { Name = "Bob", Age = 42 };
             _alice = new Person { Name = "Alice", Age = 42 };
         }
