@@ -74,18 +74,20 @@ class SerilogLogger : FrameworkLogger
             return;
         }
 
+        bool parsed = false;
         try
         {
-            Write(level, eventId, state, exception, formatter);
+            Write(level, eventId, state, exception, formatter, out parsed);
         }
-        catch (Exception ex)
+        catch (Exception ex) when (!parsed)
         {
             SelfLog.WriteLine($"Failed to write event through {typeof(SerilogLogger).Name}: {ex}");
         }
     }
 
-    void Write<TState>(LogEventLevel level, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter)
+    void Write<TState>(LogEventLevel level, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter, out bool parsed)
     {
+        parsed = false;
         var logger = _logger;
         string? messageTemplate = null;
 
@@ -153,6 +155,7 @@ class SerilogLogger : FrameworkLogger
 
         var parsedTemplate = MessageTemplateParser.Parse(messageTemplate ?? "");
         var evt = new LogEvent(DateTimeOffset.Now, level, exception, parsedTemplate, properties);
+        parsed = true;
         logger.Write(evt);
     }
 

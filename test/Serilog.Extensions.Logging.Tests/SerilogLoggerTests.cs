@@ -7,6 +7,7 @@ using Microsoft.Extensions.Logging;
 using Serilog.Debugging;
 using Serilog.Extensions.Logging.Tests.Support;
 using Xunit;
+using Serilog.Core;
 
 namespace Serilog.Extensions.Logging.Tests;
 
@@ -468,5 +469,28 @@ public class SerilogLoggerTest
         logger.LogInformation("Some test message with {Two} {Properties}", "OneProperty");
 
         Assert.Empty(sink.Writes);
+    }
+
+    [Fact]
+    public void ExceptionFromAuditSinkIsUnhandled()
+    {
+        var serilogLogger = new LoggerConfiguration()
+            .AuditTo.Sink(new MySink())
+            .CreateLogger();
+
+        var provider = new SerilogLoggerProvider(serilogLogger);
+        var logger = provider.CreateLogger(Name);
+
+        var ex = Assert.Throws<AggregateException>(() => logger.LogInformation("Normal text"));
+        Assert.IsType<NotImplementedException>(ex.InnerException);
+        Assert.Equal("Oops", ex.InnerException.Message);
+    }
+
+    private class MySink : ILogEventSink
+    {
+        public void Emit(LogEvent logEvent)
+        {
+            throw new NotImplementedException("Oops");
+        }
     }
 }
