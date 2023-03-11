@@ -43,7 +43,7 @@ class LoggerProviderCollectionSink : ILogEventSink, IDisposable
             var id = 0;
             foreach (var item in structuredEventId.Properties)
             {
-                if (item.Name == "Id" && item.Value is ScalarValue {Value: int i}) id = i;
+                if (item is {Name: "Id", Value: ScalarValue {Value: int i}}) id = i;
                 if (item is {Name: "Name", Value: ScalarValue {Value: string s}}) name = s;
             }
 
