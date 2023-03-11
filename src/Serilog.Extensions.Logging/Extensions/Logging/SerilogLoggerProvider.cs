@@ -66,7 +66,7 @@ public class SerilogLoggerProvider : ILoggerProvider, ILogEventEnricher
         List<LogEventPropertyValue>? scopeItems = null;
         for (var scope = CurrentScope; scope != null; scope = scope.Parent)
         {
-            scope.EnrichAndCreateScopeItem(logEvent, propertyFactory, out LogEventPropertyValue? scopeItem);
+            scope.EnrichAndCreateScopeItem(logEvent, propertyFactory, out var scopeItem);
 
             if (scopeItem != null)
             {

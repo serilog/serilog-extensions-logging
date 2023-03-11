@@ -29,7 +29,7 @@ class LoggerProviderCollectionSink : ILogEventSink, IDisposable
 
     public void Emit(LogEvent logEvent)
     {
-        string categoryName = "None";
+        var categoryName = "None";
         EventId eventId = default;
 
         if (logEvent.Properties.TryGetValue("SourceContext", out var sourceContextProperty) &&
