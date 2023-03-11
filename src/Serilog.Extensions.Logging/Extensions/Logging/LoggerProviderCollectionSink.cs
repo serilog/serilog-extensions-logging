@@ -33,8 +33,7 @@ class LoggerProviderCollectionSink : ILogEventSink, IDisposable
         EventId eventId = default;
 
         if (logEvent.Properties.TryGetValue("SourceContext", out var sourceContextProperty) &&
-            sourceContextProperty is ScalarValue sourceContextValue &&
-            sourceContextValue.Value is string sourceContext)
+            sourceContextProperty is ScalarValue {Value: string sourceContext})
         {
             categoryName = sourceContext;
         }
@@ -44,8 +43,8 @@ class LoggerProviderCollectionSink : ILogEventSink, IDisposable
             var id = 0;
             foreach (var item in structuredEventId.Properties)
             {
-                if (item.Name == "Id" && item.Value is ScalarValue sv && sv.Value is int i) id = i;
-                if (item.Name == "Name" && item.Value is ScalarValue sv2 && sv2.Value is string s) name = s;
+                if (item.Name == "Id" && item.Value is ScalarValue {Value: int i}) id = i;
+                if (item is {Name: "Name", Value: ScalarValue {Value: string s}}) name = s;
             }
 
             eventId = new EventId(id, name);

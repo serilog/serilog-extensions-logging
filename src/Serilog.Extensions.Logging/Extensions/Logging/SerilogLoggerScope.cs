@@ -85,7 +85,7 @@ class SerilogLoggerScope : IDisposable
 
             foreach (var stateProperty in dictionary)
             {
-                if (stateProperty.Key == SerilogLoggerProvider.OriginalFormatPropertyName && stateProperty.Value is string)
+                if (stateProperty is {Key: SerilogLoggerProvider.OriginalFormatPropertyName, Value: string})
                     scopeItem = new ScalarValue(_state.ToString());
                 else
                     AddProperty(stateProperty);
@@ -97,7 +97,7 @@ class SerilogLoggerScope : IDisposable
 
             foreach (var stateProperty in stateProperties)
             {
-                if (stateProperty.Key == SerilogLoggerProvider.OriginalFormatPropertyName && stateProperty.Value is string)
+                if (stateProperty is {Key: SerilogLoggerProvider.OriginalFormatPropertyName, Value: string})
                     scopeItem = new ScalarValue(_state.ToString());
                 else
                     AddProperty(stateProperty);

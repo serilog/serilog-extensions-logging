@@ -95,7 +95,7 @@ class SerilogLogger : FrameworkLogger
         {
             foreach (var property in structure)
             {
-                if (property.Key == SerilogLoggerProvider.OriginalFormatPropertyName && property.Value is string value)
+                if (property is {Key: SerilogLoggerProvider.OriginalFormatPropertyName, Value: string value})
                 {
                     messageTemplate = value;
                 }
