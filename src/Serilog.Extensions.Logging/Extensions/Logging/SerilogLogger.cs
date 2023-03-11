@@ -74,21 +74,23 @@ class SerilogLogger : FrameworkLogger
             return;
         }
 
-        bool parsed = false;
+        LogEvent? evt = null;
         try
         {
-            Write(level, eventId, state, exception, formatter, out parsed);
+            evt = PrepareWrite(level, eventId, state, exception, formatter);
         }
-        catch (Exception ex) when (!parsed)
+        catch (Exception ex)
         {
             SelfLog.WriteLine($"Failed to write event through {typeof(SerilogLogger).Name}: {ex}");
         }
+
+        // Do not swallow exceptions from here because Serilog takes care of them in case of WriteTo and throws them back to the caller in case of AuditTo.
+        if (evt != null)
+            _logger.Write(evt);
     }
 
-    void Write<TState>(LogEventLevel level, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter, out bool parsed)
+    LogEvent PrepareWrite<TState>(LogEventLevel level, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter)
     {
-        parsed = false;
-        var logger = _logger;
         string? messageTemplate = null;
 
         var properties = new List<LogEventProperty>();
@@ -103,17 +105,17 @@ class SerilogLogger : FrameworkLogger
                 }
                 else if (property.Key.StartsWith("@"))
                 {
-                    if (logger.BindProperty(GetKeyWithoutFirstSymbol(DestructureDictionary, property.Key), property.Value, true, out var destructured))
+                    if (_logger.BindProperty(GetKeyWithoutFirstSymbol(DestructureDictionary, property.Key), property.Value, true, out var destructured))
                         properties.Add(destructured);
                 }
                 else if (property.Key.StartsWith("$"))
                 {
-                    if (logger.BindProperty(GetKeyWithoutFirstSymbol(StringifyDictionary, property.Key), property.Value?.ToString(), true, out var stringified))
+                    if (_logger.BindProperty(GetKeyWithoutFirstSymbol(StringifyDictionary, property.Key), property.Value?.ToString(), true, out var stringified))
                         properties.Add(stringified);
                 }
                 else
                 {
-                    if (logger.BindProperty(property.Key, property.Value, false, out var bound))
+                    if (_logger.BindProperty(property.Key, property.Value, false, out var bound))
                         properties.Add(bound);
                 }
             }
@@ -124,7 +126,7 @@ class SerilogLogger : FrameworkLogger
             if (messageTemplate == null && !stateTypeInfo.IsGenericType)
             {
                 messageTemplate = "{" + stateType.Name + ":l}";
-                if (logger.BindProperty(stateType.Name, AsLoggableValue(state, formatter), false, out var stateTypeProperty))
+                if (_logger.BindProperty(stateType.Name, AsLoggableValue(state, formatter), false, out var stateTypeProperty))
                     properties.Add(stateTypeProperty);
             }
         }
@@ -145,7 +147,7 @@ class SerilogLogger : FrameworkLogger
 
             if (propertyName != null)
             {
-                if (logger.BindProperty(propertyName, AsLoggableValue(state, formatter!), false, out var property))
+                if (_logger.BindProperty(propertyName, AsLoggableValue(state, formatter!), false, out var property))
                     properties.Add(property);
             }
         }
@@ -154,9 +156,7 @@ class SerilogLogger : FrameworkLogger
             properties.Add(CreateEventIdProperty(eventId));
 
         var parsedTemplate = MessageTemplateParser.Parse(messageTemplate ?? "");
-        var evt = new LogEvent(DateTimeOffset.Now, level, exception, parsedTemplate, properties);
-        parsed = true;
-        logger.Write(evt);
+        return new LogEvent(DateTimeOffset.Now, level, exception, parsedTemplate, properties);
     }
 
     static object? AsLoggableValue<TState>(TState state, Func<TState, Exception, string> formatter)
