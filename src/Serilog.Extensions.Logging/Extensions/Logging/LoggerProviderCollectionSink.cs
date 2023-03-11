@@ -63,7 +63,7 @@ class LoggerProviderCollectionSink : ILogEventSink, IDisposable
                 eventId,
                 slv,
                 logEvent.Exception,
-                (s, e) => s.ToString());
+                (s, _) => s.ToString());
         }
     }
 
