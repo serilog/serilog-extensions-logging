@@ -1,0 +1,46 @@
+namespace Serilog.Extensions.Logging
+{
+    public static class LevelConvert
+    {
+        public static Microsoft.Extensions.Logging.LogLevel ToExtensionsLevel(Serilog.Events.LogEventLevel logEventLevel) { }
+        public static Serilog.Events.LogEventLevel ToSerilogLevel(Microsoft.Extensions.Logging.LogLevel logLevel) { }
+    }
+    public class LoggerProviderCollection : System.IDisposable
+    {
+        public LoggerProviderCollection() { }
+        public System.Collections.Generic.IEnumerable<Microsoft.Extensions.Logging.ILoggerProvider> Providers { get; }
+        public void AddProvider(Microsoft.Extensions.Logging.ILoggerProvider provider) { }
+        public void Dispose() { }
+    }
+    public class SerilogLoggerFactory : Microsoft.Extensions.Logging.ILoggerFactory, System.IDisposable
+    {
+        public SerilogLoggerFactory(Serilog.ILogger? logger = null, bool dispose = false, Serilog.Extensions.Logging.LoggerProviderCollection? providerCollection = null) { }
+        public void AddProvider(Microsoft.Extensions.Logging.ILoggerProvider provider) { }
+        public Microsoft.Extensions.Logging.ILogger CreateLogger(string categoryName) { }
+        public void Dispose() { }
+    }
+    [Microsoft.Extensions.Logging.ProviderAlias("Serilog")]
+    public class SerilogLoggerProvider : Microsoft.Extensions.Logging.ILoggerProvider, Serilog.Core.ILogEventEnricher, System.IDisposable
+    {
+        public SerilogLoggerProvider(Serilog.ILogger? logger = null, bool dispose = false) { }
+        public System.IDisposable BeginScope<T>(T state) { }
+        public Microsoft.Extensions.Logging.ILogger CreateLogger(string name) { }
+        public void Dispose() { }
+        public void Enrich(Serilog.Events.LogEvent logEvent, Serilog.Core.ILogEventPropertyFactory propertyFactory) { }
+    }
+}
+namespace Serilog
+{
+    public static class LoggerSinkConfigurationExtensions
+    {
+        public static Serilog.LoggerConfiguration Providers(this Serilog.Configuration.LoggerSinkConfiguration configuration, Serilog.Extensions.Logging.LoggerProviderCollection providers, Serilog.Events.LogEventLevel restrictedToMinimumLevel = 0, Serilog.Core.LoggingLevelSwitch? levelSwitch = null) { }
+    }
+    public static class SerilogLoggerFactoryExtensions
+    {
+        public static Microsoft.Extensions.Logging.ILoggerFactory AddSerilog(this Microsoft.Extensions.Logging.ILoggerFactory factory, Serilog.ILogger? logger = null, bool dispose = false) { }
+    }
+    public static class SerilogLoggingBuilderExtensions
+    {
+        public static Microsoft.Extensions.Logging.ILoggingBuilder AddSerilog(this Microsoft.Extensions.Logging.ILoggingBuilder builder, Serilog.ILogger? logger = null, bool dispose = false) { }
+    }
+}
