@@ -18,7 +18,6 @@
     <RepositoryType>git</RepositoryType>
     <DebugType>embedded</DebugType>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
-    <EmbedUntrackedSources>true</EmbedUntrackedSources>
     <ContinuousIntegrationBuild Condition="'$(APPVEYOR)' == 'true'">True</ContinuousIntegrationBuild>
     <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
