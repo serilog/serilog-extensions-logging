@@ -38,7 +38,7 @@ class CachingMessageTemplateParser
 
         // ReSharper disable once InconsistentlySynchronizedField
         // ignored warning because this is by design
-        var result = (MessageTemplate)_templates[messageTemplate];
+        var result = (MessageTemplate?)_templates[messageTemplate];
         if (result != null)
             return result;
 

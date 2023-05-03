@@ -5,14 +5,15 @@ using Microsoft.Extensions.Logging;
 
 namespace Serilog.Extensions.Logging.Tests.Support;
 
-public class ExtensionsProvider : ILoggerProvider, Microsoft.Extensions.Logging.ILogger
+sealed class ExtensionsProvider : ILoggerProvider, Microsoft.Extensions.Logging.ILogger
 {
-    private readonly LogLevel enabledLevel;
-    public List<(LogLevel logLevel, EventId eventId, object? state, Exception exception, string message)> Writes { get; set; } = new();
+    readonly LogLevel _enabledLevel;
+
+    public List<(LogLevel logLevel, EventId eventId, object? state, Exception? exception, string message)> Writes { get; } = new();
 
     public ExtensionsProvider(LogLevel enabledLevel)
     {
-        this.enabledLevel = enabledLevel;
+        _enabledLevel = enabledLevel;
     }
 
     public Microsoft.Extensions.Logging.ILogger CreateLogger(string categoryName)
@@ -20,17 +21,17 @@ public class ExtensionsProvider : ILoggerProvider, Microsoft.Extensions.Logging.
         return this;
     }
 
-    public IDisposable BeginScope<TState>(TState state)
+    public IDisposable BeginScope<TState>(TState state) where TState: notnull
     {
         return this;
     }
 
     public bool IsEnabled(LogLevel logLevel)
     {
-        return enabledLevel <= logLevel;
+        return _enabledLevel <= logLevel;
     }
 
-    public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter)
+    public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception?, string> formatter)
     {
         Writes.Add((logLevel, eventId, state, exception, formatter(state, exception)));
     }

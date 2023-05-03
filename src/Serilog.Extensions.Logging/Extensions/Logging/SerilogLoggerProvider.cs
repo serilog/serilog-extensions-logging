@@ -66,7 +66,7 @@ public class SerilogLoggerProvider : ILoggerProvider, ILogEventEnricher
         List<LogEventPropertyValue>? scopeItems = null;
         for (var scope = CurrentScope; scope != null; scope = scope.Parent)
         {
-            scope.EnrichAndCreateScopeItem(logEvent, propertyFactory, out LogEventPropertyValue? scopeItem);
+            scope.EnrichAndCreateScopeItem(logEvent, propertyFactory, out var scopeItem);
 
             if (scopeItem != null)
             {
@@ -82,9 +82,9 @@ public class SerilogLoggerProvider : ILoggerProvider, ILogEventEnricher
         }
     }
 
-    readonly AsyncLocal<SerilogLoggerScope> _value = new();
+    readonly AsyncLocal<SerilogLoggerScope?> _value = new();
 
-    internal SerilogLoggerScope CurrentScope
+    internal SerilogLoggerScope? CurrentScope
     {
         get => _value.Value;
         set => _value.Value = value;

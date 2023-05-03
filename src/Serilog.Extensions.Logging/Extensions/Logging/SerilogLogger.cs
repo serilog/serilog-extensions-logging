@@ -41,10 +41,9 @@ class SerilogLogger : FrameworkLogger
         string? name = null)
     {
         _provider = provider ?? throw new ArgumentNullException(nameof(provider));
-        _logger = logger!;
 
         // If a logger was passed, the provider has already added itself as an enricher
-        _logger ??= Serilog.Log.Logger.ForContext(new[] { provider });
+        _logger = logger ?? Serilog.Log.Logger.ForContext(new[] { provider });
 
         if (name != null)
         {
@@ -57,12 +56,12 @@ class SerilogLogger : FrameworkLogger
         return logLevel != LogLevel.None && _logger.IsEnabled(LevelConvert.ToSerilogLevel(logLevel));
     }
 
-    public IDisposable BeginScope<TState>(TState state)
+    public IDisposable BeginScope<TState>(TState state) where TState : notnull
     {
         return _provider.BeginScope(state);
     }
 
-    public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter)
+    public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception?, string> formatter)
     {
         if (logLevel == LogLevel.None)
         {
@@ -81,7 +80,7 @@ class SerilogLogger : FrameworkLogger
         }
         catch (Exception ex)
         {
-            SelfLog.WriteLine($"Failed to write event through {typeof(SerilogLogger).Name}: {ex}");
+            SelfLog.WriteLine($"Failed to write event through {nameof(SerilogLogger)}: {ex}");
         }
 
         // Do not swallow exceptions from here because Serilog takes care of them in case of WriteTo and throws them back to the caller in case of AuditTo.
@@ -89,7 +88,7 @@ class SerilogLogger : FrameworkLogger
             _logger.Write(evt);
     }
 
-    LogEvent PrepareWrite<TState>(LogEventLevel level, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter)
+    LogEvent PrepareWrite<TState>(LogEventLevel level, EventId eventId, TState state, Exception? exception, Func<TState, Exception?, string> formatter)
     {
         string? messageTemplate = null;
 
@@ -139,7 +138,9 @@ class SerilogLogger : FrameworkLogger
                 propertyName = "State";
                 messageTemplate = "{State:l}";
             }
-            else if (formatter != null)
+            // `formatter` was originally accepted as nullable, so despite the new annotation, this check should still
+            // be made.
+            else if (formatter != null!)
             {
                 propertyName = "Message";
                 messageTemplate = "{Message:l}";
@@ -159,12 +160,12 @@ class SerilogLogger : FrameworkLogger
         return new LogEvent(DateTimeOffset.Now, level, exception, parsedTemplate, properties);
     }
 
-    static object? AsLoggableValue<TState>(TState state, Func<TState, Exception, string> formatter)
+    static object? AsLoggableValue<TState>(TState state, Func<TState, Exception?, string>? formatter)
     {
-        object? sobj = state;
+        object? stateObj = state;
         if (formatter != null)
-            sobj = formatter(state, null!);
-        return sobj;
+            stateObj = formatter(state, null);
+        return stateObj;
     }
 
     internal static LogEventProperty CreateEventIdProperty(EventId eventId)

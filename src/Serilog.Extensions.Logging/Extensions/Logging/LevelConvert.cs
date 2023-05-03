@@ -27,9 +27,9 @@ public static class LevelConvert
     /// <summary>
     /// Convert <paramref name="logLevel"/> to the equivalent Serilog <see cref="LogEventLevel"/>.
     /// </summary>
-    /// <param name="logLevel">A Microsoft.Extensions.Logging <see cref="LogLevel"/>.</param>
+    /// <param name="logLevel">A Microsoft.Extensions.Logging <see cref="Microsoft.Extensions.Logging.LogLevel"/>.</param>
     /// <returns>The Serilog equivalent of <paramref name="logLevel"/>.</returns>
-    /// <remarks>The <see cref="LogLevel.None"/> value has no Serilog equivalent. It is mapped to
+    /// <remarks>The <see cref="Microsoft.Extensions.Logging.LogLevel.None"/> value has no Serilog equivalent. It is mapped to
     /// <see cref="LogEventLevel.Fatal"/> as the closest approximation, but this has entirely
     /// different semantics.</remarks>
     public static LogEventLevel ToSerilogLevel(LogLevel logLevel)
@@ -46,7 +46,7 @@ public static class LevelConvert
     }
 
     /// <summary>
-    /// Convert <paramref name="logEventLevel"/> to the equivalent Microsoft.Extensions.Logging <see cref="LogLevel"/>.
+    /// Convert <paramref name="logEventLevel"/> to the equivalent Microsoft.Extensions.Logging <see cref="Microsoft.Extensions.Logging.LogLevel"/>.
     /// </summary>
     /// <param name="logEventLevel">A Serilog <see cref="LogEventLevel"/>.</param>
     /// <returns>The Microsoft.Extensions.Logging equivalent of <paramref name="logEventLevel"/>.</returns>
