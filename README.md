@@ -144,6 +144,10 @@ using (_logger.BeginScope(scopeProps) {
 // }
 ```
 
+### Versioning
+
+This package tracks the versioning and target framework support of its [_Microsoft.Extensions.Logging_](https://nuget.org/packages/Microsoft.Extensions.Logging) dependency.
+
 ### Credits
 
 This package evolved from an earlier package _Microsoft.Framework.Logging.Serilog_ [provided by the ASP.NET team](https://github.com/aspnet/Logging/pull/182).
