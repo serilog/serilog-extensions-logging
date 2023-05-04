@@ -17,14 +17,14 @@ using System.Collections;
 
 namespace Serilog.Extensions.Logging;
 
-readonly struct SerilogLogValues : IReadOnlyList<KeyValuePair<string, object>>
+readonly struct SerilogLogValues : IReadOnlyList<KeyValuePair<string, object?>>
 {
     // Note, this struct is only used in a very limited context internally, so we ignore
     // the possibility of fields being null via the default struct initialization.
 
-    private readonly MessageTemplate _messageTemplate;
-    private readonly IReadOnlyDictionary<string, LogEventPropertyValue> _properties;
-    private readonly KeyValuePair<string, object>[] _values;
+    readonly MessageTemplate _messageTemplate;
+    readonly IReadOnlyDictionary<string, LogEventPropertyValue> _properties;
+    readonly KeyValuePair<string, object?>[] _values;
 
     public SerilogLogValues(MessageTemplate messageTemplate, IReadOnlyDictionary<string, LogEventPropertyValue> properties)
     {
@@ -34,24 +34,24 @@ readonly struct SerilogLogValues : IReadOnlyList<KeyValuePair<string, object>>
         _properties = properties ?? throw new ArgumentNullException(nameof(properties));
 
         // The array is needed because the IReadOnlyList<T> interface expects indexed access
-        _values = new KeyValuePair<string, object>[_properties.Count + 1];
+        _values = new KeyValuePair<string, object?>[_properties.Count + 1];
         var i = 0;
         foreach (var p in properties)
         {
-            _values[i] = new KeyValuePair<string, object>(p.Key, (p.Value is ScalarValue sv) ? sv.Value : p.Value);
+            _values[i] = new KeyValuePair<string, object?>(p.Key, (p.Value is ScalarValue sv) ? sv.Value : p.Value);
             ++i;
         }
-        _values[i] = new KeyValuePair<string, object>("{OriginalFormat}", _messageTemplate.Text);
+        _values[i] = new KeyValuePair<string, object?>("{OriginalFormat}", _messageTemplate.Text);
     }
 
-    public KeyValuePair<string, object> this[int index]
+    public KeyValuePair<string, object?> this[int index]
     {
         get => _values[index];
     }
 
     public int Count => _properties.Count + 1;
 
-    public IEnumerator<KeyValuePair<string, object>> GetEnumerator() => ((IEnumerable<KeyValuePair<string, object>>)_values).GetEnumerator();
+    public IEnumerator<KeyValuePair<string, object?>> GetEnumerator() => ((IEnumerable<KeyValuePair<string, object?>>)_values).GetEnumerator();
 
     public override string ToString() => _messageTemplate.Render(_properties);
 

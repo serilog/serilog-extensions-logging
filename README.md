@@ -1,4 +1,4 @@
-# Serilog.Extensions.Logging [![Build status](https://ci.appveyor.com/api/projects/status/865nohxfiq1rnby0/branch/master?svg=true)](https://ci.appveyor.com/project/serilog/serilog-framework-logging/history) [![NuGet Version](http://img.shields.io/nuget/v/Serilog.Extensions.Logging.svg?style=flat)](https://www.nuget.org/packages/Serilog.Extensions.Logging/) 
+# Serilog.Extensions.Logging [![Build status](https://ci.appveyor.com/api/projects/status/865nohxfiq1rnby0/branch/master?svg=true)](https://ci.appveyor.com/project/serilog/serilog-framework-logging/history) [![NuGet Version](http://img.shields.io/nuget/v/Serilog.Extensions.Logging.svg?style=flat)](https://www.nuget.org/packages/Serilog.Extensions.Logging/)
 
 A Serilog provider for [Microsoft.Extensions.Logging](https://www.nuget.org/packages/Microsoft.Extensions.Logging), the logging subsystem used by ASP.NET Core.
 
@@ -16,9 +16,9 @@ The package implements `AddSerilog()` on `ILoggingBuilder` and `ILoggerFactory` 
 
 **First**, install the _Serilog.Extensions.Logging_ [NuGet package](https://www.nuget.org/packages/Serilog.Extensions.Logging) into your web or console app. You will need a way to view the log messages - _Serilog.Sinks.Console_ writes these to the console.
 
-```powershell
-Install-Package Serilog.Extensions.Logging -DependencyVersion Highest
-Install-Package Serilog.Sinks.Console
+```sh
+dotnet add package Serilog.Extensions.Logging
+dotnet add package Serilog.Sinks.Console
 ```
 
 **Next**, in your application's `Startup` method, configure Serilog first:
@@ -34,7 +34,7 @@ public class Startup
       .Enrich.FromLogContext()
       .WriteTo.Console()
       .CreateLogger();
-      
+
     // Other startup code
 ```
 
@@ -46,7 +46,7 @@ call `AddSerilog()` on the provided `loggingBuilder`.
   {
       services.AddLogging(loggingBuilder =>
       	loggingBuilder.AddSerilog(dispose: true));
-      
+
       // Other services ...
   }
 ```
@@ -60,7 +60,7 @@ call `AddSerilog()` on the provided `loggingBuilder`.
                         IApplicationLifetime appLifetime)
   {
       loggerfactory.AddSerilog();
-      
+
       // Ensure any buffered events are sent at shutdown
       appLifetime.ApplicationStopped.Register(Log.CloseAndFlush);
 ```
@@ -69,7 +69,7 @@ That's it! With the level bumped up a little you should see log output like:
 
 ```
 [22:14:44.646 DBG] RouteCollection.RouteAsync
-	Routes: 
+	Routes:
 		Microsoft.AspNet.Mvc.Routing.AttributeRoute
 		{controller=Home}/{action=Index}/{id?}
 	Handled? True
@@ -143,6 +143,10 @@ using (_logger.BeginScope(scopeProps) {
 //	"ResponseJson": "{ \"Key1\": \"Value1\", \"Key2\": \"Value2\" }"
 // }
 ```
+
+### Versioning
+
+This package tracks the versioning and target framework support of its [_Microsoft.Extensions.Logging_](https://nuget.org/packages/Microsoft.Extensions.Logging) dependency.
 
 ### Credits
 

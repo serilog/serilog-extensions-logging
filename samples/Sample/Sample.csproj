@@ -1,9 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net7</TargetFramework>
+    <TargetFramework>net7.0</TargetFramework>
     <AssemblyName>Sample</AssemblyName>
     <OutputType>Exe</OutputType>
+    <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
   <ItemGroup>
