@@ -1,4 +1,4 @@
-﻿// Copyright 2019 Serilog Contributors
+// Copyright 2019 Serilog Contributors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,65 +12,63 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using Microsoft.Extensions.Logging;
 using Serilog.Core;
 using Serilog.Events;
 
-namespace Serilog.Extensions.Logging
+namespace Serilog.Extensions.Logging;
+
+class LoggerProviderCollectionSink : ILogEventSink, IDisposable
 {
-    class LoggerProviderCollectionSink : ILogEventSink, IDisposable
+    readonly LoggerProviderCollection _providers;
+
+    public LoggerProviderCollectionSink(LoggerProviderCollection providers)
     {
-        readonly LoggerProviderCollection _providers;
+        _providers = providers ?? throw new ArgumentNullException(nameof(providers));
+    }
 
-        public LoggerProviderCollectionSink(LoggerProviderCollection providers)
+    public void Emit(LogEvent logEvent)
+    {
+        string categoryName = "None";
+        EventId eventId = default;
+
+        if (logEvent.Properties.TryGetValue("SourceContext", out var sourceContextProperty) &&
+            sourceContextProperty is ScalarValue sourceContextValue &&
+            sourceContextValue.Value is string sourceContext)
         {
-            _providers = providers ?? throw new ArgumentNullException(nameof(providers));
+            categoryName = sourceContext;
         }
-
-        public void Emit(LogEvent logEvent)
+        if (logEvent.Properties.TryGetValue("EventId", out var eventIdPropertyValue) && eventIdPropertyValue is StructureValue structuredEventId)
         {
-            string categoryName = null;
-            EventId eventId = default;
-
-            if (logEvent.Properties.TryGetValue("SourceContext", out var sourceContextProperty) &&
-                sourceContextProperty is ScalarValue sourceContextValue &&
-                sourceContextValue.Value is string sourceContext)
+            string? name = null;
+            var id = 0;
+            foreach (var item in structuredEventId.Properties)
             {
-                categoryName = sourceContext;
-            }
-            if (logEvent.Properties.TryGetValue("EventId", out var eventIdPropertyValue) && eventIdPropertyValue is StructureValue structuredEventId)
-            {
-                string name = null;
-                var id = 0;
-                foreach (var item in structuredEventId.Properties)
-                {
-                    if (item.Name == "Id" && item.Value is ScalarValue sv && sv.Value is int i) id = i;
-                    if (item.Name == "Name" && item.Value is ScalarValue sv2 && sv2.Value is string s) name = s;
-                }
-
-                eventId = new EventId(id, name);
+                if (item.Name == "Id" && item.Value is ScalarValue sv && sv.Value is int i) id = i;
+                if (item.Name == "Name" && item.Value is ScalarValue sv2 && sv2.Value is string s) name = s;
             }
 
-            var level = LevelConvert.ToExtensionsLevel(logEvent.Level);
-            var slv = new SerilogLogValues(logEvent.MessageTemplate, logEvent.Properties);
-
-            foreach (var provider in _providers.Providers)
-            {
-                var logger = provider.CreateLogger(categoryName);
-
-                logger.Log(
-                    level,
-                    eventId,
-                    slv,
-                    logEvent.Exception,
-                    (s, e) => s.ToString());
-            }
+            eventId = new EventId(id, name);
         }
 
-        public void Dispose()
+        var level = LevelConvert.ToExtensionsLevel(logEvent.Level);
+        var slv = new SerilogLogValues(logEvent.MessageTemplate, logEvent.Properties);
+
+        foreach (var provider in _providers.Providers)
         {
-            _providers.Dispose();
+            var logger = provider.CreateLogger(categoryName);
+
+            logger.Log(
+                level,
+                eventId,
+                slv,
+                logEvent.Exception,
+                (s, e) => s.ToString());
         }
+    }
+
+    public void Dispose()
+    {
+        _providers.Dispose();
     }
 }

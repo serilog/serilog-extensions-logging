@@ -1,4 +1,4 @@
-﻿// Copyright 2019 Serilog Contributors
+// Copyright 2019 Serilog Contributors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,65 +17,49 @@ using Serilog.Events;
 
 // ReSharper disable RedundantCaseLabel
 
-namespace Serilog.Extensions.Logging
+namespace Serilog.Extensions.Logging;
+
+/// <summary>
+/// Converts between Serilog and Microsoft.Extensions.Logging level enum values.
+/// </summary>
+public static class LevelConvert
 {
     /// <summary>
-    /// Converts between Serilog and Microsoft.Extensions.Logging level enum values.
+    /// Convert <paramref name="logLevel"/> to the equivalent Serilog <see cref="LogEventLevel"/>.
     /// </summary>
-    public static class LevelConvert
+    /// <param name="logLevel">A Microsoft.Extensions.Logging <see cref="Microsoft.Extensions.Logging.LogLevel"/>.</param>
+    /// <returns>The Serilog equivalent of <paramref name="logLevel"/>.</returns>
+    /// <remarks>The <see cref="Microsoft.Extensions.Logging.LogLevel.None"/> value has no Serilog equivalent. It is mapped to
+    /// <see cref="LogEventLevel.Fatal"/> as the closest approximation, but this has entirely
+    /// different semantics.</remarks>
+    public static LogEventLevel ToSerilogLevel(LogLevel logLevel)
     {
-        /// <summary>
-        /// Convert <paramref name="logLevel"/> to the equivalent Serilog <see cref="LogEventLevel"/>.
-        /// </summary>
-        /// <param name="logLevel">A Microsoft.Extensions.Logging <see cref="LogLevel"/>.</param>
-        /// <returns>The Serilog equivalent of <paramref name="logLevel"/>.</returns>
-        /// <remarks>The <see cref="LogLevel.None"/> value has no Serilog equivalent. It is mapped to
-        /// <see cref="LogEventLevel.Fatal"/> as the closest approximation, but this has entirely
-        /// different semantics.</remarks>
-        public static LogEventLevel ToSerilogLevel(LogLevel logLevel)
+        return logLevel switch
         {
-            switch (logLevel)
-            {
-                case LogLevel.None:
-                case LogLevel.Critical:
-                    return LogEventLevel.Fatal;
-                case LogLevel.Error:
-                    return LogEventLevel.Error;
-                case LogLevel.Warning:
-                    return LogEventLevel.Warning;
-                case LogLevel.Information:
-                    return LogEventLevel.Information;
-                case LogLevel.Debug:
-                    return LogEventLevel.Debug;
-                case LogLevel.Trace:
-                default:
-                    return LogEventLevel.Verbose;
-            }
-        }
+            LogLevel.None or LogLevel.Critical => LogEventLevel.Fatal,
+            LogLevel.Error => LogEventLevel.Error,
+            LogLevel.Warning => LogEventLevel.Warning,
+            LogLevel.Information => LogEventLevel.Information,
+            LogLevel.Debug => LogEventLevel.Debug,
+            _ => LogEventLevel.Verbose,
+        };
+    }
 
-        /// <summary>
-        /// Convert <paramref name="logEventLevel"/> to the equivalent Microsoft.Extensions.Logging <see cref="LogLevel"/>.
-        /// </summary>
-        /// <param name="logEventLevel">A Serilog <see cref="LogEventLevel"/>.</param>
-        /// <returns>The Microsoft.Extensions.Logging equivalent of <paramref name="logEventLevel"/>.</returns>
-        public static LogLevel ToExtensionsLevel(LogEventLevel logEventLevel)
+    /// <summary>
+    /// Convert <paramref name="logEventLevel"/> to the equivalent Microsoft.Extensions.Logging <see cref="Microsoft.Extensions.Logging.LogLevel"/>.
+    /// </summary>
+    /// <param name="logEventLevel">A Serilog <see cref="LogEventLevel"/>.</param>
+    /// <returns>The Microsoft.Extensions.Logging equivalent of <paramref name="logEventLevel"/>.</returns>
+    public static LogLevel ToExtensionsLevel(LogEventLevel logEventLevel)
+    {
+        return logEventLevel switch
         {
-            switch (logEventLevel)
-            {
-                case LogEventLevel.Fatal:
-                    return LogLevel.Critical;
-                case LogEventLevel.Error:
-                    return LogLevel.Error;
-                case LogEventLevel.Warning:
-                    return LogLevel.Warning;
-                case LogEventLevel.Information:
-                    return LogLevel.Information;
-                case LogEventLevel.Debug:
-                    return LogLevel.Debug;
-                case LogEventLevel.Verbose:
-                default:
-                    return LogLevel.Trace;
-            }
-        }
+            LogEventLevel.Fatal => LogLevel.Critical,
+            LogEventLevel.Error => LogLevel.Error,
+            LogEventLevel.Warning => LogLevel.Warning,
+            LogEventLevel.Information => LogLevel.Information,
+            LogEventLevel.Debug => LogLevel.Debug,
+            _ => LogLevel.Trace,
+        };
     }
 }

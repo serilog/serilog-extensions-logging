@@ -2,173 +2,190 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using Serilog.Core;
 using Serilog.Events;
 using FrameworkLogger = Microsoft.Extensions.Logging.ILogger;
 using System.Reflection;
 using Serilog.Debugging;
+using System.Collections.Concurrent;
 
-namespace Serilog.Extensions.Logging
+namespace Serilog.Extensions.Logging;
+
+class SerilogLogger : FrameworkLogger
 {
-    class SerilogLogger : FrameworkLogger
+    internal static readonly ConcurrentDictionary<string, string> DestructureDictionary = new();
+    internal static readonly ConcurrentDictionary<string, string> StringifyDictionary = new();
+
+    internal static string GetKeyWithoutFirstSymbol(ConcurrentDictionary<string, string> source, string key)
     {
-        readonly SerilogLoggerProvider _provider;
-        readonly ILogger _logger;
+        if (source.TryGetValue(key, out var value))
+            return value;
+        if (source.Count < 1000)
+            return source.GetOrAdd(key, k => k.Substring(1));
+        return key.Substring(1);
+    }
 
-        static readonly CachingMessageTemplateParser MessageTemplateParser = new CachingMessageTemplateParser();
+    readonly SerilogLoggerProvider _provider;
+    readonly ILogger _logger;
 
-        // It's rare to see large event ids, as they are category-specific
-        static readonly LogEventProperty[] LowEventIdValues = Enumerable.Range(0, 48)
-            .Select(n => new LogEventProperty("Id", new ScalarValue(n)))
-            .ToArray();
+    static readonly CachingMessageTemplateParser MessageTemplateParser = new();
 
-        public SerilogLogger(
-            SerilogLoggerProvider provider,
-            ILogger logger = null,
-            string name = null)
+    // It's rare to see large event ids, as they are category-specific
+    static readonly LogEventProperty[] LowEventIdValues = Enumerable.Range(0, 48)
+        .Select(n => new LogEventProperty("Id", new ScalarValue(n)))
+        .ToArray();
+
+    public SerilogLogger(
+        SerilogLoggerProvider provider,
+        ILogger? logger = null,
+        string? name = null)
+    {
+        _provider = provider ?? throw new ArgumentNullException(nameof(provider));
+
+        // If a logger was passed, the provider has already added itself as an enricher
+        _logger = logger ?? Serilog.Log.Logger.ForContext(new[] { provider });
+
+        if (name != null)
         {
-            _provider = provider ?? throw new ArgumentNullException(nameof(provider));
-            _logger = logger;
+            _logger = _logger.ForContext(Constants.SourceContextPropertyName, name);
+        }
+    }
 
-            // If a logger was passed, the provider has already added itself as an enricher
-            _logger = _logger ?? Serilog.Log.Logger.ForContext(new[] { provider });
+    public bool IsEnabled(LogLevel logLevel)
+    {
+        return logLevel != LogLevel.None && _logger.IsEnabled(LevelConvert.ToSerilogLevel(logLevel));
+    }
 
-            if (name != null)
-            {
-                _logger = _logger.ForContext(Constants.SourceContextPropertyName, name);
-            }
+    public IDisposable BeginScope<TState>(TState state) where TState : notnull
+    {
+        return _provider.BeginScope(state);
+    }
+
+    public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception?, string> formatter)
+    {
+        if (logLevel == LogLevel.None)
+        {
+            return;
+        }
+        var level = LevelConvert.ToSerilogLevel(logLevel);
+        if (!_logger.IsEnabled(level))
+        {
+            return;
         }
 
-        public bool IsEnabled(LogLevel logLevel)
+        LogEvent? evt = null;
+        try
         {
-            return _logger.IsEnabled(LevelConvert.ToSerilogLevel(logLevel));
+            evt = PrepareWrite(level, eventId, state, exception, formatter);
+        }
+        catch (Exception ex)
+        {
+            SelfLog.WriteLine($"Failed to write event through {nameof(SerilogLogger)}: {ex}");
         }
 
-        public IDisposable BeginScope<TState>(TState state)
+        // Do not swallow exceptions from here because Serilog takes care of them in case of WriteTo and throws them back to the caller in case of AuditTo.
+        if (evt != null)
+            _logger.Write(evt);
+    }
+
+    LogEvent PrepareWrite<TState>(LogEventLevel level, EventId eventId, TState state, Exception? exception, Func<TState, Exception?, string> formatter)
+    {
+        string? messageTemplate = null;
+
+        var properties = new List<LogEventProperty>();
+
+        if (state is IEnumerable<KeyValuePair<string, object>> structure)
         {
-            return _provider.BeginScope(state);
-        }
-
-        public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter)
-        {
-            var level = LevelConvert.ToSerilogLevel(logLevel);
-            if (!_logger.IsEnabled(level))
+            foreach (var property in structure)
             {
-                return;
-            }
-
-            try
-            {
-                Write(level, eventId, state, exception, formatter);
-            }
-            catch (Exception ex)
-            {
-                SelfLog.WriteLine($"Failed to write event through {typeof(SerilogLogger).Name}: {ex}");
-            }
-        }
-
-        void Write<TState>(LogEventLevel level, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter)
-        {
-            var logger = _logger;
-            string messageTemplate = null;
-
-            var properties = new List<LogEventProperty>();
-
-            if (state is IEnumerable<KeyValuePair<string, object>> structure)
-            {
-                foreach (var property in structure)
+                if (property.Key == SerilogLoggerProvider.OriginalFormatPropertyName && property.Value is string value)
                 {
-                    if (property.Key == SerilogLoggerProvider.OriginalFormatPropertyName && property.Value is string value)
-                    {
-                        messageTemplate = value;
-                    }
-                    else if (property.Key.StartsWith("@"))
-                    {
-                        if (logger.BindProperty(property.Key.Substring(1), property.Value, true, out var destructured))
-                            properties.Add(destructured);
-                    }
-                    else if (property.Key.StartsWith("$"))
-                    {
-                        if (logger.BindProperty(property.Key.Substring(1), property.Value?.ToString(), true, out var stringified))
-                            properties.Add(stringified);
-                    }
-                    else
-                    {
-                        if (logger.BindProperty(property.Key, property.Value, false, out var bound))
-                            properties.Add(bound);
-                    }                    
+                    messageTemplate = value;
                 }
-
-                var stateType = state.GetType();
-                var stateTypeInfo = stateType.GetTypeInfo();
-                // Imperfect, but at least eliminates `1 names
-                if (messageTemplate == null && !stateTypeInfo.IsGenericType)
+                else if (property.Key.StartsWith("@"))
                 {
-                    messageTemplate = "{" + stateType.Name + ":l}";
-                    if (logger.BindProperty(stateType.Name, AsLoggableValue(state, formatter), false, out var stateTypeProperty))
-                        properties.Add(stateTypeProperty);
+                    if (_logger.BindProperty(GetKeyWithoutFirstSymbol(DestructureDictionary, property.Key), property.Value, true, out var destructured))
+                        properties.Add(destructured);
                 }
-            }
-
-            if (messageTemplate == null)
-            {
-                string propertyName = null;
-                if (state != null)
+                else if (property.Key.StartsWith("$"))
                 {
-                    propertyName = "State";
-                    messageTemplate = "{State:l}";
+                    if (_logger.BindProperty(GetKeyWithoutFirstSymbol(StringifyDictionary, property.Key), property.Value?.ToString(), true, out var stringified))
+                        properties.Add(stringified);
                 }
-                else if (formatter != null)
-                {
-                    propertyName = "Message";
-                    messageTemplate = "{Message:l}";
-                }
-
-                if (propertyName != null)
-                {
-                    if (logger.BindProperty(propertyName, AsLoggableValue(state, formatter), false, out var property))
-                        properties.Add(property);
-                }
-            }
-
-            if (eventId.Id != 0 || eventId.Name != null)
-                properties.Add(CreateEventIdProperty(eventId));
-
-            var parsedTemplate = MessageTemplateParser.Parse(messageTemplate ?? "");
-            var evt = new LogEvent(DateTimeOffset.Now, level, exception, parsedTemplate, properties);
-            logger.Write(evt);
-        }
-
-        static object AsLoggableValue<TState>(TState state, Func<TState, Exception, string> formatter)
-        {
-            object sobj = state;
-            if (formatter != null)
-                sobj = formatter(state, null);
-            return sobj;
-        }
-
-        internal static LogEventProperty CreateEventIdProperty(EventId eventId)
-        {
-            var properties = new List<LogEventProperty>(2);
-
-            if (eventId.Id != 0)
-            {
-                if (eventId.Id >= 0 && eventId.Id < LowEventIdValues.Length)
-                    // Avoid some allocations
-                    properties.Add(LowEventIdValues[eventId.Id]);
                 else
-                    properties.Add(new LogEventProperty("Id", new ScalarValue(eventId.Id)));
+                {
+                    if (_logger.BindProperty(property.Key, property.Value, false, out var bound))
+                        properties.Add(bound);
+                }
             }
 
-            if (eventId.Name != null)
+            var stateType = state.GetType();
+            var stateTypeInfo = stateType.GetTypeInfo();
+            // Imperfect, but at least eliminates `1 names
+            if (messageTemplate == null && !stateTypeInfo.IsGenericType)
             {
-                properties.Add(new LogEventProperty("Name", new ScalarValue(eventId.Name)));
+                messageTemplate = "{" + stateType.Name + ":l}";
+                if (_logger.BindProperty(stateType.Name, AsLoggableValue(state, formatter), false, out var stateTypeProperty))
+                    properties.Add(stateTypeProperty);
+            }
+        }
+
+        if (messageTemplate == null)
+        {
+            string? propertyName = null;
+            if (state != null)
+            {
+                propertyName = "State";
+                messageTemplate = "{State:l}";
+            }
+            // `formatter` was originally accepted as nullable, so despite the new annotation, this check should still
+            // be made.
+            else if (formatter != null!)
+            {
+                propertyName = "Message";
+                messageTemplate = "{Message:l}";
             }
 
-            return new LogEventProperty("EventId", new StructureValue(properties));
+            if (propertyName != null)
+            {
+                if (_logger.BindProperty(propertyName, AsLoggableValue(state, formatter!), false, out var property))
+                    properties.Add(property);
+            }
         }
+
+        if (eventId.Id != 0 || eventId.Name != null)
+            properties.Add(CreateEventIdProperty(eventId));
+
+        var parsedTemplate = MessageTemplateParser.Parse(messageTemplate ?? "");
+        return new LogEvent(DateTimeOffset.Now, level, exception, parsedTemplate, properties);
+    }
+
+    static object? AsLoggableValue<TState>(TState state, Func<TState, Exception?, string>? formatter)
+    {
+        object? stateObj = state;
+        if (formatter != null)
+            stateObj = formatter(state, null);
+        return stateObj;
+    }
+
+    internal static LogEventProperty CreateEventIdProperty(EventId eventId)
+    {
+        var properties = new List<LogEventProperty>(2);
+
+        if (eventId.Id != 0)
+        {
+            if (eventId.Id >= 0 && eventId.Id < LowEventIdValues.Length)
+                // Avoid some allocations
+                properties.Add(LowEventIdValues[eventId.Id]);
+            else
+                properties.Add(new LogEventProperty("Id", new ScalarValue(eventId.Id)));
+        }
+
+        if (eventId.Name != null)
+        {
+            properties.Add(new LogEventProperty("Name", new ScalarValue(eventId.Name)));
+        }
+
+        return new LogEventProperty("EventId", new StructureValue(properties));
     }
 }
