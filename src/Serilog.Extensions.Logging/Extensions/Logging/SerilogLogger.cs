@@ -56,10 +56,18 @@ class SerilogLogger : FrameworkLogger
         return logLevel != LogLevel.None && _logger.IsEnabled(LevelConvert.ToSerilogLevel(logLevel));
     }
 
-    public IDisposable BeginScope<TState>(TState state) where TState : notnull
+#if NET7_0
+    public IDisposable? BeginScope<TState>(TState state)
+        where TState : notnull
     {
         return _provider.BeginScope(state);
     }
+#else
+    public IDisposable BeginScope<TState>(TState state)
+    {
+        return _provider.BeginScope(state);
+    }
+#endif
 
     public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception?, string> formatter)
     {

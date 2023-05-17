@@ -20,11 +20,18 @@ sealed class ExtensionsProvider : ILoggerProvider, Microsoft.Extensions.Logging.
     {
         return this;
     }
-
-    public IDisposable BeginScope<TState>(TState state) where TState: notnull
+#if NET7_0
+    public IDisposable? BeginScope<TState>(TState state)
+        where TState : notnull
     {
         return this;
     }
+#else
+    public IDisposable BeginScope<TState>(TState state)
+    {
+        return this;
+    }
+#endif
 
     public bool IsEnabled(LogLevel logLevel)
     {
