@@ -143,7 +143,7 @@ public class SerilogLoggerTest
 
         Assert.Equal(3, sink.Writes.Count);
 
-        Assert.Equal(1, sink.Writes[0].Properties.Count);
+        Assert.Single(sink.Writes[0].Properties);
         Assert.Empty(sink.Writes[0].RenderMessage());
 
         Assert.Equal(2, sink.Writes[1].Properties.Count);
@@ -501,6 +501,11 @@ public class SerilogLoggerTest
     [Fact]
     public void TraceAndSpanIdsAreCaptured()
     {
+#if FORCE_W3C_ACTIVITY_ID
+        Activity.DefaultIdFormat = ActivityIdFormat.W3C;
+        Activity.ForceDefaultIdFormat = true;
+#endif
+
         using var listener = new ActivityListener();
         listener.ShouldListenTo = _ => true;
         listener.Sample = (ref ActivityCreationOptions<ActivityContext> _) => ActivitySamplingResult.AllData;
