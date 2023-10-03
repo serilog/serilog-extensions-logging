@@ -5,7 +5,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
   
-  <PropertyGroup Condition=" '$(TargetFramework) == 'net472' ">
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'net472' ">
     <DefineConstants>$(DefineConstants);FORCE_W3C_ACTIVITY_ID</DefineConstants>
   </PropertyGroup>
 
