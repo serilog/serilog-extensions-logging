@@ -8,6 +8,7 @@ using FrameworkLogger = Microsoft.Extensions.Logging.ILogger;
 using System.Reflection;
 using Serilog.Debugging;
 using System.Collections.Concurrent;
+using System.Diagnostics;
 
 namespace Serilog.Extensions.Logging;
 
@@ -156,8 +157,12 @@ class SerilogLogger : FrameworkLogger
         if (eventId.Id != 0 || eventId.Name != null)
             properties.Add(CreateEventIdProperty(eventId));
 
+        var (traceId, spanId) = Activity.Current is { } activity ?
+            (activity.TraceId, activity.SpanId) :
+            (default(ActivityTraceId), default(ActivitySpanId));
+
         var parsedTemplate = MessageTemplateParser.Parse(messageTemplate ?? "");
-        return new LogEvent(DateTimeOffset.Now, level, exception, parsedTemplate, properties);
+        return new LogEvent(DateTimeOffset.Now, level, exception, parsedTemplate, properties, traceId, spanId);
     }
 
     static object? AsLoggableValue<TState>(TState state, Func<TState, Exception?, string>? formatter)
