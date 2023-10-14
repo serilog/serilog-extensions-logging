@@ -2,9 +2,10 @@ version: '{build}'
 skip_tags: true
 image: Visual Studio 2022
 install:
-  - ps: mkdir -Force ".\build\" | Out-Null
+- pwsh: ./Setup.ps1
+- pwsh: mkdir -Force ".\build\" | Out-Null
 build_script:
-- ps: ./Build.ps1
+- pwsh: ./Build.ps1
 test: off
 artifacts:
 - path: artifacts/Serilog.*.nupkg

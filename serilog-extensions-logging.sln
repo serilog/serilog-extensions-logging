@@ -24,6 +24,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "assets", "assets", "{9C21B9
 		Directory.Build.targets = Directory.Build.targets
 		README.md = README.md
 		assets\Serilog.snk = assets\Serilog.snk
+		build.sh = build.sh
+		Setup.ps1 = Setup.ps1
+		global.json = global.json
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Serilog.Extensions.Logging.Benchmarks", "test\Serilog.Extensions.Logging.Benchmarks\Serilog.Extensions.Logging.Benchmarks.csproj", "{6D5986FF-EECD-4E75-8BC6-A5F78AB549B2}"
