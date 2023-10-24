@@ -42,7 +42,7 @@
   </ItemGroup>
 
   <ItemGroup Condition="'$(targetframework)' == 'netstandard2.1' or '$(targetframework)' == 'netstandard2.0' or '$(targetframework)' == 'net462'">
-    <PackageReference Include="Microsoft.Extensions.Logging" Version="8.0.0-*" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="7.0.0-*" />
   </ItemGroup>
 
 </Project>
