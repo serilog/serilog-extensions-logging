@@ -102,7 +102,7 @@ using (_logger.BeginScope("Transaction")) {
 If you simply want to add a "bag" of additional properties to your log events, however, this extension method approach can be overly verbose. For example, to add `TransactionId` and `ResponseJson` properties to your log events, you would have to do something like the following:
 
 ```csharp
-// WRONG! Prefer the dictionary approach below instead
+// WRONG! Prefer the dictionary or value tuple approach below instead
 using (_logger.BeginScope("TransactionId: {TransactionId}, ResponseJson: {ResponseJson}", 12345, jsonString)) {
     _logger.LogInformation("Completed in {DurationMs}ms...", 30);
 }
@@ -141,6 +141,23 @@ using (_logger.BeginScope(scopeProps) {
 //	"SourceContext":"SomeNamespace.SomeService",
 //	"TransactionId": 12345,
 //	"ResponseJson": "{ \"Key1\": \"Value1\", \"Key2\": \"Value2\" }"
+// }
+```
+
+Alternatively provide a `ValueTuple<string, object?>` to this method, where `Item1` is the property name and `Item2` is the property value. Note that `T2` _must_ be `object?`.
+
+```csharp
+using (_logger.BeginScope(("TransactionId", (object?)12345)) {
+    _logger.LogInformation("Transaction completed in {DurationMs}ms...", 30);
+}
+// Example JSON output:
+// {
+//	"@t":"2020-10-29T19:05:56.4176816Z",
+//	"@m":"Completed in 30ms...",
+//	"@i":"51812baa",
+//	"DurationMs":30,
+//	"SourceContext":"SomeNamespace.SomeService",
+//	"TransactionId": 12345
 // }
 ```
 
