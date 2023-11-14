@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System.Collections;
+using System.Diagnostics;
 using Serilog.Events;
 using Microsoft.Extensions.Logging;
 using Serilog.Debugging;
@@ -138,11 +139,11 @@ public class SerilogLoggerTest
 
         logger.Log<object>(LogLevel.Information, 0, null!, null!, null!);
         logger.Log(LogLevel.Information, 0, TestMessage, null!, null!);
-        logger.Log<object>(LogLevel.Information, 0, null!, null!, (_, __) => TestMessage);
+        logger.Log<object>(LogLevel.Information, 0, null!, null!, (_, _) => TestMessage);
 
         Assert.Equal(3, sink.Writes.Count);
 
-        Assert.Equal(1, sink.Writes[0].Properties.Count);
+        Assert.Single(sink.Writes[0].Properties);
         Assert.Empty(sink.Writes[0].RenderMessage());
 
         Assert.Equal(2, sink.Writes[1].Properties.Count);
@@ -308,7 +309,7 @@ public class SerilogLoggerTest
     }
 
     [Fact]
-    public void BeginScopeDestructuresObjectsWhenDestructurerIsUsedInMessageTemplate()
+    public void BeginScopeDestructuresObjectsWhenCapturingOperatorIsUsedInMessageTemplate()
     {
         var (logger, sink) = SetUp(LogLevel.Trace);
 
@@ -328,7 +329,7 @@ public class SerilogLoggerTest
     }
 
     [Fact]
-    public void BeginScopeDestructuresObjectsWhenDestructurerIsUsedInDictionary()
+    public void BeginScopeDestructuresObjectsWhenCapturingOperatorIsUsedInDictionary()
     {
         var (logger, sink) = SetUp(LogLevel.Trace);
 
@@ -348,7 +349,7 @@ public class SerilogLoggerTest
     }
 
     [Fact]
-    public void BeginScopeDoesNotModifyKeyWhenDestructurerIsNotUsedInMessageTemplate()
+    public void BeginScopeDoesNotModifyKeyWhenCapturingOperatorIsNotUsedInMessageTemplate()
     {
         var (logger, sink) = SetUp(LogLevel.Trace);
 
@@ -362,7 +363,7 @@ public class SerilogLoggerTest
     }
 
     [Fact]
-    public void BeginScopeDoesNotModifyKeyWhenDestructurerIsNotUsedInDictionary()
+    public void BeginScopeDoesNotModifyKeyWhenCapturingOperatorIsNotUsedInDictionary()
     {
         var (logger, sink) = SetUp(LogLevel.Trace);
 
@@ -466,7 +467,10 @@ public class SerilogLoggerTest
     {
         var (logger, sink) = SetUp(LogLevel.Trace);
 
+#pragma warning disable CA2017
+        // ReSharper disable once StructuredMessageTemplateProblem
         logger.LogInformation("Some test message with {Two} {Properties}", "OneProperty");
+#pragma warning restore CA2017
 
         Assert.Empty(sink.Writes);
     }
@@ -475,7 +479,7 @@ public class SerilogLoggerTest
     public void ExceptionFromAuditSinkIsUnhandled()
     {
         var serilogLogger = new LoggerConfiguration()
-            .AuditTo.Sink(new MySink())
+            .AuditTo.Sink(new UnimplementedSink())
             .CreateLogger();
 
         var provider = new SerilogLoggerProvider(serilogLogger);
@@ -486,11 +490,38 @@ public class SerilogLoggerTest
         Assert.Equal("Oops", ex.InnerException.Message);
     }
 
-    private class MySink : ILogEventSink
+    class UnimplementedSink : ILogEventSink
     {
         public void Emit(LogEvent logEvent)
         {
             throw new NotImplementedException("Oops");
         }
+    }
+
+    [Fact]
+    public void TraceAndSpanIdsAreCaptured()
+    {
+#if FORCE_W3C_ACTIVITY_ID
+        Activity.DefaultIdFormat = ActivityIdFormat.W3C;
+        Activity.ForceDefaultIdFormat = true;
+#endif
+
+        using var listener = new ActivityListener();
+        listener.ShouldListenTo = _ => true;
+        listener.Sample = (ref ActivityCreationOptions<ActivityContext> _) => ActivitySamplingResult.AllData;
+
+        ActivitySource.AddActivityListener(listener);
+
+        var source = new ActivitySource("test.activity", "1.0.0");
+        using var activity = source.StartActivity();
+        Assert.NotNull(Activity.Current);
+
+        var (logger, sink) = SetUp(LogLevel.Trace);
+        logger.LogInformation("Hello trace and span!");
+
+        var evt = Assert.Single(sink.Writes);
+
+        Assert.Equal(Activity.Current.TraceId, evt.TraceId);
+        Assert.Equal(Activity.Current.SpanId, evt.SpanId);
     }
 }
