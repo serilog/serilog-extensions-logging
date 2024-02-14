@@ -167,10 +167,10 @@ class SerilogLogger : FrameworkLogger
 
     static object? AsLoggableValue<TState>(TState state, Func<TState, Exception?, string>? formatter)
     {
-        object? stateObj = state;
+        object? stateObj = null;
         if (formatter != null)
             stateObj = formatter(state, null);
-        return stateObj;
+        return stateObj ?? state;
     }
 
     internal static LogEventProperty CreateEventIdProperty(EventId eventId)
