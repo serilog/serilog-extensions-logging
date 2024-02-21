@@ -80,6 +80,19 @@ That's it! With the level bumped up a little you should see log output like:
 [22:14:45.741 DBG] Handled. Status code: 304 File: /css/site.css
 ```
 
+### Including the log category in text-format sink output
+All _Microsoft.Extensions.Logging.ILogger_ implementations are created with a specified [_log category_](https://learn.microsoft.com/en-us/dotnet/core/extensions/logging?tabs=command-line#log-category) string, which is then attached as structured data to each log message created by that `ILogger` instance. Typically, the log category is the fully-qualified name of the class generating the log messages. This convention is implemented by the [`ILogger<TCategoryName>`](https://learn.microsoft.com/en-us/dotnet/api/microsoft.extensions.logging.ilogger-1) interface, which is commonly used as an injected dependency in frameworks that use _Microsoft.Extensions.Logging_.
+
+_Serilog.Extensions.Logging_ captures the `ILogger`'s log category, but it's not included in the default output templates for text-based sinks, such as [Console](https://github.com/serilog/serilog-sinks-console), [File](https://github.com/serilog/serilog-sinks-file) and [Debug](https://github.com/serilog/serilog-sinks-debug).
+
+To include the log category in the final written messages, add the `{SourceContext}` named hole to a customised `outputTemplate` parameter value when configuring the relevant sink(s). For example:
+```csharp
+    .WriteTo.Console(
+        outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {SourceContext}: {Message:lj}{NewLine}{Exception}")
+    .WriteTo.File("log.txt",
+        outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {SourceContext}: {Message:lj}{NewLine}{Exception}")
+```
+
 ### Notes on Log Scopes
 
 _Microsoft.Extensions.Logging_ provides the `BeginScope` API, which can be used to add arbitrary properties to log events within a certain region of code. The API comes in two forms:
