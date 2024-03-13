@@ -17,7 +17,14 @@ services.AddLogging(l => l
     .AddSerilog()
     .Configure(options =>
     {
-        options.ActivityTrackingOptions = ActivityTrackingOptions.TraceId | ActivityTrackingOptions.Tags | ActivityTrackingOptions.Baggage;
+        options.ActivityTrackingOptions =
+            ActivityTrackingOptions.SpanId
+            | ActivityTrackingOptions.TraceId
+            | ActivityTrackingOptions.ParentId
+            | ActivityTrackingOptions.TraceState
+            | ActivityTrackingOptions.TraceFlags
+            | ActivityTrackingOptions.Tags
+            | ActivityTrackingOptions.Baggage;
     }));
 
 // Add an ActivityListener (required, otherwise Activities don't actually get created if nothing is listening to them)
