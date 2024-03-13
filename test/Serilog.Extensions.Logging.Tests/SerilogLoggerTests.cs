@@ -17,7 +17,7 @@ public class SerilogLoggerTest
     const string Name = "test";
     const string TestMessage = "This is a test";
 
-    static Tuple<SerilogLogger, SerilogSink> SetUp(LogLevel logLevel)
+    static Tuple<SerilogLogger, SerilogSink> SetUp(LogLevel logLevel, IExternalScopeProvider? externalScopeProvider = null)
     {
         var sink = new SerilogSink();
 
@@ -28,6 +28,11 @@ public class SerilogLoggerTest
 
         var provider = new SerilogLoggerProvider(serilogLogger);
         var logger = (SerilogLogger)provider.CreateLogger(Name);
+
+        if (externalScopeProvider is not null)
+        {
+            provider.SetScopeProvider(externalScopeProvider);
+        }
 
         return new Tuple<SerilogLogger, SerilogSink>(logger, sink);
     }
@@ -397,6 +402,35 @@ public class SerilogLoggerTest
         Assert.Equal("Inner", items[1]);
     }
 
+    [Fact]
+    public void ExternalScopesAreCaptured()
+    {
+        var externalScopeProvider = new FakeExternalScopeProvider();
+        var (logger, sink) = SetUp(LogLevel.Trace, externalScopeProvider);
+
+        externalScopeProvider.Push(new Dictionary<string, int>()
+        {
+            { "FirstKey", 1 },
+            { "SecondKey", 2 }
+        });
+
+        var scopeObject = new { ObjectKey = "Some value" };
+        externalScopeProvider.Push(scopeObject);
+
+        logger.Log(LogLevel.Information, 0, TestMessage, null!, null!);
+
+        Assert.Single(sink.Writes);
+        Assert.True(sink.Writes[0].Properties.TryGetValue(SerilogLoggerProvider.ScopePropertyName, out var scopeValue));
+        var sequence = Assert.IsType<SequenceValue>(scopeValue);
+
+        var objectScope = (ScalarValue) sequence.Elements.Single(e => e is ScalarValue);
+        Assert.Equal(scopeObject.ToString(), (string?)objectScope.Value);
+
+        var dictionaryScope = (DictionaryValue) sequence.Elements.Single(e => e is DictionaryValue);
+        Assert.Equal(1, ((ScalarValue)dictionaryScope.Elements.Single(pair => pair.Key.Value!.Equals("FirstKey")).Value).Value);
+        Assert.Equal(2, ((ScalarValue)dictionaryScope.Elements.Single(pair => pair.Key.Value!.Equals("SecondKey")).Value).Value);
+    }
+
     class FoodScope : IEnumerable<KeyValuePair<string, object>>
     {
         readonly string _name;
@@ -444,6 +478,43 @@ public class SerilogLoggerTest
 
         // ReSharper disable once UnusedAutoPropertyAccessor.Local
         public string? LastName { get; set; }
+    }
+
+    class FakeExternalScopeProvider : IExternalScopeProvider
+    {
+        private readonly List<Scope> _scopes = new List<Scope>();
+
+        public void ForEachScope<TState>(Action<object?, TState> callback, TState state)
+        {
+            foreach (var scope in _scopes)
+            {
+                if (scope.IsDisposed) continue;
+                callback(scope.Value, state);
+            }
+        }
+
+        public IDisposable Push(object? state)
+        {
+            var scope = new Scope(state);
+            _scopes.Add(scope);
+            return scope;
+        }
+
+        private class Scope : IDisposable
+        {
+            public bool IsDisposed { get; set; } = false;
+            public object? Value { get; set; }
+
+            public Scope(object? value)
+            {
+                Value = value;
+            }
+
+            public void Dispose()
+            {
+                IsDisposed = true;
+            }
+        }
     }
 
     [Theory]
