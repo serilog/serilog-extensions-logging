@@ -13,7 +13,7 @@ namespace Serilog.Extensions.Logging;
 /// An <see cref="ILoggerProvider"/> that pipes events through Serilog.
 /// </summary>
 [ProviderAlias("Serilog")]
-public class SerilogLoggerProvider : ILoggerProvider, ILogEventEnricher
+public class SerilogLoggerProvider : ILoggerProvider, ILogEventEnricher, ISupportExternalScope
 {
     internal const string OriginalFormatPropertyName = "{OriginalFormat}";
     internal const string ScopePropertyName = "Scope";
@@ -21,6 +21,7 @@ public class SerilogLoggerProvider : ILoggerProvider, ILogEventEnricher
     // May be null; if it is, Log.Logger will be lazily used
     readonly ILogger? _logger;
     readonly Action? _dispose;
+    private IExternalScopeProvider? _externalScopeProvider;
 
     /// <summary>
     /// Construct a <see cref="SerilogLoggerProvider"/>.
@@ -75,11 +76,30 @@ public class SerilogLoggerProvider : ILoggerProvider, ILogEventEnricher
             }
         }
 
+        _externalScopeProvider?.ForEachScope((state, accumulatingLogEvent) =>
+        {
+            var scope = new SerilogLoggerScope(this, state);
+
+            scope.EnrichAndCreateScopeItem(accumulatingLogEvent, propertyFactory, out var scopeItem);
+
+            if (scopeItem != null)
+            {
+                scopeItems ??= new List<LogEventPropertyValue>();
+                scopeItems.Add(scopeItem);
+            }
+        }, logEvent);
+
         if (scopeItems != null)
         {
             scopeItems.Reverse();
             logEvent.AddPropertyIfAbsent(new LogEventProperty(ScopePropertyName, new SequenceValue(scopeItems)));
         }
+    }
+
+    /// <inheritdoc />
+    public void SetScopeProvider(IExternalScopeProvider scopeProvider)
+    {
+        _externalScopeProvider = scopeProvider;
     }
 
     readonly AsyncLocal<SerilogLoggerScope?> _value = new();
