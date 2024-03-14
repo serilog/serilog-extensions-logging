@@ -49,11 +49,9 @@ class SerilogLoggerScope : IDisposable
 
     public void EnrichAndCreateScopeItem(LogEvent logEvent, ILogEventPropertyFactory propertyFactory, out LogEventPropertyValue? scopeItem)
     {
-        void AddProperty(KeyValuePair<string, object> stateProperty)
+        void AddProperty(string key, object? value)
         {
-            var key = stateProperty.Key;
             var destructureObject = false;
-            var value = stateProperty.Value;
 
             if (key.StartsWith("@"))
             {
@@ -86,7 +84,7 @@ class SerilogLoggerScope : IDisposable
                 if (stateProperty.Key == SerilogLoggerProvider.OriginalFormatPropertyName && stateProperty.Value is string)
                     scopeItem = new ScalarValue(_state.ToString());
                 else
-                    AddProperty(stateProperty);
+                    AddProperty(stateProperty.Key, stateProperty.Value);
             }
         }
         else if (_state is IEnumerable<KeyValuePair<string, object>> stateProperties)
@@ -98,8 +96,17 @@ class SerilogLoggerScope : IDisposable
                 if (stateProperty.Key == SerilogLoggerProvider.OriginalFormatPropertyName && stateProperty.Value is string)
                     scopeItem = new ScalarValue(_state.ToString());
                 else
-                    AddProperty(stateProperty);
+                    AddProperty(stateProperty.Key, stateProperty.Value);
             }
+        }
+        else if (_state is ValueTuple<string, object?> tuple)
+        {
+            scopeItem = null; // Unless it's `FormattedLogValues`, these are treated as property bags rather than scope items.
+
+            if (tuple.Item1 == SerilogLoggerProvider.OriginalFormatPropertyName && tuple.Item2 is string)
+                scopeItem = new ScalarValue(_state.ToString());
+            else
+                AddProperty(tuple.Item1, tuple.Item2);
         }
         else
         {
