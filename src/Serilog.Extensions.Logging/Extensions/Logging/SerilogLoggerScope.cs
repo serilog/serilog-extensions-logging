@@ -49,25 +49,6 @@ class SerilogLoggerScope : IDisposable
 
     public void EnrichAndCreateScopeItem(LogEvent logEvent, ILogEventPropertyFactory propertyFactory, out LogEventPropertyValue? scopeItem)
     {
-        void AddProperty(string key, object? value)
-        {
-            var destructureObject = false;
-
-            if (key.StartsWith("@"))
-            {
-                key = SerilogLogger.GetKeyWithoutFirstSymbol(SerilogLogger.DestructureDictionary, key);
-                destructureObject = true;
-            }
-            else if (key.StartsWith("$"))
-            {
-                key = SerilogLogger.GetKeyWithoutFirstSymbol(SerilogLogger.StringifyDictionary, key);
-                value = value?.ToString();
-            }
-
-            var property = propertyFactory.CreateProperty(key, value, destructureObject);
-            logEvent.AddPropertyIfAbsent(property);
-        }
-
         if (_state == null)
         {
             scopeItem = null;
@@ -84,7 +65,7 @@ class SerilogLoggerScope : IDisposable
                 if (stateProperty.Key == SerilogLoggerProvider.OriginalFormatPropertyName && stateProperty.Value is string)
                     scopeItem = new ScalarValue(_state.ToString());
                 else
-                    AddProperty(stateProperty.Key, stateProperty.Value);
+                    AddProperty(logEvent, propertyFactory, stateProperty.Key, stateProperty.Value);
             }
         }
         else if (_state is IEnumerable<KeyValuePair<string, object>> stateProperties)
@@ -96,7 +77,7 @@ class SerilogLoggerScope : IDisposable
                 if (stateProperty.Key == SerilogLoggerProvider.OriginalFormatPropertyName && stateProperty.Value is string)
                     scopeItem = new ScalarValue(_state.ToString());
                 else
-                    AddProperty(stateProperty.Key, stateProperty.Value);
+                    AddProperty(logEvent, propertyFactory, stateProperty.Key, stateProperty.Value);
             }
         }
         else if (_state is ValueTuple<string, object?> tuple)
@@ -106,11 +87,30 @@ class SerilogLoggerScope : IDisposable
             if (tuple.Item1 == SerilogLoggerProvider.OriginalFormatPropertyName && tuple.Item2 is string)
                 scopeItem = new ScalarValue(_state.ToString());
             else
-                AddProperty(tuple.Item1, tuple.Item2);
+                AddProperty(logEvent, propertyFactory, tuple.Item1, tuple.Item2);
         }
         else
         {
             scopeItem = propertyFactory.CreateProperty(NoName, _state).Value;
         }
+    }
+
+    static void AddProperty(LogEvent logEvent, ILogEventPropertyFactory propertyFactory, string key, object? value)
+    {
+        var destructureObject = false;
+
+        if (key.StartsWith("@"))
+        {
+            key = SerilogLogger.GetKeyWithoutFirstSymbol(SerilogLogger.DestructureDictionary, key);
+            destructureObject = true;
+        }
+        else if (key.StartsWith("$"))
+        {
+            key = SerilogLogger.GetKeyWithoutFirstSymbol(SerilogLogger.StringifyDictionary, key);
+            value = value?.ToString();
+        }
+
+        var property = propertyFactory.CreateProperty(key, value, destructureObject);
+        logEvent.AddPropertyIfAbsent(property);
     }
 }

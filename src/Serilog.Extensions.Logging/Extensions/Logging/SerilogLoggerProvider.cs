@@ -21,7 +21,7 @@ public class SerilogLoggerProvider : ILoggerProvider, ILogEventEnricher, ISuppor
     // May be null; if it is, Log.Logger will be lazily used
     readonly ILogger? _logger;
     readonly Action? _dispose;
-    private IExternalScopeProvider? _externalScopeProvider;
+    IExternalScopeProvider? _externalScopeProvider;
 
     /// <summary>
     /// Construct a <see cref="SerilogLoggerProvider"/>.
