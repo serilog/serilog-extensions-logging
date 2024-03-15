@@ -115,7 +115,10 @@ class SerilogLogger : FrameworkLogger
                 }
                 else
                 {
-                    if (_logger.BindProperty(property.Key, property.Value, false, out var bound))
+                    // Simple micro-optimization for the most common and reliably scalar values; could go further here.
+                    if (property.Value is null or string or int or long && LogEventProperty.IsValidName(property.Key))
+                        properties.Add(property.Key, new ScalarValue(property.Value));
+                    else if (_logger.BindProperty(property.Key, property.Value, false, out var bound))
                         properties.Add(bound.Name, bound.Value);
                 }
             }
@@ -154,7 +157,7 @@ class SerilogLogger : FrameworkLogger
             }
         }
 
-        if (eventId.Id != 0 || eventId.Name != null)
+        if (eventId != default)
             properties.Add("EventId", CreateEventIdPropertyValue(eventId));
 
         var (traceId, spanId) = Activity.Current is { } activity ?

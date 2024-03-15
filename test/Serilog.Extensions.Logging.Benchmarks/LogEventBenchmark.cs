@@ -20,46 +20,93 @@ using IMelLogger = Microsoft.Extensions.Logging.ILogger;
 
 #pragma warning disable xUnit1013 // Public method should be marked as test
 
-namespace Serilog.Extensions.Logging.Benchmarks
+namespace Serilog.Extensions.Logging.Benchmarks;
+
+[MemoryDiagnoser]
+public class LogEventBenchmark
 {
-    [MemoryDiagnoser]
-    public class LogEventBenchmark
+    class Person
     {
-        class Person
-        {
-            public string? Name { get; set; }
-            public int Age { get; set; }
-            public override string ToString() => "Fixed text";
-        }
+        public string? Name { get; set; }
+        public int Age { get; set; }
+        public override string ToString() => "Fixed text";
+    }
 
-        readonly IMelLogger _melLogger;
-        readonly Person _bob, _alice;
+    readonly IMelLogger _melLogger;
+    readonly Person _bob, _alice;
+    readonly ILogger _underlyingLogger;
 
-        public LogEventBenchmark()
-        {
-            var underlyingLogger = new LoggerConfiguration().CreateLogger();
-            _melLogger = new SerilogLoggerProvider(underlyingLogger).CreateLogger(GetType().FullName!);
-            _bob = new Person { Name = "Bob", Age = 42 };
-            _alice = new Person { Name = "Alice", Age = 42 };
-        }
+    public LogEventBenchmark()
+    {
+        _underlyingLogger = new LoggerConfiguration().CreateLogger();
+        _melLogger = new SerilogLoggerProvider(_underlyingLogger).CreateLogger(GetType().FullName!);
+        _bob = new Person { Name = "Bob", Age = 42 };
+        _alice = new Person { Name = "Alice", Age = 42 };
+    }
 
-        [Fact]
-        public void Benchmark()
-        {
-            BenchmarkRunner.Run<LogEventBenchmark>();
-        }
+    [Fact]
+    public void Benchmark()
+    {
+        BenchmarkRunner.Run<LogEventBenchmark>();
+    }
 
-        [Benchmark]
-        public void LogInformation()
-        {
-            _melLogger.LogInformation("Hi {@User} from {$Me}", _bob, _alice);
-        }
+    [Benchmark(Baseline = true)]
+    public void SerilogOnly()
+    {
+        _underlyingLogger.Information("Hello!");
+    }
 
-        [Benchmark]
-        public void LogInformationScoped()
-        {
-            using var scope = _melLogger.BeginScope("Hi {@User} from {$Me}", _bob, _alice);
-            _melLogger.LogInformation("Hi");
-        }
+    [Benchmark]
+    public void SimpleEvent()
+    {
+        _melLogger.LogInformation("Hello!");
+    }
+
+    [Benchmark]
+    public void Template()
+    {
+        _melLogger.LogInformation("Hello, {Property1}!", 42);
+    }
+
+    [Benchmark]
+    public void StringScope()
+    {
+        using var scope = _melLogger.BeginScope("Scope1");
+        _melLogger.LogInformation("Hello!");
+    }
+
+    [Benchmark]
+    public void TemplateScope()
+    {
+        using var scope = _melLogger.BeginScope("Scope1 {Property1}", 42);
+        _melLogger.LogInformation("Hello!");
+    }
+
+    [Benchmark]
+    public void TupleScope()
+    {
+        using var scope = _melLogger.BeginScope(("Property1", 42));
+        _melLogger.LogInformation("Hello!");
+    }
+
+    [Benchmark]
+    public void DictionaryScope()
+    {
+        // Note that allocations here include the dictionary and boxed int.
+        using var scope = _melLogger.BeginScope(new Dictionary<string, object> { ["Property1"] = 42 });
+        _melLogger.LogInformation("Hello!");
+    }
+
+    [Benchmark]
+    public void Capturing()
+    {
+        _melLogger.LogInformation("Hi {@User} from {$Me}", _bob, _alice);
+    }
+
+    [Benchmark]
+    public void CapturingScope()
+    {
+        using var scope = _melLogger.BeginScope("Hi {@User} from {$Me}", _bob, _alice);
+        _melLogger.LogInformation("Hi");
     }
 }
