@@ -25,7 +25,7 @@ namespace Serilog.Extensions.Logging.Benchmarks
     [MemoryDiagnoser]
     public class LogEventBenchmark
     {
-        private class Person
+        class Person
         {
             public string? Name { get; set; }
             public int Age { get; set; }
@@ -58,8 +58,8 @@ namespace Serilog.Extensions.Logging.Benchmarks
         [Benchmark]
         public void LogInformationScoped()
         {
-            using (var scope = _melLogger.BeginScope("Hi {@User} from {$Me}", _bob, _alice))
-                _melLogger.LogInformation("Hi");
+            using var scope = _melLogger.BeginScope("Hi {@User} from {$Me}", _bob, _alice);
+            _melLogger.LogInformation("Hi");
         }
     }
 }

@@ -93,30 +93,30 @@ class SerilogLogger : FrameworkLogger
     {
         string? messageTemplate = null;
 
-        var properties = new List<LogEventProperty>();
+        var properties = new Dictionary<string, LogEventPropertyValue>();
 
         if (state is IEnumerable<KeyValuePair<string, object>> structure)
         {
             foreach (var property in structure)
             {
-                if (property.Key == SerilogLoggerProvider.OriginalFormatPropertyName && property.Value is string value)
+                if (property is { Key: SerilogLoggerProvider.OriginalFormatPropertyName, Value: string value })
                 {
                     messageTemplate = value;
                 }
                 else if (property.Key.StartsWith("@"))
                 {
                     if (_logger.BindProperty(GetKeyWithoutFirstSymbol(DestructureDictionary, property.Key), property.Value, true, out var destructured))
-                        properties.Add(destructured);
+                        properties.Add(destructured.Name, destructured.Value);
                 }
                 else if (property.Key.StartsWith("$"))
                 {
                     if (_logger.BindProperty(GetKeyWithoutFirstSymbol(StringifyDictionary, property.Key), property.Value?.ToString(), true, out var stringified))
-                        properties.Add(stringified);
+                        properties.Add(stringified.Name, stringified.Value);
                 }
                 else
                 {
                     if (_logger.BindProperty(property.Key, property.Value, false, out var bound))
-                        properties.Add(bound);
+                        properties.Add(bound.Name, bound.Value);
                 }
             }
 
@@ -127,7 +127,7 @@ class SerilogLogger : FrameworkLogger
             {
                 messageTemplate = "{" + stateType.Name + ":l}";
                 if (_logger.BindProperty(stateType.Name, AsLoggableValue(state, formatter), false, out var stateTypeProperty))
-                    properties.Add(stateTypeProperty);
+                    properties.Add(stateTypeProperty.Name, stateTypeProperty.Value);
             }
         }
 
@@ -150,19 +150,19 @@ class SerilogLogger : FrameworkLogger
             if (propertyName != null)
             {
                 if (_logger.BindProperty(propertyName, AsLoggableValue(state, formatter!), false, out var property))
-                    properties.Add(property);
+                    properties.Add(property.Name, property.Value);
             }
         }
 
         if (eventId.Id != 0 || eventId.Name != null)
-            properties.Add(CreateEventIdProperty(eventId));
+            properties.Add("EventId", CreateEventIdPropertyValue(eventId));
 
         var (traceId, spanId) = Activity.Current is { } activity ?
             (activity.TraceId, activity.SpanId) :
             (default(ActivityTraceId), default(ActivitySpanId));
 
         var parsedTemplate = MessageTemplateParser.Parse(messageTemplate ?? "");
-        return new LogEvent(DateTimeOffset.Now, level, exception, parsedTemplate, properties, traceId, spanId);
+        return LogEvent.UnstableAssembleFromParts(DateTimeOffset.Now, level, exception, parsedTemplate, properties, traceId, spanId);
     }
 
     static object? AsLoggableValue<TState>(TState state, Func<TState, Exception?, string>? formatter)
@@ -173,7 +173,7 @@ class SerilogLogger : FrameworkLogger
         return stateObj ?? state;
     }
 
-    internal static LogEventProperty CreateEventIdProperty(EventId eventId)
+    internal static StructureValue CreateEventIdPropertyValue(EventId eventId)
     {
         var properties = new List<LogEventProperty>(2);
 
@@ -191,6 +191,6 @@ class SerilogLogger : FrameworkLogger
             properties.Add(new LogEventProperty("Name", new ScalarValue(eventId.Name)));
         }
 
-        return new LogEventProperty("EventId", new StructureValue(properties));
+        return new StructureValue(properties);
     }
 }

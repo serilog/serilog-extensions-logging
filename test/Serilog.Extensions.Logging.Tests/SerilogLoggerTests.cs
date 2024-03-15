@@ -500,9 +500,9 @@ public class SerilogLoggerTest
             return scope;
         }
 
-        private class Scope : IDisposable
+        class Scope : IDisposable
         {
-            public bool IsDisposed { get; set; } = false;
+            public bool IsDisposed { get; set; }
             public object? Value { get; set; }
 
             public Scope(object? value)
@@ -525,8 +525,7 @@ public class SerilogLoggerTest
     public void LowAndHighNumberedEventIdsAreMapped(int id)
     {
         var orig = new EventId(id, "test");
-        var mapped = SerilogLogger.CreateEventIdProperty(orig);
-        var value = Assert.IsType<StructureValue>(mapped.Value);
+        var value = SerilogLogger.CreateEventIdPropertyValue(orig);
         Assert.Equal(2, value.Properties.Count);
         var idValue = value.Properties.Single(p => p.Name == "Id").Value;
         var scalar = Assert.IsType<ScalarValue>(idValue);
