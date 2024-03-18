@@ -157,7 +157,8 @@ class SerilogLogger : FrameworkLogger
             }
         }
 
-        if (eventId != default)
+        // The overridden `!=` operator on this type ignores `Name`.
+        if (eventId.Id != 0 || eventId.Name != null)
             properties["EventId"] = CreateEventIdPropertyValue(eventId);
 
         var (traceId, spanId) = Activity.Current is { } activity ?
