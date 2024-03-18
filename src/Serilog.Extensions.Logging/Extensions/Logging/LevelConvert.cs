@@ -36,7 +36,8 @@ public static class LevelConvert
     {
         return logLevel switch
         {
-            LogLevel.None or LogLevel.Critical => LogEventLevel.Fatal,
+            LogLevel.None => LevelAlias.Off,
+            LogLevel.Critical => LogEventLevel.Fatal,
             LogLevel.Error => LogEventLevel.Error,
             LogLevel.Warning => LogEventLevel.Warning,
             LogLevel.Information => LogEventLevel.Information,

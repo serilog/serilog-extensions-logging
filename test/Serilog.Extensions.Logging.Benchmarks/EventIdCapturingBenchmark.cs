@@ -23,7 +23,7 @@ using Xunit;
 namespace Serilog.Extensions.Logging.Benchmarks;
 
 [MemoryDiagnoser]
-public class LogEventConstructionBenchmark
+public class EventIdCapturingBenchmark
 {
     readonly IMelLogger _melLogger;
     readonly ILogger _serilogContextualLogger;
@@ -31,11 +31,11 @@ public class LogEventConstructionBenchmark
     const int LowId = 10, HighId = 101;
     const string Template = "This is an event";
 
-    public LogEventConstructionBenchmark()
+    public EventIdCapturingBenchmark()
     {
         _sink = new CapturingSink();
         var underlyingLogger = new LoggerConfiguration().WriteTo.Sink(_sink).CreateLogger();
-        _serilogContextualLogger = underlyingLogger.ForContext<LogEventConstructionBenchmark>();
+        _serilogContextualLogger = underlyingLogger.ForContext<EventIdCapturingBenchmark>();
         _melLogger = new SerilogLoggerProvider(underlyingLogger).CreateLogger(GetType().FullName!);
     }
 
@@ -68,7 +68,7 @@ public class LogEventConstructionBenchmark
     [Fact]
     public void Benchmark()
     {
-        BenchmarkRunner.Run<LogEventConstructionBenchmark>();
+        BenchmarkRunner.Run<EventIdCapturingBenchmark>();
     }
 
     [Benchmark(Baseline = true)]
