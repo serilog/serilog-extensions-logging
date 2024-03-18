@@ -106,20 +106,20 @@ class SerilogLogger : FrameworkLogger
                 else if (property.Key.StartsWith("@", StringComparison.Ordinal))
                 {
                     if (_logger.BindProperty(GetKeyWithoutFirstSymbol(DestructureDictionary, property.Key), property.Value, true, out var destructured))
-                        properties.Add(destructured.Name, destructured.Value);
+                        properties[destructured.Name] = destructured.Value;
                 }
                 else if (property.Key.StartsWith("$", StringComparison.Ordinal))
                 {
                     if (_logger.BindProperty(GetKeyWithoutFirstSymbol(StringifyDictionary, property.Key), property.Value?.ToString(), true, out var stringified))
-                        properties.Add(stringified.Name, stringified.Value);
+                        properties[stringified.Name] = stringified.Value;
                 }
                 else
                 {
                     // Simple micro-optimization for the most common and reliably scalar values; could go further here.
                     if (property.Value is null or string or int or long && LogEventProperty.IsValidName(property.Key))
-                        properties.Add(property.Key, new ScalarValue(property.Value));
+                        properties[property.Key] = new ScalarValue(property.Value);
                     else if (_logger.BindProperty(property.Key, property.Value, false, out var bound))
-                        properties.Add(bound.Name, bound.Value);
+                        properties[bound.Name] = bound.Value;
                 }
             }
 
@@ -130,7 +130,7 @@ class SerilogLogger : FrameworkLogger
             {
                 messageTemplate = "{" + stateType.Name + ":l}";
                 if (_logger.BindProperty(stateType.Name, AsLoggableValue(state, formatter), false, out var stateTypeProperty))
-                    properties.Add(stateTypeProperty.Name, stateTypeProperty.Value);
+                    properties[stateTypeProperty.Name] = stateTypeProperty.Value;
             }
         }
 
@@ -153,18 +153,18 @@ class SerilogLogger : FrameworkLogger
             if (propertyName != null)
             {
                 if (_logger.BindProperty(propertyName, AsLoggableValue(state, formatter!), false, out var property))
-                    properties.Add(property.Name, property.Value);
+                    properties[property.Name] = property.Value;
             }
         }
 
         if (eventId != default)
-            properties.Add("EventId", CreateEventIdPropertyValue(eventId));
+            properties["EventId"] = CreateEventIdPropertyValue(eventId);
 
         var (traceId, spanId) = Activity.Current is { } activity ?
             (activity.TraceId, activity.SpanId) :
             (default(ActivityTraceId), default(ActivitySpanId));
 
-        var parsedTemplate = MessageTemplateParser.Parse(messageTemplate ?? "");
+        var parsedTemplate = messageTemplate != null ? MessageTemplateParser.Parse(messageTemplate) : MessageTemplate.Empty;
         return LogEvent.UnstableAssembleFromParts(DateTimeOffset.Now, level, exception, parsedTemplate, properties, traceId, spanId);
     }
 
