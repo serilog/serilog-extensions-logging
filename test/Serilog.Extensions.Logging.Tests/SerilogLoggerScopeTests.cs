@@ -80,7 +80,7 @@ public class SerilogLoggerScopeTests
 
         var (loggerProvider, logEventPropertyFactory, logEvent) = SetUp();
 
-        var state = (propertyName, expectedValue);
+        var state = (propertyName, (object)expectedValue);
 
         var loggerScope = new SerilogLoggerScope(loggerProvider, state);
 
