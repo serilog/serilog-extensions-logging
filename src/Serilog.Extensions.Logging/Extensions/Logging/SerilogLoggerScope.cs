@@ -99,6 +99,17 @@ class SerilogLoggerScope : IDisposable
                     AddProperty(stateProperty.Key, stateProperty.Value);
             }
         }
+#if FEATURE_ITUPLE
+        else if (_state is System.Runtime.CompilerServices.ITuple tuple && tuple.Length == 2 && tuple[0] is string s)
+        {
+            scopeItem = null; // Unless it's `FormattedLogValues`, these are treated as property bags rather than scope items.
+
+            if (s == SerilogLoggerProvider.OriginalFormatPropertyName && tuple[1] is string)
+                scopeItem = new ScalarValue(_state.ToString());
+            else
+                AddProperty(s, tuple[1]);
+        }
+#else
         else if (_state is ValueTuple<string, object?> tuple)
         {
             scopeItem = null; // Unless it's `FormattedLogValues`, these are treated as property bags rather than scope items.
@@ -108,6 +119,7 @@ class SerilogLoggerScope : IDisposable
             else
                 AddProperty(tuple.Item1, tuple.Item2);
         }
+#endif
         else
         {
             scopeItem = propertyFactory.CreateProperty(NoName, _state).Value;
