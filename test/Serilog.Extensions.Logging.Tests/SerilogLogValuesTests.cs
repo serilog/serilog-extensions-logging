@@ -1,4 +1,4 @@
-﻿using Serilog.Events;
+using Serilog.Events;
 using Serilog.Parsing;
 using Xunit;
 
@@ -29,10 +29,10 @@ public class SerilogLogValuesTests
     }
 
     [Fact]
-    public void NonscalarPropertiesAreWrapped()
+    public void NonScalarPropertiesAreWrapped()
     {
         const string name = "Sequence";
-        var seq = new SequenceValue(Enumerable.Empty<LogEventPropertyValue>());
+        var seq = new SequenceValue([]);
         var lv = new SerilogLogValues(MessageTemplate.Empty, new Dictionary<string, LogEventPropertyValue> { [name] = seq });
         var kvp = lv.Single(p => p.Key == name);
         var sv = Assert.IsType<SequenceValue>(kvp.Value);

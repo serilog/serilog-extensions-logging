@@ -9,7 +9,7 @@ sealed class ExtensionsProvider : ILoggerProvider, Microsoft.Extensions.Logging.
 {
     readonly LogLevel _enabledLevel;
 
-    public List<(LogLevel logLevel, EventId eventId, object? state, Exception? exception, string message)> Writes { get; } = new();
+    public List<(LogLevel logLevel, EventId eventId, object? state, Exception? exception, string message)> Writes { get; } = [];
 
     public ExtensionsProvider(LogLevel enabledLevel)
     {

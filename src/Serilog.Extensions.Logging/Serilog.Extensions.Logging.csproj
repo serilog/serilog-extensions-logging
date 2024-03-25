@@ -28,7 +28,6 @@
   <ItemGroup>
     <None Include="..\..\assets\serilog-extension-nuget.png" Pack="true" PackagePath="" Visible="false" />
     <None Include="..\..\README.md" Pack="true" PackagePath="\" Visible="false" />
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" />
     <PackageReference Include="Serilog" Version="3.1.1" />
     <!-- The version of this reference must match the major and minor components of the package version prefix. -->
     <PackageReference Include="Microsoft.Extensions.Logging" Version="8.0.0" />

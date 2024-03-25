@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Serilog;
@@ -37,7 +37,7 @@ ActivitySource.AddActivityListener(new ActivityListener
 // Run our test
 var activitySource = new ActivitySource("SomeActivitySource");
 
-var serviceProvider = services.BuildServiceProvider();
+using var serviceProvider = services.BuildServiceProvider();
 var logger = serviceProvider.GetRequiredService<ILogger<Program>>();
 
 using var activity = activitySource.StartActivity();
@@ -52,5 +52,3 @@ using var scope = logger.BeginScope(new
 });
 
 logger.LogInformation("Hello world!");
-
-serviceProvider.Dispose();

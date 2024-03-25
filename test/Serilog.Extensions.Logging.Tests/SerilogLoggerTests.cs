@@ -193,7 +193,7 @@ public class SerilogLoggerTest
     {
         var (logger, sink) = SetUp(LogLevel.Trace);
 
-        using (logger.BeginScope("{$values}", new [] { 1, 2, 3, 4 }))
+        using (logger.BeginScope("{$values}", new[] { 1, 2, 3, 4 }))
         {
             logger.Log(LogLevel.Information, 0, TestMessage, null!, null!);
         }
@@ -482,7 +482,7 @@ public class SerilogLoggerTest
 
     class FakeExternalScopeProvider : IExternalScopeProvider
     {
-        private readonly List<Scope> _scopes = new List<Scope>();
+        private readonly List<Scope> _scopes = [];
 
         public void ForEachScope<TState>(Action<object?, TState> callback, TState state)
         {

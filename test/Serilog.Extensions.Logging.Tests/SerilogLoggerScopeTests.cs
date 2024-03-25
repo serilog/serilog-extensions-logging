@@ -7,6 +7,7 @@ using Serilog.Extensions.Logging.Tests.Support;
 using Xunit;
 
 namespace Serilog.Extensions.Logging.Tests;
+
 public class SerilogLoggerScopeTests
 {
     static (SerilogLoggerProvider, LogEventPropertyFactory, LogEvent) SetUp()
@@ -16,7 +17,7 @@ public class SerilogLoggerScopeTests
         var logEventPropertyFactory = new LogEventPropertyFactory();
 
         var dateTimeOffset = new DateTimeOffset(2000, 1, 1, 0, 0, 0, TimeSpan.Zero);
-        var messageTemplate = new MessageTemplate(Enumerable.Empty<Parsing.MessageTemplateToken>());
+        var messageTemplate = new MessageTemplate([]);
         var properties = Enumerable.Empty<LogEventProperty>();
         var logEvent = new LogEvent(dateTimeOffset, LogEventLevel.Information, null, messageTemplate, properties);
 
@@ -31,12 +32,11 @@ public class SerilogLoggerScopeTests
 
         var(loggerProvider, logEventPropertyFactory, logEvent) = SetUp();
 
-
         var state = new Dictionary<string, object?>() { { propertyName, expectedValue } };
 
         var loggerScope = new SerilogLoggerScope(loggerProvider, state);
 
-        loggerScope.EnrichAndCreateScopeItem(logEvent, logEventPropertyFactory, out LogEventPropertyValue? scopeItem);
+        loggerScope.EnrichAndCreateScopeItem(logEvent, logEventPropertyFactory, out LogEventPropertyValue? _);
 
         Assert.Contains(propertyName, logEvent.Properties);
 
@@ -56,12 +56,11 @@ public class SerilogLoggerScopeTests
 
         var (loggerProvider, logEventPropertyFactory, logEvent) = SetUp();
 
-
-        var state = new KeyValuePair<string, object?>[] { new KeyValuePair<string, object?>(propertyName, expectedValue) };
+        var state = new KeyValuePair<string, object?>[] { new(propertyName, expectedValue) };
 
         var loggerScope = new SerilogLoggerScope(loggerProvider, state);
 
-        loggerScope.EnrichAndCreateScopeItem(logEvent, logEventPropertyFactory, out LogEventPropertyValue? scopeItem);
+        loggerScope.EnrichAndCreateScopeItem(logEvent, logEventPropertyFactory, out LogEventPropertyValue? _);
 
         Assert.Contains(propertyName, logEvent.Properties);
 
@@ -81,12 +80,11 @@ public class SerilogLoggerScopeTests
 
         var (loggerProvider, logEventPropertyFactory, logEvent) = SetUp();
 
-
-        var state = (propertyName, (object)expectedValue);
+        var state = (propertyName, expectedValue);
 
         var loggerScope = new SerilogLoggerScope(loggerProvider, state);
 
-        loggerScope.EnrichAndCreateScopeItem(logEvent, logEventPropertyFactory, out LogEventPropertyValue? scopeItem);
+        loggerScope.EnrichAndCreateScopeItem(logEvent, logEventPropertyFactory, out LogEventPropertyValue? _);
 
         Assert.Contains(propertyName, logEvent.Properties);
 

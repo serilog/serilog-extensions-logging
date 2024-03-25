@@ -71,7 +71,7 @@ public class SerilogLoggerProvider : ILoggerProvider, ILogEventEnricher, ISuppor
 
             if (scopeItem != null)
             {
-                scopeItems ??= new List<LogEventPropertyValue>();
+                scopeItems ??= [];
                 scopeItems.Add(scopeItem);
             }
         }
@@ -84,7 +84,7 @@ public class SerilogLoggerProvider : ILoggerProvider, ILogEventEnricher, ISuppor
 
             if (scopeItem != null)
             {
-                scopeItems ??= new List<LogEventPropertyValue>();
+                scopeItems ??= [];
                 scopeItems.Add(scopeItem);
             }
         }, logEvent);
