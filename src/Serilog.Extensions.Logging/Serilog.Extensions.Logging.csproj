@@ -35,4 +35,19 @@
     <PackageReference Include="Nullable" Version="1.3.1" PrivateAssets="All" />
   </ItemGroup>
 
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard2.1' ">
+    <DefineConstants>$(DefineConstants);FEATURE_ITUPLE</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'net6.0' ">
+    <DefineConstants>$(DefineConstants);FEATURE_ITUPLE</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'net7.0' ">
+    <DefineConstants>$(DefineConstants);FEATURE_ITUPLE</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'net8.0' ">
+    <DefineConstants>$(DefineConstants);FEATURE_ITUPLE</DefineConstants>
+  </PropertyGroup>
 </Project>
