@@ -47,7 +47,9 @@ class SerilogLoggerScope : IDisposable
         }
     }
 
-    public void EnrichAndCreateScopeItem(LogEvent logEvent, ILogEventPropertyFactory propertyFactory, out LogEventPropertyValue? scopeItem)
+    public void EnrichAndCreateScopeItem(LogEvent logEvent, ILogEventPropertyFactory propertyFactory, out LogEventPropertyValue? scopeItem) => EnrichWithStateAndCreateScopeItem(logEvent, propertyFactory, _state, out scopeItem);
+
+    public static void EnrichWithStateAndCreateScopeItem(LogEvent logEvent, ILogEventPropertyFactory propertyFactory, object? state, out LogEventPropertyValue? scopeItem)
     {
         void AddProperty(string key, object? value)
         {
@@ -68,61 +70,61 @@ class SerilogLoggerScope : IDisposable
             logEvent.AddPropertyIfAbsent(property);
         }
 
-        if (_state == null)
+        if (state == null)
         {
             scopeItem = null;
             return;
         }
 
         // Eliminates boxing of Dictionary<TKey, TValue>.Enumerator for the most common use case
-        if (_state is Dictionary<string, object> dictionary)
+        if (state is Dictionary<string, object> dictionary)
         {
             scopeItem = null; // Unless it's `FormattedLogValues`, these are treated as property bags rather than scope items.
 
             foreach (var stateProperty in dictionary)
             {
                 if (stateProperty.Key == SerilogLoggerProvider.OriginalFormatPropertyName && stateProperty.Value is string)
-                    scopeItem = new ScalarValue(_state.ToString());
+                    scopeItem = new ScalarValue(state.ToString());
                 else
                     AddProperty(stateProperty.Key, stateProperty.Value);
             }
         }
-        else if (_state is IEnumerable<KeyValuePair<string, object>> stateProperties)
+        else if (state is IEnumerable<KeyValuePair<string, object>> stateProperties)
         {
             scopeItem = null; // Unless it's `FormattedLogValues`, these are treated as property bags rather than scope items.
 
             foreach (var stateProperty in stateProperties)
             {
                 if (stateProperty.Key == SerilogLoggerProvider.OriginalFormatPropertyName && stateProperty.Value is string)
-                    scopeItem = new ScalarValue(_state.ToString());
+                    scopeItem = new ScalarValue(state.ToString());
                 else
                     AddProperty(stateProperty.Key, stateProperty.Value);
             }
         }
 #if FEATURE_ITUPLE
-        else if (_state is System.Runtime.CompilerServices.ITuple tuple && tuple.Length == 2 && tuple[0] is string s)
+        else if (state is System.Runtime.CompilerServices.ITuple tuple && tuple.Length == 2 && tuple[0] is string s)
         {
             scopeItem = null; // Unless it's `FormattedLogValues`, these are treated as property bags rather than scope items.
 
             if (s == SerilogLoggerProvider.OriginalFormatPropertyName && tuple[1] is string)
-                scopeItem = new ScalarValue(_state.ToString());
+                scopeItem = new ScalarValue(state.ToString());
             else
                 AddProperty(s, tuple[1]);
         }
 #else
-        else if (_state is ValueTuple<string, object?> tuple)
+        else if (state is ValueTuple<string, object?> tuple)
         {
             scopeItem = null; // Unless it's `FormattedLogValues`, these are treated as property bags rather than scope items.
 
             if (tuple.Item1 == SerilogLoggerProvider.OriginalFormatPropertyName && tuple.Item2 is string)
-                scopeItem = new ScalarValue(_state.ToString());
+                scopeItem = new ScalarValue(state.ToString());
             else
                 AddProperty(tuple.Item1, tuple.Item2);
         }
 #endif
         else
         {
-            scopeItem = propertyFactory.CreateProperty(NoName, _state).Value;
+            scopeItem = propertyFactory.CreateProperty(NoName, state).Value;
         }
     }
 }
