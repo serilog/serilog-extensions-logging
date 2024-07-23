@@ -28,41 +28,41 @@ using Serilog;
 
 public class Startup
 {
-  public Startup(IHostingEnvironment env)
-  {
-    Log.Logger = new LoggerConfiguration()
-      .Enrich.FromLogContext()
-      .WriteTo.Console()
-      .CreateLogger();
+    public Startup(IHostingEnvironment env)
+    {
+        Log.Logger = new LoggerConfiguration()
+          .Enrich.FromLogContext()
+          .WriteTo.Console()
+          .CreateLogger();
 
-    // Other startup code
+        // Other startup code
 ```
 
 **Finally, for .NET Core 2.0+**, in your `Startup` class's `Configure()` method, remove the existing logger configuration entries and
 call `AddSerilog()` on the provided `loggingBuilder`.
 
 ```csharp
-  public void ConfigureServices(IServiceCollection services)
-  {
-      services.AddLogging(loggingBuilder =>
-      	loggingBuilder.AddSerilog(dispose: true));
+public void ConfigureServices(IServiceCollection services)
+{
+    services.AddLogging(loggingBuilder =>
+        loggingBuilder.AddSerilog(dispose: true));
 
-      // Other services ...
-  }
+    // Other services ...
+}
 ```
 
 **For .NET Core 1.0 or 1.1**, in your `Startup` class's `Configure()` method, remove the existing logger configuration entries and call `AddSerilog()` on the provided `loggerFactory`.
 
 ```
-  public void Configure(IApplicationBuilder app,
-                        IHostingEnvironment env,
-                        ILoggerFactory loggerfactory,
-                        IApplicationLifetime appLifetime)
-  {
-      loggerfactory.AddSerilog();
+public void Configure(IApplicationBuilder app,
+                      IHostingEnvironment env,
+                      ILoggerFactory loggerfactory,
+                      IApplicationLifetime appLifetime)
+{
+    loggerfactory.AddSerilog();
 
-      // Ensure any buffered events are sent at shutdown
-      appLifetime.ApplicationStopped.Register(Log.CloseAndFlush);
+    // Ensure any buffered events are sent at shutdown
+    appLifetime.ApplicationStopped.Register(Log.CloseAndFlush);
 ```
 
 That's it! With the level bumped up a little you should see log output like:
@@ -87,10 +87,10 @@ _Serilog.Extensions.Logging_ captures the `ILogger`'s log category, but it's not
 
 To include the log category in the final written messages, add the `{SourceContext}` named hole to a customised `outputTemplate` parameter value when configuring the relevant sink(s). For example:
 ```csharp
-    .WriteTo.Console(
-        outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {SourceContext}: {Message:lj}{NewLine}{Exception}")
-    .WriteTo.File("log.txt",
-        outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {SourceContext}: {Message:lj}{NewLine}{Exception}")
+.WriteTo.Console(
+    outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {SourceContext}: {Message:lj}{NewLine}{Exception}")
+.WriteTo.File("log.txt",
+    outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {SourceContext}: {Message:lj}{NewLine}{Exception}")
 ```
 
 ### Notes on Log Scopes
@@ -103,7 +103,8 @@ _Microsoft.Extensions.Logging_ provides the `BeginScope` API, which can be used 
 Using the extension method will add a `Scope` property to your log events. This is most useful for adding simple "scope strings" to your events, as in the following code:
 
 ```csharp
-using (_logger.BeginScope("Transaction")) {
+using (_logger.BeginScope("Transaction"))
+{
     _logger.LogInformation("Beginning...");
     _logger.LogInformation("Completed in {DurationMs}ms...", 30);
 }
@@ -116,7 +117,8 @@ If you simply want to add a "bag" of additional properties to your log events, h
 
 ```csharp
 // WRONG! Prefer the dictionary or value tuple approach below instead
-using (_logger.BeginScope("TransactionId: {TransactionId}, ResponseJson: {ResponseJson}", 12345, jsonString)) {
+using (_logger.BeginScope("TransactionId: {TransactionId}, ResponseJson: {ResponseJson}", 12345, jsonString))
+{
     _logger.LogInformation("Completed in {DurationMs}ms...", 30);
 }
 // Example JSON output:
@@ -138,11 +140,13 @@ Moreover, the template string within `BeginScope` is rather arbitrary when all y
 A far better alternative is to use the `BeginScope<TState>(TState state)` method. If you provide any `IEnumerable<KeyValuePair<string, object>>` to this method, then Serilog will output the key/value pairs as structured properties _without_ the `Scope` property, as in this example:
 
 ```csharp
-var scopeProps = new Dictionary<string, object> {
+var scopeProps = new Dictionary<string, object>
+{
     { "TransactionId", 12345 },
     { "ResponseJson", jsonString },
 };
-using (_logger.BeginScope(scopeProps) {
+using (_logger.BeginScope(scopeProps)
+{
     _logger.LogInformation("Transaction completed in {DurationMs}ms...", 30);
 }
 // Example JSON output:
@@ -157,10 +161,12 @@ using (_logger.BeginScope(scopeProps) {
 // }
 ```
 
-Alternatively provide a `ValueTuple<string, object?>` to this method, where `Item1` is the property name and `Item2` is the property value. Note that `T2` _must_ be `object?`.
+Alternatively provide a `ValueTuple<string, object?>` to this method, where `Item1` is the property name and `Item2` is the property value.
+Note that `T2` _must_ be `object?` if your target platform is net462 or netstandard2.0.
 
 ```csharp
-using (_logger.BeginScope(("TransactionId", (object?)12345)) {
+using (_logger.BeginScope(("TransactionId", 12345))
+{
     _logger.LogInformation("Transaction completed in {DurationMs}ms...", 30);
 }
 // Example JSON output:

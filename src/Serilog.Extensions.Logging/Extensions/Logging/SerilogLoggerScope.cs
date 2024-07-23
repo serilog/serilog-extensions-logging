@@ -47,24 +47,27 @@ class SerilogLoggerScope : IDisposable
         }
     }
 
-    public void EnrichAndCreateScopeItem(LogEvent logEvent, ILogEventPropertyFactory propertyFactory, out LogEventPropertyValue? scopeItem)
+    public void EnrichAndCreateScopeItem(LogEvent logEvent, ILogEventPropertyFactory propertyFactory, out LogEventPropertyValue? scopeItem) => EnrichWithStateAndCreateScopeItem(logEvent, propertyFactory, _state, out scopeItem);
+
+    public static void EnrichWithStateAndCreateScopeItem(LogEvent logEvent, ILogEventPropertyFactory propertyFactory, object? state, out LogEventPropertyValue? scopeItem)
     {
-        if (_state == null)
+        if (state == null)
         {
             scopeItem = null;
             return;
         }
 
-        if (_state is Dictionary<string, object> dictionary)
+        // Eliminates boxing of Dictionary<TKey, TValue>.Enumerator for the most common use case
+        if (state is Dictionary<string, object> dictionary)
         {
             // Separate handling of this case eliminates boxing of Dictionary<TKey, TValue>.Enumerator.
             scopeItem = null;
             foreach (var stateProperty in dictionary)
-            {
+            {                
                 AddProperty(logEvent, propertyFactory, stateProperty.Key, stateProperty.Value);
             }
         }
-        else if (_state is IEnumerable<KeyValuePair<string, object>> stateProperties)
+        else if (state is IEnumerable<KeyValuePair<string, object>> stateProperties)
         {
             scopeItem = null;
             foreach (var stateProperty in stateProperties)
@@ -72,7 +75,7 @@ class SerilogLoggerScope : IDisposable
                 if (stateProperty is { Key: SerilogLoggerProvider.OriginalFormatPropertyName, Value: string })
                 {
                     // `_state` is most likely `FormattedLogValues` (a MEL internal type).
-                    scopeItem = new ScalarValue(_state.ToString());
+                    scopeItem = new ScalarValue(state.ToString());
                 }
                 else
                 {
@@ -80,14 +83,22 @@ class SerilogLoggerScope : IDisposable
                 }
             }
         }
-        else if (_state is ValueTuple<string, object?> tuple)
+#if FEATURE_ITUPLE
+        else if (state is System.Runtime.CompilerServices.ITuple tuple && tuple.Length == 2 && tuple[0] is string s)
+        {
+            scopeItem = null; // Unless it's `FormattedLogValues`, these are treated as property bags rather than scope items.
+            AddProperty(logEvent, propertyFactory, s, tuple[1]);
+        }
+#else
+        else if (state is ValueTuple<string, object?> tuple)
         {
             scopeItem = null;
             AddProperty(logEvent, propertyFactory, tuple.Item1, tuple.Item2);
         }
+#endif
         else
         {
-            scopeItem = propertyFactory.CreateProperty(NoName, _state).Value;
+            scopeItem = propertyFactory.CreateProperty(NoName, state).Value;
         }
     }
 

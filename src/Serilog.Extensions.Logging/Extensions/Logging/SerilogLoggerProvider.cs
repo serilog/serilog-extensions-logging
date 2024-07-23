@@ -78,9 +78,7 @@ public class SerilogLoggerProvider : ILoggerProvider, ILogEventEnricher, ISuppor
 
         _externalScopeProvider?.ForEachScope((state, accumulatingLogEvent) =>
         {
-            var scope = new SerilogLoggerScope(this, state);
-
-            scope.EnrichAndCreateScopeItem(accumulatingLogEvent, propertyFactory, out var scopeItem);
+            SerilogLoggerScope.EnrichWithStateAndCreateScopeItem(accumulatingLogEvent, propertyFactory, state, out var scopeItem);
 
             if (scopeItem != null)
             {
