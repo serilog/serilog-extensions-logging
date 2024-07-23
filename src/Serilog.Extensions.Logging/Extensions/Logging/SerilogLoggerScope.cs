@@ -106,12 +106,12 @@ class SerilogLoggerScope : IDisposable
     {
         var destructureObject = false;
 
-        if (key.StartsWith("@", StringComparison.Ordinal))
+        if (key.StartsWith('@'))
         {
             key = SerilogLogger.GetKeyWithoutFirstSymbol(SerilogLogger.DestructureDictionary, key);
             destructureObject = true;
         }
-        else if (key.StartsWith("$", StringComparison.Ordinal))
+        else if (key.StartsWith('$'))
         {
             key = SerilogLogger.GetKeyWithoutFirstSymbol(SerilogLogger.StringifyDictionary, key);
             value = value?.ToString();

@@ -103,12 +103,12 @@ class SerilogLogger : FrameworkLogger
                 {
                     messageTemplate = value;
                 }
-                else if (property.Key.StartsWith("@", StringComparison.Ordinal))
+                else if (property.Key.StartsWith('@'))
                 {
                     if (_logger.BindProperty(GetKeyWithoutFirstSymbol(DestructureDictionary, property.Key), property.Value, true, out var destructured))
                         properties[destructured.Name] = destructured.Value;
                 }
-                else if (property.Key.StartsWith("$", StringComparison.Ordinal))
+                else if (property.Key.StartsWith('$'))
                 {
                     if (_logger.BindProperty(GetKeyWithoutFirstSymbol(StringifyDictionary, property.Key), property.Value?.ToString(), true, out var stringified))
                         properties[stringified.Name] = stringified.Value;
