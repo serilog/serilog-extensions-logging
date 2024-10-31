@@ -29,9 +29,6 @@ class SerilogLogger : FrameworkLogger
     readonly SerilogLoggerProvider _provider;
     readonly ILogger _logger;
 
-    /// Per-ILogger LogEventProperty cache for EventId.
-    /// Each ILogger has its own cache.
-    /// Each { ILogger, EventId.Id } pair is assumed to be unique.
     readonly EventIdPropertyCache _eventPropertyCache = new (48);
 
     static readonly CachingMessageTemplateParser MessageTemplateParser = new();
