@@ -29,9 +29,7 @@ class SerilogLogger : FrameworkLogger
     readonly SerilogLoggerProvider _provider;
     readonly ILogger _logger;
 
-    readonly EventIdPropertyCache _eventPropertyCache = new (48);
-
-    static readonly CachingMessageTemplateParser MessageTemplateParser = new();
+    static readonly CachingMessageTemplateParser MessageTemplateParser = new ();
 
     public SerilogLogger(
         SerilogLoggerProvider provider,
@@ -152,7 +150,7 @@ class SerilogLogger : FrameworkLogger
         }
 
         if (eventId.Id != 0 || eventId.Name != null)
-            properties.Add(this._eventPropertyCache.GetOrCreateProperty(in eventId));
+            properties.Add(EventIdPropertyCache.GetOrCreateProperty(in eventId));
 
         var (traceId, spanId) = Activity.Current is { } activity ?
             (activity.TraceId, activity.SpanId) :

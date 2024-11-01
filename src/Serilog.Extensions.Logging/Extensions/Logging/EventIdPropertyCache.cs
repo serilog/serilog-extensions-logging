@@ -14,53 +14,46 @@
 
 namespace Serilog.Extensions.Logging
 {
+    using System.Collections.Concurrent;
     using Microsoft.Extensions.Logging;
     using Serilog.Events;
 
-    internal sealed class EventIdPropertyCache
+    static class EventIdPropertyCache
     {
-        private readonly object _createLock = new();
-        private readonly int _maxCapacity;
-        private readonly Dictionary<EventKey, LogEventProperty> _propertyCache;
+        const int MaxCachedProperties = 1024;
 
-        private int count;
+        static readonly ConcurrentDictionary<EventKey, LogEventProperty> s_propertyCache = new();
+        static int s_count;
 
-        public EventIdPropertyCache(int maxCapacity)
-        {
-            _maxCapacity = maxCapacity;
-            _propertyCache = new Dictionary<EventKey, LogEventProperty>(capacity: maxCapacity);
-        }
-
-        public LogEventProperty GetOrCreateProperty(in EventId eventId)
+        public static LogEventProperty GetOrCreateProperty(in EventId eventId)
         {
             var eventKey = new EventKey(eventId);
 
-            if (_propertyCache.TryGetValue(eventKey, out var cachedProperty))
+            LogEventProperty? property;
+
+            if (s_count >= MaxCachedProperties)
             {
-                return cachedProperty;
+                if (!s_propertyCache.TryGetValue(eventKey, out property))
+                {
+                    property = CreateCore(in eventKey);
+                }
+            }
+            else
+            {
+                property = s_propertyCache.GetOrAdd(
+                    eventKey,
+                    static key =>
+                    {
+                        Interlocked.Increment(ref s_count);
+
+                        return CreateCore(in key);
+                    });
             }
 
-            lock (_createLock)
-            {
-                // Double check under lock
-                if (_propertyCache.TryGetValue(eventKey, out cachedProperty))
-                {
-                    return cachedProperty;
-                }
-
-                cachedProperty = CreateCore(in eventKey);
-
-                if (count < _maxCapacity)
-                {
-                    _propertyCache[eventKey] = cachedProperty;
-                    count++;
-                }
-
-                return cachedProperty;
-            }
+            return property;
         }
 
-        private static LogEventProperty CreateCore(in EventKey eventKey)
+        static LogEventProperty CreateCore(in EventKey eventKey)
         {
             var properties = new List<LogEventProperty>(2);
 
@@ -77,9 +70,8 @@ namespace Serilog.Extensions.Logging
             return new LogEventProperty("EventId", new StructureValue(properties));
         }
 
-        private readonly record struct EventKey
+        readonly record struct EventKey
         {
-            
             public EventKey(EventId eventId)
             {
                 Id = eventId.Id;

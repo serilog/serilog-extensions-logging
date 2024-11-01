@@ -28,12 +28,10 @@ namespace Serilog.Extensions.Logging.Tests
         public void LowAndHighNumberedEventIdsAreMapped(int id)
         {
             // Arrange
-            var cache = new EventIdPropertyCache(48);
-
             var eventId = new EventId(id, "test");
 
             // Act
-            var mapped = cache.GetOrCreateProperty(eventId);
+            var mapped = EventIdPropertyCache.GetOrCreateProperty(eventId);
 
             // Assert
             var value = Assert.IsType<StructureValue>(mapped.Value);
