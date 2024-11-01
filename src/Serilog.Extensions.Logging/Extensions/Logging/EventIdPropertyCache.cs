@@ -66,7 +66,7 @@ namespace Serilog.Extensions.Logging
             return new LogEventProperty("EventId", new StructureValue(properties));
         }
 
-        private readonly struct EventKey : IEquatable<EventKey>
+        private readonly record struct EventKey
         {
             
             public EventKey(EventId eventId)
@@ -78,26 +78,6 @@ namespace Serilog.Extensions.Logging
             public int Id { get; }
 
             public string? Name { get; }
-
-            /// <inheritdoc />
-            public override int GetHashCode()
-            {
-                unchecked
-                {
-                    var hashCode = 17;
-
-                    hashCode = (hashCode * 397) ^ this.Id;
-                    hashCode = (hashCode * 397) ^ (this.Name?.GetHashCode() ?? 0);
-
-                    return hashCode;
-                }
-            }
-
-            /// <inheritdoc />
-            public bool Equals(EventKey other) => this.Id == other.Id && this.Name == other.Name;
-
-            /// <inheritdoc />
-            public override bool Equals(object? obj) => obj is EventKey other && Equals(other);
         }
     }
 }
