@@ -1,6 +1,7 @@
 // Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
+using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Serilog.Core;
 using Serilog.Events;
@@ -14,6 +15,9 @@ namespace Serilog.Extensions.Logging;
 /// </summary>
 [ProviderAlias("Serilog")]
 public class SerilogLoggerProvider : ILoggerProvider, ILogEventEnricher, ISupportExternalScope
+#if NET6_0_OR_GREATER
+    , IAsyncDisposable
+#endif
 {
     internal const string OriginalFormatPropertyName = "{OriginalFormat}";
     internal const string ScopePropertyName = "Scope";
@@ -21,6 +25,9 @@ public class SerilogLoggerProvider : ILoggerProvider, ILogEventEnricher, ISuppor
     // May be null; if it is, Log.Logger will be lazily used
     readonly ILogger? _logger;
     readonly Action? _dispose;
+#if NET6_0_OR_GREATER
+    readonly Func<ValueTask>? _disposeAsync;
+#endif
     private IExternalScopeProvider? _externalScopeProvider;
 
     /// <summary>
@@ -36,9 +43,25 @@ public class SerilogLoggerProvider : ILoggerProvider, ILogEventEnricher, ISuppor
         if (dispose)
         {
             if (logger != null)
+            {
                 _dispose = () => (logger as IDisposable)?.Dispose();
+#if NET6_0_OR_GREATER
+                _disposeAsync = () =>
+                {
+                    // Dispose via IAsyncDisposable if possible, otherwise fall back to IDisposable
+                    if (logger is IAsyncDisposable asyncDisposable) return asyncDisposable.DisposeAsync();
+                    else (logger as IDisposable)?.Dispose();
+                    return default;
+                };
+#endif
+            }
             else
+            {
                 _dispose = Log.CloseAndFlush;
+#if NET6_0_OR_GREATER
+                _disposeAsync = Log.CloseAndFlushAsync;
+#endif
+            }
         }
     }
 
@@ -113,4 +136,12 @@ public class SerilogLoggerProvider : ILoggerProvider, ILogEventEnricher, ISuppor
     {
         _dispose?.Invoke();
     }
+
+#if NET6_0_OR_GREATER
+    /// <inheritdoc />
+    public ValueTask DisposeAsync()
+    {
+        return _disposeAsync?.Invoke() ?? default;
+    }
+#endif
 }
