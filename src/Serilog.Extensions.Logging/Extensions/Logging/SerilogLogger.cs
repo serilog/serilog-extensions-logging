@@ -28,13 +28,9 @@ class SerilogLogger : FrameworkLogger
 
     readonly SerilogLoggerProvider _provider;
     readonly ILogger _logger;
+    readonly EventIdPropertyCache _eventIdPropertyCache = new();
 
     static readonly CachingMessageTemplateParser MessageTemplateParser = new();
-
-    // It's rare to see large event ids, as they are category-specific
-    static readonly LogEventProperty[] LowEventIdValues = Enumerable.Range(0, 48)
-        .Select(n => new LogEventProperty("Id", new ScalarValue(n)))
-        .ToArray();
 
     public SerilogLogger(
         SerilogLoggerProvider provider,
@@ -155,7 +151,7 @@ class SerilogLogger : FrameworkLogger
         }
 
         if (eventId.Id != 0 || eventId.Name != null)
-            properties.Add(CreateEventIdProperty(eventId));
+            properties.Add(_eventIdPropertyCache.GetOrCreateProperty(in eventId));
 
         var (traceId, spanId) = Activity.Current is { } activity ?
             (activity.TraceId, activity.SpanId) :
@@ -171,26 +167,5 @@ class SerilogLogger : FrameworkLogger
         if (formatter != null)
             stateObj = formatter(state, null);
         return stateObj ?? state;
-    }
-
-    internal static LogEventProperty CreateEventIdProperty(EventId eventId)
-    {
-        var properties = new List<LogEventProperty>(2);
-
-        if (eventId.Id != 0)
-        {
-            if (eventId.Id >= 0 && eventId.Id < LowEventIdValues.Length)
-                // Avoid some allocations
-                properties.Add(LowEventIdValues[eventId.Id]);
-            else
-                properties.Add(new LogEventProperty("Id", new ScalarValue(eventId.Id)));
-        }
-
-        if (eventId.Name != null)
-        {
-            properties.Add(new LogEventProperty("Name", new ScalarValue(eventId.Name)));
-        }
-
-        return new LogEventProperty("EventId", new StructureValue(properties));
     }
 }
