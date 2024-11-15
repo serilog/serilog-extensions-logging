@@ -12,75 +12,86 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Serilog.Extensions.Logging
+namespace Serilog.Extensions.Logging;
+
+using System.Collections.Concurrent;
+using Microsoft.Extensions.Logging;
+using Serilog.Events;
+
+class EventIdPropertyCache
 {
-    using System.Collections.Concurrent;
-    using Microsoft.Extensions.Logging;
-    using Serilog.Events;
+    readonly int _maxCachedProperties;
+    readonly ConcurrentDictionary<EventKey, LogEventProperty> _propertyCache = new();
 
-    static class EventIdPropertyCache
+    int _count;
+
+    public EventIdPropertyCache(int maxCachedProperties = 1024)
     {
-        const int MaxCachedProperties = 1024;
+        _maxCachedProperties = maxCachedProperties;
+    }
 
-        static readonly ConcurrentDictionary<EventKey, LogEventProperty> s_propertyCache = new();
-        static int s_count;
+    public LogEventProperty GetOrCreateProperty(in EventId eventId)
+    {
+        var eventKey = new EventKey(eventId);
 
-        public static LogEventProperty GetOrCreateProperty(in EventId eventId)
+        LogEventProperty? property;
+
+        if (_count >= _maxCachedProperties)
         {
-            var eventKey = new EventKey(eventId);
-
-            LogEventProperty? property;
-
-            if (s_count >= MaxCachedProperties)
+            if (!_propertyCache.TryGetValue(eventKey, out property))
             {
-                if (!s_propertyCache.TryGetValue(eventKey, out property))
-                {
-                    property = CreateCore(in eventKey);
-                }
+                property = CreateProperty(in eventKey);
             }
-            else
+        }
+        else
+        {
+            if (!_propertyCache.TryGetValue(eventKey, out property))
             {
-                property = s_propertyCache.GetOrAdd(
-                    eventKey,
-                    static key =>
-                    {
-                        Interlocked.Increment(ref s_count);
-
-                        return CreateCore(in key);
-                    });
+                // GetOrAdd is moved to a separate method to prevent closure allocation
+                property = GetOrAddCore(in eventKey);
             }
-
-            return property;
         }
 
-        static LogEventProperty CreateCore(in EventKey eventKey)
+        return property;
+    }
+
+    static LogEventProperty CreateProperty(in EventKey eventKey)
+    {
+        var properties = new List<LogEventProperty>(2);
+
+        if (eventKey.Id != 0)
         {
-            var properties = new List<LogEventProperty>(2);
-
-            if (eventKey.Id != 0)
-            {
-                properties.Add(new LogEventProperty("Id", new ScalarValue(eventKey.Id)));
-            }
-
-            if (eventKey.Name != null)
-            {
-                properties.Add(new LogEventProperty("Name", new ScalarValue(eventKey.Name)));
-            }
-
-            return new LogEventProperty("EventId", new StructureValue(properties));
+            properties.Add(new LogEventProperty("Id", new ScalarValue(eventKey.Id)));
         }
 
-        readonly record struct EventKey
+        if (eventKey.Name != null)
         {
-            public EventKey(EventId eventId)
-            {
-                Id = eventId.Id;
-                Name = eventId.Name;
-            }
-
-            public int Id { get; }
-
-            public string? Name { get; }
+            properties.Add(new LogEventProperty("Name", new ScalarValue(eventKey.Name)));
         }
+
+        return new LogEventProperty("EventId", new StructureValue(properties));
+    }
+
+    LogEventProperty GetOrAddCore(in EventKey eventKey) =>
+        _propertyCache.GetOrAdd(
+            eventKey,
+            key =>
+            {
+                Interlocked.Increment(ref _count);
+
+                return CreateProperty(in key);
+            });
+
+    readonly record struct EventKey
+    {
+        public EventKey(EventId eventId)
+        {
+            Id = eventId.Id;
+            Name = eventId.Name;
+        }
+
+        public int Id { get; }
+
+        public string? Name { get; }
     }
 }

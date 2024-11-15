@@ -16,30 +16,99 @@ using Microsoft.Extensions.Logging;
 using Serilog.Events;
 using Xunit;
 
-namespace Serilog.Extensions.Logging.Tests
+namespace Serilog.Extensions.Logging.Tests;
+
+public class EventIdPropertyCacheTests
 {
-    public class EventIdPropertyCacheTests
+    [Fact]
+    public void CreatesPropertyWithCorrectIdAndName()
     {
-        [Theory]
-        [InlineData(1)]
-        [InlineData(10)]
-        [InlineData(48)]
-        [InlineData(100)]
-        public void LowAndHighNumberedEventIdsAreMapped(int id)
-        {
-            // Arrange
-            var eventId = new EventId(id, "test");
+        // Arrange
+        const int id = 101;
+        const string name = "TestEvent";
+        var eventId = new EventId(id, name);
 
-            // Act
-            var mapped = EventIdPropertyCache.GetOrCreateProperty(eventId);
+        var cache = new EventIdPropertyCache();
 
-            // Assert
-            var value = Assert.IsType<StructureValue>(mapped.Value);
-            Assert.Equal(2, value.Properties.Count);
+        // Act
+        var eventProperty = cache.GetOrCreateProperty(eventId);
 
-            var idValue = value.Properties.Single(p => p.Name == "Id").Value;
-            var scalar = Assert.IsType<ScalarValue>(idValue);
-            Assert.Equal(id, scalar.Value);
-        }
+        // Assert
+        var value = Assert.IsType<StructureValue>(eventProperty.Value);
+
+        Assert.Equal(2, value.Properties.Count);
+
+        var idValue = value.Properties.Single(property => property.Name == "Id").Value;
+        var nameValue = value.Properties.Single(property => property.Name == "Name").Value;
+
+        var scalarId = Assert.IsType<ScalarValue>(idValue);
+        var scalarName = Assert.IsType<ScalarValue>(nameValue);
+
+        Assert.Equal(id, scalarId.Value);
+        Assert.Equal(name, scalarName.Value);
+    }
+
+    [Fact]
+    public void EventsWithDSameKeysHaveSameReferences()
+    {
+        // Arrange
+        var cache = new EventIdPropertyCache();
+
+        // Act
+        var property1 = cache.GetOrCreateProperty(new EventId(1, "Name1"));
+        var property2 = cache.GetOrCreateProperty(new EventId(1, "Name1"));
+
+        // Assert
+        Assert.Same(property1, property2);
+    }
+
+    [Theory]
+    [InlineData(1, "SomeName", 1, "AnotherName")]
+    [InlineData(1, "SomeName", 2, "SomeName")]
+    [InlineData(1, "SomeName", 2, "AnotherName")]
+    public void EventsWithDifferentKeysHaveDifferentReferences(int firstId, string firstName, int secondId, string secondName)
+    {
+        // Arrange
+        var cache = new EventIdPropertyCache();
+
+        // Act
+        var property1 = cache.GetOrCreateProperty(new EventId(firstId, firstName));
+        var property2 = cache.GetOrCreateProperty(new EventId(secondId, secondName));
+
+        // Assert
+        Assert.NotSame(property1, property2);
+    }
+
+
+    [Fact]
+    public void WhenLimitIsNotOverSameEventsHaveSameReferences()
+    {
+        // Arrange
+        var eventId = new EventId(101, "test");
+        var cache = new EventIdPropertyCache();
+
+        // Act
+        var property1 = cache.GetOrCreateProperty(eventId);
+        var property2 = cache.GetOrCreateProperty(eventId);
+
+        // Assert
+        Assert.Same(property1, property2);
+    }
+
+    [Fact]
+    public void WhenLimitIsOverSameEventsHaveDifferentReferences()
+    {
+        // Arrange
+        var cache = new EventIdPropertyCache(maxCachedProperties: 1);
+        cache.GetOrCreateProperty(new EventId(1, "InitialEvent"));
+
+        var eventId = new EventId(101, "DifferentEvent");
+
+        // Act
+        var property1 = cache.GetOrCreateProperty(eventId);
+        var property2 = cache.GetOrCreateProperty(eventId);
+
+        // Assert
+        Assert.NotSame(property1, property2);
     }
 }
