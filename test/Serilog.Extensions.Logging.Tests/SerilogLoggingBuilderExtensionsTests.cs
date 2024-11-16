@@ -8,7 +8,7 @@ namespace Serilog.Extensions.Logging.Tests;
 public class SerilogLoggingBuilderExtensionsTests
 {
     [Fact]
-    public void AddSerilog_must_register_a_ILoggerProvider()
+    public void AddSerilogMustRegisterAnILoggerProvider()
     {
         var services = new ServiceCollection()
             .AddLogging(builder => { builder.AddSerilog(); })
@@ -19,7 +19,7 @@ public class SerilogLoggingBuilderExtensionsTests
     }
 
     [Fact]
-    public void AddSerilog_must_register_a_ILoggerProvider_that_forwards_logs_to_static_Serilog_Logger()
+    public void AddSerilogMustRegisterAnILoggerProviderThatForwardsLogsToStaticSerilogLogger()
     {
         var sink = new SerilogSink();
         Log.Logger = new LoggerConfiguration()
@@ -37,7 +37,7 @@ public class SerilogLoggingBuilderExtensionsTests
     }
 
     [Fact]
-    public void AddSerilog_must_register_a_ILoggerProvider_that_forwards_logs_to_provided_logger()
+    public void AddSerilogMustRegisterAnILoggerProviderThatForwardsLogsToProvidedLogger()
     {
         var sink = new SerilogSink();
         var serilogLogger = new LoggerConfiguration()

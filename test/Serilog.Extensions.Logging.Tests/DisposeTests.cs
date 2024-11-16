@@ -20,7 +20,7 @@ public class DisposeTests
     }
 
     [Fact]
-    public void AddSerilog_must_dispose_the_provider_when_dispose_is_true()
+    public void DisposesProviderWhenDisposeIsTrue()
     {
         var services = new ServiceCollection()
             .AddLogging(builder => builder.AddSerilog(logger: _serilogLogger, dispose: true))
@@ -37,7 +37,7 @@ public class DisposeTests
 
 #if NET8_0_OR_GREATER
     [Fact]
-    public async Task AddSerilog_must_async_dispose_the_provider_when_dispose_is_true()
+    public async Task DisposesProviderAsyncWhenDisposeIsTrue()
     {
       var services = new ServiceCollection()
             .AddLogging(builder => builder.AddSerilog(logger: _serilogLogger, dispose: true))
