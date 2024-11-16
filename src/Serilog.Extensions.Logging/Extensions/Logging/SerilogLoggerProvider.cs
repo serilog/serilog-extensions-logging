@@ -15,7 +15,7 @@ namespace Serilog.Extensions.Logging;
 /// </summary>
 [ProviderAlias("Serilog")]
 public class SerilogLoggerProvider : ILoggerProvider, ILogEventEnricher, ISupportExternalScope
-#if NET6_0_OR_GREATER
+#if FEATURE_ASYNCDISPOSABLE
     , IAsyncDisposable
 #endif
 {
@@ -25,7 +25,7 @@ public class SerilogLoggerProvider : ILoggerProvider, ILogEventEnricher, ISuppor
     // May be null; if it is, Log.Logger will be lazily used
     readonly ILogger? _logger;
     readonly Action? _dispose;
-#if NET6_0_OR_GREATER
+#if FEATURE_ASYNCDISPOSABLE
     readonly Func<ValueTask>? _disposeAsync;
 #endif
     private IExternalScopeProvider? _externalScopeProvider;
@@ -45,7 +45,7 @@ public class SerilogLoggerProvider : ILoggerProvider, ILogEventEnricher, ISuppor
             if (logger != null)
             {
                 _dispose = () => (logger as IDisposable)?.Dispose();
-#if NET6_0_OR_GREATER
+#if FEATURE_ASYNCDISPOSABLE
                 _disposeAsync = () =>
                 {
                     // Dispose via IAsyncDisposable if possible, otherwise fall back to IDisposable
@@ -58,7 +58,7 @@ public class SerilogLoggerProvider : ILoggerProvider, ILogEventEnricher, ISuppor
             else
             {
                 _dispose = Log.CloseAndFlush;
-#if NET6_0_OR_GREATER
+#if FEATURE_ASYNCDISPOSABLE
                 _disposeAsync = Log.CloseAndFlushAsync;
 #endif
             }
@@ -137,7 +137,7 @@ public class SerilogLoggerProvider : ILoggerProvider, ILogEventEnricher, ISuppor
         _dispose?.Invoke();
     }
 
-#if NET6_0_OR_GREATER
+#if FEATURE_ASYNCDISPOSABLE
     /// <inheritdoc />
     public ValueTask DisposeAsync()
     {
