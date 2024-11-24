@@ -18,20 +18,19 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "assets", "assets", "{9C21B9DF-AEDD-4AA6-BEA4-912DEF3E5B8E}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
-		appveyor.yml = appveyor.yml
 		Build.ps1 = Build.ps1
 		Directory.Build.props = Directory.Build.props
-		Directory.Build.targets = Directory.Build.targets
 		README.md = README.md
 		assets\Serilog.snk = assets\Serilog.snk
-		build.sh = build.sh
-		Setup.ps1 = Setup.ps1
 		global.json = global.json
+		Directory.Version.props = Directory.Version.props
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Serilog.Extensions.Logging.Benchmarks", "test\Serilog.Extensions.Logging.Benchmarks\Serilog.Extensions.Logging.Benchmarks.csproj", "{6D5986FF-EECD-4E75-8BC6-A5F78AB549B2}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SampleWithExternalScope", "samples\SampleWithExternalScope\SampleWithExternalScope.csproj", "{653092A8-CBAD-40AA-A4CE-F8B19D6492C2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SampleWithMelProviders", "samples\SampleWithMelProviders\SampleWithMelProviders.csproj", "{B1454759-126F-4F33-84EE-C8E19541DF79}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -59,6 +58,10 @@ Global
 		{653092A8-CBAD-40AA-A4CE-F8B19D6492C2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{653092A8-CBAD-40AA-A4CE-F8B19D6492C2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{653092A8-CBAD-40AA-A4CE-F8B19D6492C2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B1454759-126F-4F33-84EE-C8E19541DF79}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B1454759-126F-4F33-84EE-C8E19541DF79}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B1454759-126F-4F33-84EE-C8E19541DF79}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B1454759-126F-4F33-84EE-C8E19541DF79}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -69,6 +72,7 @@ Global
 		{65357FBC-9BC4-466D-B621-1C3A19BC2A78} = {F2407211-6043-439C-8E06-3641634332E7}
 		{6D5986FF-EECD-4E75-8BC6-A5F78AB549B2} = {E30F638E-BBBE-4AD1-93CE-48CC69CFEFE1}
 		{653092A8-CBAD-40AA-A4CE-F8B19D6492C2} = {F2407211-6043-439C-8E06-3641634332E7}
+		{B1454759-126F-4F33-84EE-C8E19541DF79} = {F2407211-6043-439C-8E06-3641634332E7}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {811E61C5-3871-4633-AFAE-B35B619C8A10}

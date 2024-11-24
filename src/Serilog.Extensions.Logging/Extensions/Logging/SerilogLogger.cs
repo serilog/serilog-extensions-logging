@@ -12,7 +12,7 @@ using System.Diagnostics;
 
 namespace Serilog.Extensions.Logging;
 
-class SerilogLogger : FrameworkLogger
+sealed class SerilogLogger : FrameworkLogger
 {
     internal static readonly ConcurrentDictionary<string, string> DestructureDictionary = new();
     internal static readonly ConcurrentDictionary<string, string> StringifyDictionary = new();
