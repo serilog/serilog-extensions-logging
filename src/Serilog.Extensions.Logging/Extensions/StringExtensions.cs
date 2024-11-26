@@ -1,8 +1,8 @@
-﻿using System.Runtime.CompilerServices;
+﻿#if !NET6_0_OR_GREATER && !NETSTANDARD2_1_OR_GREATER
+using System.Runtime.CompilerServices;
 
 namespace Serilog.Extensions;
 
-#if !NET6_0_OR_GREATER && !NETSTANDARD2_1_OR_GREATER
 static class StringExtensions
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

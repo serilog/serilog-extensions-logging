@@ -3,14 +3,33 @@ using Microsoft.Extensions.Logging;
 using Serilog;
 using Serilog.Extensions.Logging;
 
+// Creating a `LoggerProviderCollection` lets Serilog optionally write
+// events through other dynamically-added MEL ILoggerProviders.
+var providers = new LoggerProviderCollection();
+
+// The sample sets up Serilog's console sink here:
 Log.Logger = new LoggerConfiguration()
+    .MinimumLevel.Debug()
     .WriteTo.Console()
+    .WriteTo.Providers(providers)
     .CreateLogger();
 
 var services = new ServiceCollection();
 
-services.AddLogging();
-services.AddSingleton<ILoggerFactory>(new SerilogLoggerFactory());
+services.AddSingleton(providers);
+services.AddSingleton<ILoggerFactory>(sc =>
+{
+    var providerCollection = sc.GetService<LoggerProviderCollection>();
+    var factory = new SerilogLoggerFactory(null, true, providerCollection);
+
+    foreach (var provider in sc.GetServices<ILoggerProvider>())
+        factory.AddProvider(provider);
+
+    return factory;
+});
+
+// ..and MEL's console provider here:
+services.AddLogging(l => l.AddConsole());
 
 using var serviceProvider = services.BuildServiceProvider();
 var logger = serviceProvider.GetRequiredService<ILogger<Program>>();

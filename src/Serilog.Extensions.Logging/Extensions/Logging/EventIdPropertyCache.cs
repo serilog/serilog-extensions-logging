@@ -16,9 +16,9 @@ namespace Serilog.Extensions.Logging;
 
 using System.Collections.Concurrent;
 using Microsoft.Extensions.Logging;
-using Serilog.Events;
+using Events;
 
-class EventIdPropertyCache
+sealed class EventIdPropertyCache
 {
     readonly int _maxCachedProperties;
     readonly ConcurrentDictionary<EventKey, LogEventProperty> _propertyCache = new();
