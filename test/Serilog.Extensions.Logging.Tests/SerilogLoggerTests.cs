@@ -516,22 +516,7 @@ public class SerilogLoggerTest
             }
         }
     }
-
-    [Theory]
-    [InlineData(1)]
-    [InlineData(10)]
-    [InlineData(48)]
-    [InlineData(100)]
-    public void LowAndHighNumberedEventIdsAreMapped(int id)
-    {
-        var orig = new EventId(id, "test");
-        var value = SerilogLogger.CreateEventIdPropertyValue(orig);
-        Assert.Equal(2, value.Properties.Count);
-        var idValue = value.Properties.Single(p => p.Name == "Id").Value;
-        var scalar = Assert.IsType<ScalarValue>(idValue);
-        Assert.Equal(id, scalar.Value);
-    }
-
+    
     [Fact]
     public void MismatchedMessageTemplateParameterCountIsHandled()
     {

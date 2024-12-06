@@ -13,7 +13,10 @@ namespace Serilog.Extensions.Logging;
 /// An <see cref="ILoggerProvider"/> that pipes events through Serilog.
 /// </summary>
 [ProviderAlias("Serilog")]
-public class SerilogLoggerProvider : ILoggerProvider, ILogEventEnricher, ISupportExternalScope
+public sealed class SerilogLoggerProvider : ILoggerProvider, ILogEventEnricher, ISupportExternalScope
+#if FEATURE_ASYNCDISPOSABLE
+    , IAsyncDisposable
+#endif
 {
     internal const string OriginalFormatPropertyName = "{OriginalFormat}";
     internal const string ScopePropertyName = "Scope";
@@ -21,6 +24,9 @@ public class SerilogLoggerProvider : ILoggerProvider, ILogEventEnricher, ISuppor
     // May be null; if it is, Log.Logger will be lazily used
     readonly ILogger? _logger;
     readonly Action? _dispose;
+#if FEATURE_ASYNCDISPOSABLE
+    readonly Func<ValueTask>? _disposeAsync;
+#endif
     IExternalScopeProvider? _externalScopeProvider;
 
     /// <summary>
@@ -31,14 +37,34 @@ public class SerilogLoggerProvider : ILoggerProvider, ILogEventEnricher, ISuppor
     public SerilogLoggerProvider(ILogger? logger = null, bool dispose = false)
     {
         if (logger != null)
-            _logger = logger.ForContext(new[] { this });
+            _logger = logger.ForContext([this]);
 
         if (dispose)
         {
             if (logger != null)
+            {
                 _dispose = () => (logger as IDisposable)?.Dispose();
+#if FEATURE_ASYNCDISPOSABLE
+                _disposeAsync = async () =>
+                {
+                    if (logger is IAsyncDisposable asyncDisposable)
+                    {
+                        await asyncDisposable.DisposeAsync();
+                    }
+                    else
+                    {
+                        (logger as IDisposable)?.Dispose();
+                    }
+                };
+#endif
+            }
             else
+            {
                 _dispose = Log.CloseAndFlush;
+#if FEATURE_ASYNCDISPOSABLE
+                _disposeAsync = Log.CloseAndFlushAsync;
+#endif
+            }
         }
     }
 
@@ -71,7 +97,7 @@ public class SerilogLoggerProvider : ILoggerProvider, ILogEventEnricher, ISuppor
 
             if (scopeItem != null)
             {
-                scopeItems ??= new List<LogEventPropertyValue>();
+                scopeItems ??= [];
                 scopeItems.Add(scopeItem);
             }
         }
@@ -113,4 +139,12 @@ public class SerilogLoggerProvider : ILoggerProvider, ILogEventEnricher, ISuppor
     {
         _dispose?.Invoke();
     }
+
+#if FEATURE_ASYNCDISPOSABLE
+    /// <inheritdoc />
+    public ValueTask DisposeAsync()
+    {
+        return _disposeAsync?.Invoke() ?? default;
+    }
+#endif
 }

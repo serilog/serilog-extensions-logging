@@ -201,3 +201,6 @@ project.lock.json
 .idea
 
 .vscode
+
+.DS_Store
+

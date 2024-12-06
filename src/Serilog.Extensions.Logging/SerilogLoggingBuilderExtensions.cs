@@ -38,7 +38,7 @@ public static class SerilogLoggingBuilderExtensions
 
         if (dispose)
         {
-            builder.Services.AddSingleton<ILoggerProvider, SerilogLoggerProvider>(services => new SerilogLoggerProvider(logger, true));
+            builder.Services.AddSingleton<ILoggerProvider, SerilogLoggerProvider>(_ => new SerilogLoggerProvider(logger, true));
         }
         else
         {

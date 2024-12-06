@@ -12,7 +12,7 @@ using System.Diagnostics;
 
 namespace Serilog.Extensions.Logging;
 
-class SerilogLogger : FrameworkLogger
+sealed class SerilogLogger : FrameworkLogger
 {
     internal static readonly ConcurrentDictionary<string, string> DestructureDictionary = new();
     internal static readonly ConcurrentDictionary<string, string> StringifyDictionary = new();
@@ -28,13 +28,9 @@ class SerilogLogger : FrameworkLogger
 
     readonly SerilogLoggerProvider _provider;
     readonly ILogger _logger;
+    readonly EventIdPropertyCache _eventIdPropertyCache = new();
 
     static readonly CachingMessageTemplateParser MessageTemplateParser = new();
-
-    // It's rare to see large event ids, as they are category-specific
-    static readonly LogEventProperty[] LowEventIdValues = Enumerable.Range(0, 48)
-        .Select(n => new LogEventProperty("Id", new ScalarValue(n)))
-        .ToArray();
 
     public SerilogLogger(
         SerilogLoggerProvider provider,
@@ -159,7 +155,7 @@ class SerilogLogger : FrameworkLogger
 
         // The overridden `!=` operator on this type ignores `Name`.
         if (eventId.Id != 0 || eventId.Name != null)
-            properties["EventId"] = CreateEventIdPropertyValue(eventId);
+            properties.Add("EventId", _eventIdPropertyCache.GetOrCreatePropertyValue(in eventId));
 
         var (traceId, spanId) = Activity.Current is { } activity ?
             (activity.TraceId, activity.SpanId) :
@@ -175,26 +171,5 @@ class SerilogLogger : FrameworkLogger
         if (formatter != null)
             stateObj = formatter(state, null);
         return stateObj ?? state;
-    }
-
-    internal static StructureValue CreateEventIdPropertyValue(EventId eventId)
-    {
-        var properties = new List<LogEventProperty>(2);
-
-        if (eventId.Id != 0)
-        {
-            if (eventId.Id >= 0 && eventId.Id < LowEventIdValues.Length)
-                // Avoid some allocations
-                properties.Add(LowEventIdValues[eventId.Id]);
-            else
-                properties.Add(new LogEventProperty("Id", new ScalarValue(eventId.Id)));
-        }
-
-        if (eventId.Name != null)
-        {
-            properties.Add(new LogEventProperty("Name", new ScalarValue(eventId.Name)));
-        }
-
-        return new StructureValue(properties);
     }
 }

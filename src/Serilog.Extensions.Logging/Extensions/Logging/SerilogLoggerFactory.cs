@@ -20,7 +20,7 @@ namespace Serilog.Extensions.Logging;
 /// <summary>
 /// A complete Serilog-backed implementation of the .NET Core logging infrastructure.
 /// </summary>
-public class SerilogLoggerFactory : ILoggerFactory
+public sealed class SerilogLoggerFactory : ILoggerFactory
 {
     readonly LoggerProviderCollection? _providerCollection;
     readonly SerilogLoggerProvider _provider;

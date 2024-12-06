@@ -35,6 +35,7 @@ public class LogEventBenchmark
     readonly IMelLogger _melLogger;
     readonly Person _bob, _alice;
     readonly ILogger _underlyingLogger;
+    readonly EventId _eventId = new EventId(1, "Test");
 
     public LogEventBenchmark()
     {
@@ -108,5 +109,23 @@ public class LogEventBenchmark
     {
         using var scope = _melLogger.BeginScope("Hi {@User} from {$Me}", _bob, _alice);
         _melLogger.LogInformation("Hi");
+    }
+
+    [Benchmark]
+    public void LogInformationScoped()
+    {
+        using (var scope = _melLogger.BeginScope("Hi {@User} from {$Me}", _bob, _alice))
+            _melLogger.LogInformation("Hi");
+    }
+
+    [Benchmark]
+    public void LogInformation_WithEventId()
+    {
+        this._melLogger.Log(
+            LogLevel.Information,
+            _eventId,
+            "Hi {@User} from {$Me}",
+            _bob,
+            _alice);
     }
 }

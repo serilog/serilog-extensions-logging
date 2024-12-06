@@ -6,7 +6,7 @@ using Serilog.Events;
 
 namespace Serilog.Extensions.Logging;
 
-class SerilogLoggerScope : IDisposable
+sealed class SerilogLoggerScope : IDisposable
 {
     const string NoName = "None";
 

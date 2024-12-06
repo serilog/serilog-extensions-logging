@@ -30,14 +30,14 @@ services.AddLogging(l => l
 // Add an ActivityListener (required, otherwise Activities don't actually get created if nothing is listening to them)
 ActivitySource.AddActivityListener(new ActivityListener
 {
-    ShouldListenTo = source => true,
-    Sample = (ref ActivityCreationOptions<ActivityContext> options) => ActivitySamplingResult.AllDataAndRecorded
+    ShouldListenTo = _ => true,
+    Sample = (ref ActivityCreationOptions<ActivityContext> _) => ActivitySamplingResult.AllDataAndRecorded
 });
 
 // Run our test
 var activitySource = new ActivitySource("SomeActivitySource");
 
-var serviceProvider = services.BuildServiceProvider();
+using var serviceProvider = services.BuildServiceProvider();
 var logger = serviceProvider.GetRequiredService<ILogger<Program>>();
 
 using var activity = activitySource.StartActivity();
@@ -53,4 +53,3 @@ using var scope = logger.BeginScope(new
 
 logger.LogInformation("Hello world!");
 
-serviceProvider.Dispose();
