@@ -21,7 +21,7 @@ using Events;
 sealed class EventIdPropertyCache
 {
     readonly int _maxCachedProperties;
-    readonly ConcurrentDictionary<EventKey, LogEventProperty> _propertyCache = new();
+    readonly ConcurrentDictionary<EventKey, LogEventPropertyValue> _propertyCache = new();
 
     int _count;
 
@@ -30,32 +30,32 @@ sealed class EventIdPropertyCache
         _maxCachedProperties = maxCachedProperties;
     }
 
-    public LogEventProperty GetOrCreateProperty(in EventId eventId)
+    public LogEventPropertyValue GetOrCreatePropertyValue(in EventId eventId)
     {
         var eventKey = new EventKey(eventId);
 
-        LogEventProperty? property;
+        LogEventPropertyValue? propertyValue;
 
         if (_count >= _maxCachedProperties)
         {
-            if (!_propertyCache.TryGetValue(eventKey, out property))
+            if (!_propertyCache.TryGetValue(eventKey, out propertyValue))
             {
-                property = CreateProperty(in eventKey);
+                propertyValue = CreatePropertyValue(in eventKey);
             }
         }
         else
         {
-            if (!_propertyCache.TryGetValue(eventKey, out property))
+            if (!_propertyCache.TryGetValue(eventKey, out propertyValue))
             {
                 // GetOrAdd is moved to a separate method to prevent closure allocation
-                property = GetOrAddCore(in eventKey);
+                propertyValue = GetOrAddCore(in eventKey);
             }
         }
 
-        return property;
+        return propertyValue;
     }
 
-    static LogEventProperty CreateProperty(in EventKey eventKey)
+    static LogEventPropertyValue CreatePropertyValue(in EventKey eventKey)
     {
         var properties = new List<LogEventProperty>(2);
 
@@ -69,17 +69,17 @@ sealed class EventIdPropertyCache
             properties.Add(new LogEventProperty("Name", new ScalarValue(eventKey.Name)));
         }
 
-        return new LogEventProperty("EventId", new StructureValue(properties));
+        return new StructureValue(properties);
     }
 
-    LogEventProperty GetOrAddCore(in EventKey eventKey) =>
+    LogEventPropertyValue GetOrAddCore(in EventKey eventKey) =>
         _propertyCache.GetOrAdd(
             eventKey,
             key =>
             {
                 Interlocked.Increment(ref _count);
 
-                return CreateProperty(in key);
+                return CreatePropertyValue(in key);
             });
 
     readonly record struct EventKey

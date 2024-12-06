@@ -500,9 +500,9 @@ public class SerilogLoggerTest
             return scope;
         }
 
-        private class Scope : IDisposable
+        class Scope : IDisposable
         {
-            public bool IsDisposed { get; set; } = false;
+            public bool IsDisposed { get; set; }
             public object? Value { get; set; }
 
             public Scope(object? value)
@@ -516,7 +516,7 @@ public class SerilogLoggerTest
             }
         }
     }
-
+    
     [Fact]
     public void MismatchedMessageTemplateParameterCountIsHandled()
     {

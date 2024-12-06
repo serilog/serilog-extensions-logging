@@ -21,7 +21,7 @@ namespace Serilog.Extensions.Logging.Tests;
 public class EventIdPropertyCacheTests
 {
     [Fact]
-    public void CreatesPropertyWithCorrectIdAndName()
+    public void CreatesPropertyValueWithCorrectIdAndName()
     {
         // Arrange
         const int id = 101;
@@ -31,10 +31,10 @@ public class EventIdPropertyCacheTests
         var cache = new EventIdPropertyCache();
 
         // Act
-        var eventProperty = cache.GetOrCreateProperty(eventId);
+        var eventPropertyValue = cache.GetOrCreatePropertyValue(eventId);
 
         // Assert
-        var value = Assert.IsType<StructureValue>(eventProperty.Value);
+        var value = Assert.IsType<StructureValue>(eventPropertyValue);
 
         Assert.Equal(2, value.Properties.Count);
 
@@ -55,11 +55,11 @@ public class EventIdPropertyCacheTests
         var cache = new EventIdPropertyCache();
 
         // Act
-        var property1 = cache.GetOrCreateProperty(new EventId(1, "Name1"));
-        var property2 = cache.GetOrCreateProperty(new EventId(1, "Name1"));
+        var propertyValue1 = cache.GetOrCreatePropertyValue(new EventId(1, "Name1"));
+        var propertyValue2 = cache.GetOrCreatePropertyValue(new EventId(1, "Name1"));
 
         // Assert
-        Assert.Same(property1, property2);
+        Assert.Same(propertyValue1, propertyValue2);
     }
 
     [Theory]
@@ -72,11 +72,11 @@ public class EventIdPropertyCacheTests
         var cache = new EventIdPropertyCache();
 
         // Act
-        var property1 = cache.GetOrCreateProperty(new EventId(firstId, firstName));
-        var property2 = cache.GetOrCreateProperty(new EventId(secondId, secondName));
+        var propertyValue1 = cache.GetOrCreatePropertyValue(new EventId(firstId, firstName));
+        var propertyValue2 = cache.GetOrCreatePropertyValue(new EventId(secondId, secondName));
 
         // Assert
-        Assert.NotSame(property1, property2);
+        Assert.NotSame(propertyValue1, propertyValue2);
     }
 
 
@@ -88,11 +88,11 @@ public class EventIdPropertyCacheTests
         var cache = new EventIdPropertyCache();
 
         // Act
-        var property1 = cache.GetOrCreateProperty(eventId);
-        var property2 = cache.GetOrCreateProperty(eventId);
+        var propertyValue1 = cache.GetOrCreatePropertyValue(eventId);
+        var propertyValue2 = cache.GetOrCreatePropertyValue(eventId);
 
         // Assert
-        Assert.Same(property1, property2);
+        Assert.Same(propertyValue1, propertyValue2);
     }
 
     [Fact]
@@ -100,15 +100,15 @@ public class EventIdPropertyCacheTests
     {
         // Arrange
         var cache = new EventIdPropertyCache(maxCachedProperties: 1);
-        cache.GetOrCreateProperty(new EventId(1, "InitialEvent"));
+        cache.GetOrCreatePropertyValue(new EventId(1, "InitialEvent"));
 
         var eventId = new EventId(101, "DifferentEvent");
 
         // Act
-        var property1 = cache.GetOrCreateProperty(eventId);
-        var property2 = cache.GetOrCreateProperty(eventId);
+        var propertyValue1 = cache.GetOrCreatePropertyValue(eventId);
+        var propertyValue2 = cache.GetOrCreatePropertyValue(eventId);
 
         // Assert
-        Assert.NotSame(property1, property2);
+        Assert.NotSame(propertyValue1, propertyValue2);
     }
 }

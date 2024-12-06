@@ -51,25 +51,6 @@ sealed class SerilogLoggerScope : IDisposable
 
     public static void EnrichWithStateAndCreateScopeItem(LogEvent logEvent, ILogEventPropertyFactory propertyFactory, object? state, out LogEventPropertyValue? scopeItem)
     {
-        void AddProperty(string key, object? value)
-        {
-            var destructureObject = false;
-
-            if (key.StartsWith('@'))
-            {
-                key = SerilogLogger.GetKeyWithoutFirstSymbol(SerilogLogger.DestructureDictionary, key);
-                destructureObject = true;
-            }
-            else if (key.StartsWith('$'))
-            {
-                key = SerilogLogger.GetKeyWithoutFirstSymbol(SerilogLogger.StringifyDictionary, key);
-                value = value?.ToString();
-            }
-
-            var property = propertyFactory.CreateProperty(key, value, destructureObject);
-            logEvent.AddPropertyIfAbsent(property);
-        }
-
         if (state == null)
         {
             scopeItem = null;
@@ -79,52 +60,64 @@ sealed class SerilogLoggerScope : IDisposable
         // Eliminates boxing of Dictionary<TKey, TValue>.Enumerator for the most common use case
         if (state is Dictionary<string, object> dictionary)
         {
-            scopeItem = null; // Unless it's `FormattedLogValues`, these are treated as property bags rather than scope items.
-
+            // Separate handling of this case eliminates boxing of Dictionary<TKey, TValue>.Enumerator.
+            scopeItem = null;
             foreach (var stateProperty in dictionary)
-            {
-                if (stateProperty.Key == SerilogLoggerProvider.OriginalFormatPropertyName && stateProperty.Value is string)
-                    scopeItem = new ScalarValue(state.ToString());
-                else
-                    AddProperty(stateProperty.Key, stateProperty.Value);
+            {                
+                AddProperty(logEvent, propertyFactory, stateProperty.Key, stateProperty.Value);
             }
         }
         else if (state is IEnumerable<KeyValuePair<string, object>> stateProperties)
         {
-            scopeItem = null; // Unless it's `FormattedLogValues`, these are treated as property bags rather than scope items.
-
+            scopeItem = null;
             foreach (var stateProperty in stateProperties)
             {
-                if (stateProperty.Key == SerilogLoggerProvider.OriginalFormatPropertyName && stateProperty.Value is string)
+                if (stateProperty is { Key: SerilogLoggerProvider.OriginalFormatPropertyName, Value: string })
+                {
+                    // `_state` is most likely `FormattedLogValues` (a MEL internal type).
                     scopeItem = new ScalarValue(state.ToString());
+                }
                 else
-                    AddProperty(stateProperty.Key, stateProperty.Value);
+                {
+                    AddProperty(logEvent, propertyFactory, stateProperty.Key, stateProperty.Value);
+                }
             }
         }
 #if FEATURE_ITUPLE
         else if (state is System.Runtime.CompilerServices.ITuple tuple && tuple.Length == 2 && tuple[0] is string s)
         {
             scopeItem = null; // Unless it's `FormattedLogValues`, these are treated as property bags rather than scope items.
-
-            if (s == SerilogLoggerProvider.OriginalFormatPropertyName && tuple[1] is string)
-                scopeItem = new ScalarValue(state.ToString());
-            else
-                AddProperty(s, tuple[1]);
+            AddProperty(logEvent, propertyFactory, s, tuple[1]);
         }
 #else
         else if (state is ValueTuple<string, object?> tuple)
         {
-            scopeItem = null; // Unless it's `FormattedLogValues`, these are treated as property bags rather than scope items.
-
-            if (tuple.Item1 == SerilogLoggerProvider.OriginalFormatPropertyName && tuple.Item2 is string)
-                scopeItem = new ScalarValue(state.ToString());
-            else
-                AddProperty(tuple.Item1, tuple.Item2);
+            scopeItem = null;
+            AddProperty(logEvent, propertyFactory, tuple.Item1, tuple.Item2);
         }
 #endif
         else
         {
             scopeItem = propertyFactory.CreateProperty(NoName, state).Value;
         }
+    }
+
+    static void AddProperty(LogEvent logEvent, ILogEventPropertyFactory propertyFactory, string key, object? value)
+    {
+        var destructureObject = false;
+
+        if (key.StartsWith('@'))
+        {
+            key = SerilogLogger.GetKeyWithoutFirstSymbol(SerilogLogger.DestructureDictionary, key);
+            destructureObject = true;
+        }
+        else if (key.StartsWith('$'))
+        {
+            key = SerilogLogger.GetKeyWithoutFirstSymbol(SerilogLogger.StringifyDictionary, key);
+            value = value?.ToString();
+        }
+
+        var property = propertyFactory.CreateProperty(key, value, destructureObject);
+        logEvent.AddPropertyIfAbsent(property);
     }
 }
