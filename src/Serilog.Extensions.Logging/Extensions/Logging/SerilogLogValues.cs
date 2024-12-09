@@ -44,10 +44,7 @@ readonly struct SerilogLogValues : IReadOnlyList<KeyValuePair<string, object?>>
         _values[i] = new KeyValuePair<string, object?>("{OriginalFormat}", _messageTemplate.Text);
     }
 
-    public KeyValuePair<string, object?> this[int index]
-    {
-        get => _values[index];
-    }
+    public KeyValuePair<string, object?> this[int index] => _values[index];
 
     public int Count => _properties.Count + 1;
 

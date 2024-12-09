@@ -18,7 +18,7 @@ using Serilog.Events;
 
 namespace Serilog.Extensions.Logging;
 
-class LoggerProviderCollectionSink : ILogEventSink, IDisposable
+sealed class LoggerProviderCollectionSink : ILogEventSink, IDisposable
 {
     readonly LoggerProviderCollection _providers;
 
