@@ -4,11 +4,11 @@ A Serilog provider for [Microsoft.Extensions.Logging](https://www.nuget.org/pack
 
 ### ASP.NET Core Instructions
 
-**ASP.NET Core** applications should prefer [Serilog.AspNetCore](https://github.com/serilog/serilog-aspnetcore) and `UseSerilog()` instead.
+**ASP.NET Core** applications should prefer [Serilog.AspNetCore](https://github.com/serilog/serilog-aspnetcore#instructions) and `AddSerilog()` instead.
 
 ### Non-web .NET Core Instructions
 
-**Non-web .NET Core** applications should prefer [Serilog.Extensions.Hosting](https://github.com/serilog/serilog-extensions-hosting) and `UseSerilog()` instead.
+**Non-web .NET Core** applications should prefer [Serilog.Extensions.Hosting](https://github.com/serilog/serilog-extensions-hosting#instructions) and `AddSerilog()` instead.
 
 ### .NET Core 1.0, 1.1 and Default Provider Integration
 
