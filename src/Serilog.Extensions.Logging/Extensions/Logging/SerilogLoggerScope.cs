@@ -47,9 +47,9 @@ sealed class SerilogLoggerScope : IDisposable
         }
     }
 
-    public void EnrichAndCreateScopeItem(LogEvent logEvent, ILogEventPropertyFactory propertyFactory, out LogEventPropertyValue? scopeItem) => EnrichWithStateAndCreateScopeItem(logEvent, propertyFactory, _state, out scopeItem);
+    public void EnrichAndCreateScopeItem(LogEvent logEvent, ILogEventPropertyFactory propertyFactory, out LogEventPropertyValue? scopeItem) => EnrichWithStateAndCreateScopeItem(logEvent, propertyFactory, _state, update: false, out scopeItem);
 
-    public static void EnrichWithStateAndCreateScopeItem(LogEvent logEvent, ILogEventPropertyFactory propertyFactory, object? state, out LogEventPropertyValue? scopeItem)
+    public static void EnrichWithStateAndCreateScopeItem(LogEvent logEvent, ILogEventPropertyFactory propertyFactory, object? state, bool update, out LogEventPropertyValue? scopeItem)
     {
         if (state == null)
         {
@@ -63,8 +63,8 @@ sealed class SerilogLoggerScope : IDisposable
             // Separate handling of this case eliminates boxing of Dictionary<TKey, TValue>.Enumerator.
             scopeItem = null;
             foreach (var stateProperty in dictionary)
-            {                
-                AddProperty(logEvent, propertyFactory, stateProperty.Key, stateProperty.Value);
+            {
+                AddProperty(logEvent, propertyFactory, stateProperty.Key, stateProperty.Value, update);
             }
         }
         else if (state is IEnumerable<KeyValuePair<string, object>> stateProperties)
@@ -79,7 +79,7 @@ sealed class SerilogLoggerScope : IDisposable
                 }
                 else
                 {
-                    AddProperty(logEvent, propertyFactory, stateProperty.Key, stateProperty.Value);
+                    AddProperty(logEvent, propertyFactory, stateProperty.Key, stateProperty.Value, update);
                 }
             }
         }
@@ -87,13 +87,13 @@ sealed class SerilogLoggerScope : IDisposable
         else if (state is System.Runtime.CompilerServices.ITuple tuple && tuple.Length == 2 && tuple[0] is string s)
         {
             scopeItem = null; // Unless it's `FormattedLogValues`, these are treated as property bags rather than scope items.
-            AddProperty(logEvent, propertyFactory, s, tuple[1]);
+            AddProperty(logEvent, propertyFactory, s, tuple[1], update);
         }
 #else
         else if (state is ValueTuple<string, object?> tuple)
         {
             scopeItem = null;
-            AddProperty(logEvent, propertyFactory, tuple.Item1, tuple.Item2);
+            AddProperty(logEvent, propertyFactory, tuple.Item1, tuple.Item2, update);
         }
 #endif
         else
@@ -102,14 +102,14 @@ sealed class SerilogLoggerScope : IDisposable
         }
     }
 
-    static void AddProperty(LogEvent logEvent, ILogEventPropertyFactory propertyFactory, string key, object? value)
+    static void AddProperty(LogEvent logEvent, ILogEventPropertyFactory propertyFactory, string key, object? value, bool update)
     {
-        var destructureObject = false;
+        var destructureObjects = false;
 
         if (key.StartsWith('@'))
         {
             key = SerilogLogger.GetKeyWithoutFirstSymbol(SerilogLogger.DestructureDictionary, key);
-            destructureObject = true;
+            destructureObjects = true;
         }
         else if (key.StartsWith('$'))
         {
@@ -117,7 +117,14 @@ sealed class SerilogLoggerScope : IDisposable
             value = value?.ToString();
         }
 
-        var property = propertyFactory.CreateProperty(key, value, destructureObject);
-        logEvent.AddPropertyIfAbsent(property);
+        var property = propertyFactory.CreateProperty(key, value, destructureObjects);
+        if (update)
+        {
+            logEvent.AddOrUpdateProperty(property);
+        }
+        else
+        {
+            logEvent.AddPropertyIfAbsent(property);
+        }
     }
 }

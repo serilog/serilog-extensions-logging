@@ -3,12 +3,14 @@
 
 using System.Collections;
 using System.Diagnostics;
+using Microsoft.Extensions.DependencyInjection;
 using Serilog.Events;
 using Microsoft.Extensions.Logging;
 using Serilog.Debugging;
 using Serilog.Extensions.Logging.Tests.Support;
 using Xunit;
 using Serilog.Core;
+// ReSharper disable AccessToDisposedClosure
 
 namespace Serilog.Extensions.Logging.Tests;
 
@@ -17,9 +19,9 @@ public class SerilogLoggerTest
     const string Name = "test";
     const string TestMessage = "This is a test";
 
-    static Tuple<SerilogLogger, SerilogSink> SetUp(LogLevel logLevel, IExternalScopeProvider? externalScopeProvider = null)
+    static Tuple<SerilogLogger, CollectingSink> SetUp(LogLevel logLevel, IExternalScopeProvider? externalScopeProvider = null)
     {
-        var sink = new SerilogSink();
+        var sink = new CollectingSink();
 
         var serilogLogger = new LoggerConfiguration()
             .WriteTo.Sink(sink)
@@ -34,7 +36,7 @@ public class SerilogLoggerTest
             provider.SetScopeProvider(externalScopeProvider);
         }
 
-        return new Tuple<SerilogLogger, SerilogSink>(logger, sink);
+        return new Tuple<SerilogLogger, CollectingSink>(logger, sink);
     }
 
     [Fact]
@@ -516,7 +518,7 @@ public class SerilogLoggerTest
             }
         }
     }
-    
+
     [Fact]
     public void MismatchedMessageTemplateParameterCountIsHandled()
     {
@@ -578,5 +580,42 @@ public class SerilogLoggerTest
 
         Assert.Equal(Activity.Current.TraceId, evt.TraceId);
         Assert.Equal(Activity.Current.SpanId, evt.SpanId);
+    }
+
+    [Fact]
+    public void LoggingScopeReplacesPropertyInNestedScope()
+    {
+        var sink = new CollectingSink();
+        using var logger = new LoggerConfiguration().WriteTo.Sink(sink).CreateLogger();
+
+        var services = new ServiceCollection();
+        services.AddLogging(l => l.AddSerilog(logger));
+
+        using var serviceProvider = services.BuildServiceProvider();
+        var msLogger = serviceProvider.GetRequiredService<ILogger<SerilogLoggerTest>>();
+
+        using (msLogger.BeginScope(new Dictionary<string, object> { { "EXECUTION_TAGS", "[TAG1]" } }))
+        {
+            msLogger.LogInformation("Message1");
+            using (msLogger.BeginScope(new Dictionary<string, object> { { "EXECUTION_TAGS", "[TAG2]" } }))
+            {
+                msLogger.LogInformation("Message2");
+            }
+        }
+
+        var logEvent = sink.Writes.FirstOrDefault(e => e.MessageTemplate.Text == "Message1");
+        Assert.NotNull(logEvent);
+        AssertHasScalarProperty(logEvent, "EXECUTION_TAGS", "[TAG1]");
+
+        logEvent = sink.Writes.FirstOrDefault(e => e.MessageTemplate.Text == "Message2");
+        Assert.NotNull(logEvent);
+        AssertHasScalarProperty(logEvent, "EXECUTION_TAGS", "[TAG2]");
+    }
+
+    static void AssertHasScalarProperty(LogEvent logEvent, string name, object? expectedValue)
+    {
+        Assert.True(logEvent.Properties.TryGetValue(name, out var result));
+        var scalar = Assert.IsType<ScalarValue>(result);
+        Assert.Equal(expectedValue, scalar.Value);
     }
 }

@@ -21,7 +21,7 @@ public class SerilogLoggingBuilderExtensionsTests
     [Fact]
     public void AddSerilogMustRegisterAnILoggerProviderThatForwardsLogsToStaticSerilogLogger()
     {
-        var sink = new SerilogSink();
+        var sink = new CollectingSink();
         Log.Logger = new LoggerConfiguration()
             .WriteTo.Sink(sink)
             .CreateLogger();
@@ -39,7 +39,7 @@ public class SerilogLoggingBuilderExtensionsTests
     [Fact]
     public void AddSerilogMustRegisterAnILoggerProviderThatForwardsLogsToProvidedLogger()
     {
-        var sink = new SerilogSink();
+        var sink = new CollectingSink();
         var serilogLogger = new LoggerConfiguration()
             .WriteTo.Sink(sink)
             .CreateLogger();
