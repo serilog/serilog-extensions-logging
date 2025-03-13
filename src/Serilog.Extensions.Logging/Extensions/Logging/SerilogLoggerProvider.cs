@@ -102,9 +102,12 @@ public sealed class SerilogLoggerProvider : ILoggerProvider, ILogEventEnricher, 
             }
         }
 
+        scopeItems?.Reverse();
+
         _externalScopeProvider?.ForEachScope((state, accumulatingLogEvent) =>
         {
-            SerilogLoggerScope.EnrichWithStateAndCreateScopeItem(accumulatingLogEvent, propertyFactory, state, out var scopeItem);
+            SerilogLoggerScope.EnrichWithStateAndCreateScopeItem(
+                accumulatingLogEvent, propertyFactory, state, update: true, out var scopeItem);
 
             if (scopeItem != null)
             {
@@ -115,7 +118,6 @@ public sealed class SerilogLoggerProvider : ILoggerProvider, ILogEventEnricher, 
 
         if (scopeItems != null)
         {
-            scopeItems.Reverse();
             logEvent.AddPropertyIfAbsent(new LogEventProperty(ScopePropertyName, new SequenceValue(scopeItems)));
         }
     }
