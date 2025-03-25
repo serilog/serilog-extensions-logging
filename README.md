@@ -1,14 +1,14 @@
-# Serilog.Extensions.Logging [![Build status](https://ci.appveyor.com/api/projects/status/865nohxfiq1rnby0/branch/master?svg=true)](https://ci.appveyor.com/project/serilog/serilog-framework-logging/history) [![NuGet Version](http://img.shields.io/nuget/v/Serilog.Extensions.Logging.svg?style=flat)](https://www.nuget.org/packages/Serilog.Extensions.Logging/)
+# Serilog.Extensions.Logging&nbsp;[![Build status](https://github.com/serilog/serilog-extensions-logging/actions/workflows/ci.yml/badge.svg?branch=dev)](https://github.com/serilog/serilog-extensions-logging/actions)&nbsp;[![NuGet Version](http://img.shields.io/nuget/v/Serilog.Extensions.Logging.svg?style=flat)](https://www.nuget.org/packages/Serilog.Extensions.Logging/)
 
 A Serilog provider for [Microsoft.Extensions.Logging](https://www.nuget.org/packages/Microsoft.Extensions.Logging), the logging subsystem used by ASP.NET Core.
 
 ### ASP.NET Core Instructions
 
-**ASP.NET Core** applications should prefer [Serilog.AspNetCore](https://github.com/serilog/serilog-aspnetcore) and `UseSerilog()` instead.
+**ASP.NET Core** applications should prefer [Serilog.AspNetCore](https://github.com/serilog/serilog-aspnetcore#instructions) and `AddSerilog()` instead.
 
 ### Non-web .NET Core Instructions
 
-**Non-web .NET Core** applications should prefer [Serilog.Extensions.Hosting](https://github.com/serilog/serilog-extensions-hosting) and `UseSerilog()` instead.
+**Non-web .NET Core** applications should prefer [Serilog.Extensions.Hosting](https://github.com/serilog/serilog-extensions-hosting#instructions) and `AddSerilog()` instead.
 
 ### .NET Core 1.0, 1.1 and Default Provider Integration
 

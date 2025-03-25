@@ -6,7 +6,7 @@ using Serilog.Events;
 
 namespace Serilog.Extensions.Logging.Tests.Support;
 
-public class SerilogSink : ILogEventSink
+public class CollectingSink : ILogEventSink
 {
     public List<LogEvent> Writes { get; set; } = new();
 
