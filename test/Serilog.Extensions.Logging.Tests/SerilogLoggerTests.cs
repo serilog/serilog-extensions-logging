@@ -618,4 +618,33 @@ public class SerilogLoggerTest
         var scalar = Assert.IsType<ScalarValue>(result);
         Assert.Equal(expectedValue, scalar.Value);
     }
+
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public void LoggingScopeShouldNotReplacePropertyInLogEvent(bool withExternalScopeProvider)
+    {
+        var sink = new CollectingSink();
+        using var logger = new LoggerConfiguration().WriteTo.Sink(sink).CreateLogger();
+        var serilogLoggerProvider = new SerilogLoggerProvider(logger);
+
+        var services = new ServiceCollection();
+        services.AddLogging(l => l.AddSerilog(logger));
+
+        using var serviceProvider = services.BuildServiceProvider();
+        var msLogger = withExternalScopeProvider
+            ? serviceProvider.GetRequiredService<ILogger<SerilogLoggerTest>>()
+            : serilogLoggerProvider.CreateLogger(Name);
+
+        using (msLogger.BeginScope(new Dictionary<string, object?> { { "Value", 1 } }))
+        using (msLogger.BeginScope(new Dictionary<string, object?> { { "Value", 2 } }))
+        {
+            msLogger.LogInformation("Value: {Value}", 3);
+        }
+
+        var logEvent = sink.Writes.First();
+        var value = (logEvent.Properties["Value"] as ScalarValue)?.Value;
+
+        Assert.Equal(3, value);
+    }
 }
