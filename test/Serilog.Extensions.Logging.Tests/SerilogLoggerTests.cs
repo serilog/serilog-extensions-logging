@@ -618,4 +618,20 @@ public class SerilogLoggerTest
         var scalar = Assert.IsType<ScalarValue>(result);
         Assert.Equal(expectedValue, scalar.Value);
     }
+
+    [Fact]
+    public void ConflictingEventIdTemplatePropertyIsIgnored()
+    {
+        var (logger, sink) = SetUp(LogLevel.Trace);
+
+        var loggedEventId = 17;
+        logger.LogInformation(loggedEventId, "{EventId}", 42);
+
+        var write = Assert.Single(sink.Writes);
+        var recordedEventIdProperty = Assert.IsType<StructureValue>(write.Properties["EventId"]);
+        var recordedEventIdStructure = Assert.Single(recordedEventIdProperty.Properties, p => p.Name == "Id");
+        var recordedEventIdPropertyValue = Assert.IsType<ScalarValue>(recordedEventIdStructure.Value);
+        var recordedEventId = Assert.IsType<int>(recordedEventIdPropertyValue.Value);
+        Assert.Equal(loggedEventId, recordedEventId);
+    }
 }
