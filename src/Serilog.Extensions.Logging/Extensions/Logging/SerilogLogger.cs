@@ -40,7 +40,7 @@ sealed class SerilogLogger : FrameworkLogger
         _provider = provider ?? throw new ArgumentNullException(nameof(provider));
 
         // If a logger was passed, the provider has already added itself as an enricher
-        _logger = logger ?? Serilog.Log.Logger.ForContext(new[] { provider });
+        _logger = logger ?? Serilog.Log.Logger.ForContext([provider]);
 
         if (name != null)
         {
@@ -91,7 +91,7 @@ sealed class SerilogLogger : FrameworkLogger
 
         var properties = new Dictionary<string, LogEventPropertyValue>();
 
-        if (state is IEnumerable<KeyValuePair<string, object>> structure)
+        if (state is IEnumerable<KeyValuePair<string, object?>> structure)
         {
             foreach (var property in structure)
             {
@@ -155,7 +155,7 @@ sealed class SerilogLogger : FrameworkLogger
 
         // The overridden `!=` operator on this type ignores `Name`.
         if (eventId.Id != 0 || eventId.Name != null)
-            properties.Add("EventId", _eventIdPropertyCache.GetOrCreatePropertyValue(in eventId));
+            properties["EventId"] = _eventIdPropertyCache.GetOrCreatePropertyValue(in eventId);
 
         var (traceId, spanId) = Activity.Current is { } activity ?
             (activity.TraceId, activity.SpanId) :
