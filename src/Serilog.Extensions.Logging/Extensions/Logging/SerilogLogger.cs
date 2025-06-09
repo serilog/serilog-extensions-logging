@@ -91,43 +91,27 @@ sealed class SerilogLogger : FrameworkLogger
 
         var properties = new Dictionary<string, LogEventPropertyValue>();
 
-        if (state is IEnumerable<KeyValuePair<string, object?>> structure)
+        // Optimization: MEL state object type represents either LogValues or FormattedLogValues
+        // These types implement IReadOnlyList, which be used to avoid enumerator obj allocation.
+        if (state is IReadOnlyList<KeyValuePair<string, object?>> propertiesList)
         {
-            foreach (var property in structure)
+            var length = propertiesList.Count;
+
+            for (var i = 0; i < length; i++)
             {
-                if (property is { Key: SerilogLoggerProvider.OriginalFormatPropertyName, Value: string value })
-                {
-                    messageTemplate = value;
-                }
-                else if (property.Key.StartsWith('@'))
-                {
-                    if (_logger.BindProperty(GetKeyWithoutFirstSymbol(DestructureDictionary, property.Key), property.Value, true, out var destructured))
-                        properties[destructured.Name] = destructured.Value;
-                }
-                else if (property.Key.StartsWith('$'))
-                {
-                    if (_logger.BindProperty(GetKeyWithoutFirstSymbol(StringifyDictionary, property.Key), property.Value?.ToString(), true, out var stringified))
-                        properties[stringified.Name] = stringified.Value;
-                }
-                else
-                {
-                    // Simple micro-optimization for the most common and reliably scalar values; could go further here.
-                    if (property.Value is null or string or int or long && LogEventProperty.IsValidName(property.Key))
-                        properties[property.Key] = new ScalarValue(property.Value);
-                    else if (_logger.BindProperty(property.Key, property.Value, false, out var bound))
-                        properties[bound.Name] = bound.Value;
-                }
+                ProcessStateProperty(propertiesList[i]);
             }
 
-            var stateType = state.GetType();
-            var stateTypeInfo = stateType.GetTypeInfo();
-            // Imperfect, but at least eliminates `1 names
-            if (messageTemplate == null && !stateTypeInfo.IsGenericType)
+            TrySetMessageTemplateFromState();
+        }
+        else if (state is IEnumerable<KeyValuePair<string, object?>> propertiesEnumerable)
+        {
+            foreach (var property in propertiesEnumerable)
             {
-                messageTemplate = "{" + stateType.Name + ":l}";
-                if (_logger.BindProperty(stateType.Name, AsLoggableValue(state, formatter), false, out var stateTypeProperty))
-                    properties[stateTypeProperty.Name] = stateTypeProperty.Value;
+                ProcessStateProperty(property);
             }
+
+            TrySetMessageTemplateFromState();
         }
 
         if (messageTemplate == null)
@@ -163,6 +147,46 @@ sealed class SerilogLogger : FrameworkLogger
 
         var parsedTemplate = messageTemplate != null ? MessageTemplateParser.Parse(messageTemplate) : MessageTemplate.Empty;
         return LogEvent.UnstableAssembleFromParts(DateTimeOffset.Now, level, exception, parsedTemplate, properties, traceId, spanId);
+
+        void ProcessStateProperty(KeyValuePair<string, object?> property)
+        {
+            if (property is { Key: SerilogLoggerProvider.OriginalFormatPropertyName, Value: string value })
+            {
+                messageTemplate = value;
+            }
+            else if (property.Key.StartsWith('@'))
+            {
+                if (this._logger.BindProperty(GetKeyWithoutFirstSymbol(DestructureDictionary, property.Key), property.Value, true, out var destructured))
+                    properties[destructured.Name] = destructured.Value;
+            }
+            else if (property.Key.StartsWith('$'))
+            {
+                if (this._logger.BindProperty(GetKeyWithoutFirstSymbol(StringifyDictionary, property.Key), property.Value?.ToString(), true, out var stringified))
+                    properties[stringified.Name] = stringified.Value;
+            }
+            else
+            {
+                // Simple micro-optimization for the most common and reliably scalar values; could go further here.
+                if (property.Value is null or string or int or long && LogEventProperty.IsValidName(property.Key))
+                    properties[property.Key] = new ScalarValue(property.Value);
+                else if (this._logger.BindProperty(property.Key, property.Value, false, out var bound))
+                    properties[bound.Name] = bound.Value;
+            }
+        }
+
+        void TrySetMessageTemplateFromState()
+        {
+            // Imperfect, but at least eliminates `1 names
+            var stateType = state.GetType();
+            var stateTypeInfo = stateType.GetTypeInfo();
+            // Imperfect, but at least eliminates `1 names
+            if (messageTemplate == null && !stateTypeInfo.IsGenericType)
+            {
+                messageTemplate = "{" + stateType.Name + ":l}";
+                if (_logger.BindProperty(stateType.Name, AsLoggableValue(state, formatter), false, out var stateTypeProperty))
+                    properties[stateTypeProperty.Name] = stateTypeProperty.Value;
+            }
+        }
     }
 
     static object? AsLoggableValue<TState>(TState state, Func<TState, Exception?, string>? formatter)
