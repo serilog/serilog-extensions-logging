@@ -105,13 +105,13 @@ public sealed class SerilogLoggerProvider : ILoggerProvider, ILogEventEnricher, 
 
         scopeCollector.ReverseItems();
 
-        _externalScopeProvider?.ForEachScope(static (state, parameters) =>
+        _externalScopeProvider?.ForEachScopeReversed(static (state, parameters) =>
         {
             SerilogLoggerScope.EnrichWithStateAndCreateScopeItem(
                 parameters.LogEvent,
                 parameters.PropertyFactory,
                 state,
-                update: true,
+                update: false,
                 out var scopeItem);
 
             if (scopeItem != null)
@@ -174,6 +174,21 @@ public sealed class SerilogLoggerProvider : ILoggerProvider, ILogEventEnricher, 
             var scopeItems = _scopeItems;
             _scopeItems = null;
             return scopeItems;
+        }
+    }
+}
+
+
+file static class Extensions
+{
+    public static void ForEachScopeReversed<TState>(this IExternalScopeProvider provider, Action<object?, TState> callback, TState state)
+    {
+        var list = new List<(object?, TState)>();
+        provider.ForEachScope((m, n) => list.Add((m, n)), state);
+
+        for (var i = list.Count - 1; i >= 0; i--)
+        {
+            callback(list[i].Item1, list[i].Item2);
         }
     }
 }
