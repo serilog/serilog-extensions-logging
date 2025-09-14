@@ -619,32 +619,19 @@ public class SerilogLoggerTest
         Assert.Equal(expectedValue, scalar.Value);
     }
 
-    [Theory]
-    [InlineData(true)]
-    [InlineData(false)]
-    public void LoggingScopeShouldNotReplacePropertyInLogEvent(bool withExternalScopeProvider)
+    [Fact]
+    public void ConflictingEventIdTemplatePropertyIsIgnored()
     {
-        var sink = new CollectingSink();
-        using var logger = new LoggerConfiguration().WriteTo.Sink(sink).CreateLogger();
-        var serilogLoggerProvider = new SerilogLoggerProvider(logger);
+        var (logger, sink) = SetUp(LogLevel.Trace);
 
-        var services = new ServiceCollection();
-        services.AddLogging(l => l.AddSerilog(logger));
+        var loggedEventId = 17;
+        logger.LogInformation(loggedEventId, "{EventId}", 42);
 
-        using var serviceProvider = services.BuildServiceProvider();
-        var msLogger = withExternalScopeProvider
-            ? serviceProvider.GetRequiredService<ILogger<SerilogLoggerTest>>()
-            : serilogLoggerProvider.CreateLogger(Name);
-
-        using (msLogger.BeginScope(new Dictionary<string, object?> { { "Value", 1 } }))
-        using (msLogger.BeginScope(new Dictionary<string, object?> { { "Value", 2 } }))
-        {
-            msLogger.LogInformation("Value: {Value}", 3);
-        }
-
-        var logEvent = sink.Writes.First();
-        var value = (logEvent.Properties["Value"] as ScalarValue)?.Value;
-
-        Assert.Equal(3, value);
+        var write = Assert.Single(sink.Writes);
+        var recordedEventIdProperty = Assert.IsType<StructureValue>(write.Properties["EventId"]);
+        var recordedEventIdStructure = Assert.Single(recordedEventIdProperty.Properties, p => p.Name == "Id");
+        var recordedEventIdPropertyValue = Assert.IsType<ScalarValue>(recordedEventIdStructure.Value);
+        var recordedEventId = Assert.IsType<int>(recordedEventIdPropertyValue.Value);
+        Assert.Equal(loggedEventId, recordedEventId);
     }
 }

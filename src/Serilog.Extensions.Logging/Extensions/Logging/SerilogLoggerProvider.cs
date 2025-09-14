@@ -24,6 +24,7 @@ public sealed class SerilogLoggerProvider : ILoggerProvider, ILogEventEnricher, 
     // May be null; if it is, Log.Logger will be lazily used
     readonly ILogger? _logger;
     readonly Action? _dispose;
+    readonly ThreadLocal<ScopeCollector> _scopeCollector = new(() => new ScopeCollector());
 #if FEATURE_ASYNCDISPOSABLE
     readonly Func<ValueTask>? _disposeAsync;
 #endif
@@ -90,35 +91,38 @@ public sealed class SerilogLoggerProvider : ILoggerProvider, ILogEventEnricher, 
     /// <inheritdoc />
     public void Enrich(LogEvent logEvent, ILogEventPropertyFactory propertyFactory)
     {
-        List<LogEventPropertyValue>? scopeItems = null;
+        var scopeCollector = _scopeCollector.Value!;
+
         for (var scope = CurrentScope; scope != null; scope = scope.Parent)
         {
             scope.EnrichAndCreateScopeItem(logEvent, propertyFactory, out var scopeItem);
 
             if (scopeItem != null)
             {
-                scopeItems ??= [];
-                scopeItems.Add(scopeItem);
+                scopeCollector.AddItem(scopeItem);
             }
         }
 
-        scopeItems?.Reverse();
+        scopeCollector.ReverseItems();
 
-        _externalScopeProvider?.ForEachScopeReversed((state, accumulatingLogEvent) =>
+        _externalScopeProvider?.ForEachScope(static (state, parameters) =>
         {
             SerilogLoggerScope.EnrichWithStateAndCreateScopeItem(
-                accumulatingLogEvent, propertyFactory, state, update: false, out var scopeItem);
+                parameters.LogEvent,
+                parameters.PropertyFactory,
+                state,
+                update: true,
+                out var scopeItem);
 
             if (scopeItem != null)
             {
-                scopeItems ??= new List<LogEventPropertyValue>();
-                scopeItems.Add(scopeItem);
+                parameters.ScopeCollector.AddItem(scopeItem);
             }
-        }, logEvent);
+        }, (ScopeCollector: scopeCollector, PropertyFactory: propertyFactory, LogEvent: logEvent));
 
-        if (scopeItems != null)
+        if (scopeCollector.Complete() is { } items)
         {
-            logEvent.AddPropertyIfAbsent(new LogEventProperty(ScopePropertyName, new SequenceValue(scopeItems)));
+            logEvent.AddPropertyIfAbsent(new LogEventProperty(ScopePropertyName, new SequenceValue(items)));
         }
     }
 
@@ -149,18 +153,27 @@ public sealed class SerilogLoggerProvider : ILoggerProvider, ILogEventEnricher, 
         return _disposeAsync?.Invoke() ?? default;
     }
 #endif
-}
 
-file static class Extensions
-{
-    public static void ForEachScopeReversed<TState>(this IExternalScopeProvider provider, Action<object?, TState> callback, TState state)
+    /// <summary>
+    /// A wrapper around a list to allow lazy initialization when iterating through scopes.
+    /// </summary>
+    sealed class ScopeCollector
     {
-        var list = new List<(object?, TState)>();
-        provider.ForEachScope((m, n) => list.Add((m, n)), state);
+        List<LogEventPropertyValue>? _scopeItems;
 
-        for (var i = list.Count - 1; i >= 0; i--)
+        public void AddItem(LogEventPropertyValue scopeItem)
         {
-            callback(list[i].Item1, list[i].Item2);
+            _scopeItems ??= [];
+            _scopeItems.Add(scopeItem);
+        }
+
+        public void ReverseItems() => _scopeItems?.Reverse();
+
+        public List<LogEventPropertyValue>? Complete()
+        {
+            var scopeItems = _scopeItems;
+            _scopeItems = null;
+            return scopeItems;
         }
     }
 }
