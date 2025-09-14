@@ -181,14 +181,26 @@ public sealed class SerilogLoggerProvider : ILoggerProvider, ILogEventEnricher, 
 
 file static class Extensions
 {
+    public static void TryClear<T>(this List<T> list)
+    {
+        if (list.Count > 0)
+            list.Clear();
+    }
+
+    private static readonly ThreadLocal<List<object?>> _list = new(() => []);
+
     public static void ForEachScopeReversed<TState>(this IExternalScopeProvider provider, Action<object?, TState> callback, TState state)
     {
-        var list = new List<(object?, TState)>();
-        provider.ForEachScope((m, n) => list.Add((m, n)), state);
+        var list = _list.Value!;
+        list.TryClear();
+
+        provider.ForEachScope((m, _) => list.Add(m), state);
 
         for (var i = list.Count - 1; i >= 0; i--)
         {
-            callback(list[i].Item1, list[i].Item2);
+            callback(list[i], state);
         }
+
+        list.TryClear();
     }
 }
