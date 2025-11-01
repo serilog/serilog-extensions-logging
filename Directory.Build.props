@@ -16,8 +16,6 @@
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-    <!-- Not required on .NET 10 GA, remove for 10.0.0 -->
-    <RestoreEnablePackagePruning Condition=" '$(TargetFramework)' == 'net462' ">false</RestoreEnablePackagePruning>
   </PropertyGroup>
   <ItemGroup Condition="'$(TargetFrameworkIdentifier)' == '.NETFramework'">
     <Reference Include="System" />
