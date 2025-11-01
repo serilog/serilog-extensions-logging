@@ -14,7 +14,7 @@
     <RootNamespace>Serilog</RootNamespace>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <!-- See https://github.com/NuGet/Home/issues/6001 -->
-    <NoWarn>NU5118;NU1510</NoWarn>
+    <NoWarn>NU5118</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
