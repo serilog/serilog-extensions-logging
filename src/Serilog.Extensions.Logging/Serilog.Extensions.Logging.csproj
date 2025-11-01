@@ -15,8 +15,6 @@
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <!-- See https://github.com/NuGet/Home/issues/6001 -->
     <NoWarn>NU5118</NoWarn>
-    <!-- Not required on .NET 10 GA -->
-    <RestoreEnablePackagePruning Condition=" '$(TargetFramework)' == 'net462' ">false</RestoreEnablePackagePruning>
   </PropertyGroup>
 
   <ItemGroup>
