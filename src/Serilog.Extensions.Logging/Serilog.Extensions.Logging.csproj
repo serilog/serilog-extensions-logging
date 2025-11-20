@@ -22,7 +22,7 @@
     <None Include="..\..\README.md" Pack="true" PackagePath="\" Visible="false" />
     <PackageReference Include="Serilog" Version="4.2.0" />
     <!-- The version of this reference must match the major and minor components of the package version prefix. -->
-    <PackageReference Include="Microsoft.Extensions.Logging" Version="10.0.0-*" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="10.0.0" />
   </ItemGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'net462' or '$(TargetFramework)' == 'netstandard2.0' ">
