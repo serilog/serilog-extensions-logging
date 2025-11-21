@@ -32,6 +32,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SampleWithExternalScope", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SampleWithMelProviders", "samples\SampleWithMelProviders\SampleWithMelProviders.csproj", "{B1454759-126F-4F33-84EE-C8E19541DF79}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{1990627E-914D-4072-A593-E1FCA2CE110D}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{E5A26872-83A7-43A8-8C7D-1C26E56A4FAF}"
+	ProjectSection(SolutionItems) = preProject
+		.github\workflows\ci.yml = .github\workflows\ci.yml
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -73,6 +80,7 @@ Global
 		{6D5986FF-EECD-4E75-8BC6-A5F78AB549B2} = {E30F638E-BBBE-4AD1-93CE-48CC69CFEFE1}
 		{653092A8-CBAD-40AA-A4CE-F8B19D6492C2} = {F2407211-6043-439C-8E06-3641634332E7}
 		{B1454759-126F-4F33-84EE-C8E19541DF79} = {F2407211-6043-439C-8E06-3641634332E7}
+		{E5A26872-83A7-43A8-8C7D-1C26E56A4FAF} = {1990627E-914D-4072-A593-E1FCA2CE110D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {811E61C5-3871-4633-AFAE-B35B619C8A10}
