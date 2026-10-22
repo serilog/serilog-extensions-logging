@@ -482,6 +482,39 @@ public class SerilogLoggerTest
         public string? LastName { get; set; }
     }
 
+    [Fact]
+    public void ScopesFromMultipleProvidersDisposedInOrderDoNotLeakIntoLogContext()
+    {
+        // Providers are marked by an always-present external scope, so that any provider
+        // left behind on the `LogContext` is visible on events logged through Serilog directly.
+        var externalScopes = new FakeExternalScopeProvider();
+        externalScopes.Push("external");
+
+        var provider1 = new SerilogLoggerProvider();
+        provider1.SetScopeProvider(externalScopes);
+        var provider2 = new SerilogLoggerProvider();
+        provider2.SetScopeProvider(externalScopes);
+
+        var logger1 = provider1.CreateLogger(Name);
+        var logger2 = provider2.CreateLogger(Name);
+
+        // Microsoft.Extensions.Logging disposes the scopes of multiple providers in the order they were begun.
+        var scope1 = logger1.BeginScope("Some property");
+        var scope2 = logger2.BeginScope("Some property");
+        scope1!.Dispose();
+        scope2!.Dispose();
+
+        var sink = new CollectingSink();
+        var plain = new LoggerConfiguration()
+            .Enrich.FromLogContext()
+            .WriteTo.Sink(sink)
+            .CreateLogger();
+        plain.Information(TestMessage);
+
+        var write = Assert.Single(sink.Writes);
+        Assert.False(write.Properties.ContainsKey(SerilogLoggerProvider.ScopePropertyName));
+    }
+
     class FakeExternalScopeProvider : IExternalScopeProvider
     {
         private readonly List<Scope> _scopes = new List<Scope>();

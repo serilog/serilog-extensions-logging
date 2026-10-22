@@ -5,7 +5,6 @@ using Microsoft.Extensions.Logging;
 using Serilog.Core;
 using Serilog.Events;
 using FrameworkLogger = Microsoft.Extensions.Logging.ILogger;
-using Serilog.Context;
 
 namespace Serilog.Extensions.Logging;
 
@@ -84,7 +83,7 @@ public sealed class SerilogLoggerProvider : ILoggerProvider, ILogEventEnricher, 
         // The outermost scope pushes and pops the Serilog `LogContext` - once
         // this enricher is on the stack, the `CurrentScope` property takes care
         // of the rest of the `BeginScope()` stack.
-        var popSerilogContext = LogContext.Push(this);
+        var popSerilogContext = SharedLogContextPush.Push(this);
         return new SerilogLoggerScope(this, state, popSerilogContext);
     }
 
