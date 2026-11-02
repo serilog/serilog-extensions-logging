@@ -20,7 +20,7 @@
   <ItemGroup>
     <None Include="..\..\assets\serilog-extension-nuget.png" Pack="true" PackagePath="" Visible="false" />
     <None Include="..\..\README.md" Pack="true" PackagePath="\" Visible="false" />
-    <PackageReference Include="Serilog" Version="4.2.0" />
+    <PackageReference Include="Serilog" Version="4.4.0" />
     <!-- The version of this reference must match the major and minor components of the package version prefix. -->
     <PackageReference Include="Microsoft.Extensions.Logging" Version="11.0.0-rc.2.26504.105" />
   </ItemGroup>
