@@ -1,4 +1,4 @@
-# Serilog.Extensions.Logging&nbsp;[![Build status](https://github.com/serilog/serilog-extensions-logging/actions/workflows/ci.yml/badge.svg?branch=dev)](https://github.com/serilog/serilog-extensions-logging/actions)&nbsp;[![NuGet Version](http://img.shields.io/nuget/v/Serilog.Extensions.Logging.svg?style=flat)](https://www.nuget.org/packages/Serilog.Extensions.Logging/)
+# Serilog.Extensions.Logging&nbsp;[![Build status](https://github.com/serilog/serilog-extensions-logging/actions/workflows/publish.yml/badge.svg?branch=dev)](https://github.com/serilog/serilog-extensions-logging/actions)&nbsp;[![NuGet Version](http://img.shields.io/nuget/v/Serilog.Extensions.Logging.svg?style=flat)](https://www.nuget.org/packages/Serilog.Extensions.Logging/)
 
 A Serilog provider for [Microsoft.Extensions.Logging](https://www.nuget.org/packages/Microsoft.Extensions.Logging).
 
