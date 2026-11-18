@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net8.0;net9.0;net10.0</TargetFrameworks>
+    <TargetFrameworks>net10.0;net11.0</TargetFrameworks>
     <GenerateDocumentationFile>false</GenerateDocumentationFile>
   </PropertyGroup>
 
@@ -13,7 +13,7 @@
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.0.0" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2" PrivateAssets="All" />
     <PackageReference Include="xunit" Version="2.9.3" />
-    <PackageReference Include="BenchmarkDotNet" Version="0.15.5" />
+    <PackageReference Include="BenchmarkDotNet" Version="0.16.0-preview.2" />
   </ItemGroup>
 
 </Project>
